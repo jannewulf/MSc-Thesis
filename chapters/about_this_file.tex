@@ -1,0 +1,34 @@
+\chapter{Über diese Datei}
+Die Datei \file{DEMO-TUDaThesis.tex} ist ein Template für Abschlussarbeiten im Stil des Corporate Designs der TU Darmstadt.
+Sie ist Teil des TUDa-CI-Bundles wurde vom in Teilen tuddesign-Paket von C.~v.~Loewenich und J.~Werner inspiriert.
+
+Sie verwendet die Dokumentenklasse \file{tudapub.cls}, allerdings mit erweiterten Einstellungen. In diesem Dokument werden überwiegend die speziell auf Abschlussarbeiten ausgelegten Möglichkeiten beschrieben. Weitere Konfigurationsmöglichkeiten finden sich in der Datei \file{DEMO-TUDaPub.pdf} \cite{tudapub}.
+
+Es ist voreingestellt, dass eine PDF/A-Datei erzeugt wird. Die beste Kompatibilität hierfür bietet Lua\LaTeX. Bei anderen Compilern kann dies entsprechend der Informationen in DEMO-TUDaPub zu Problemen führen. In diesem Fall sollte entweder der Compiler gewechselt oder \code{pdfa=false} aktiviert werden.
+
+Für weitere Informationen kann ein Blick in die zur Dokumentenklasse gehörigen Dokumentation (tudapub.pdf) hilfreich sein. Sie wird zusammen mit den Quelldateien verteilt.
+
+\minisec{Unterschiede der Demodateien DEMO-TUDaThesis und DEMO-TUDaPhD}
+Zwar basieren alle drei DEMO-Dateien auf der Klasse \code{tudapub}, allerdings sind die Basiseinstelungen dem Dokumententyp angepasst.
+Für Erläuterungen zu den TUDaPub spezifischen Optionen, sei auf die Datei DEMO-TUDaPub verwiesen.
+Da die Basisklasse für beide identisch ist, kann jede Option abgeändert werden. Die Folgende Liste zeigt lediglich die gezeigten Features bei Standardeinstellungen.
+
+\noindent\begin{tabularx}{\linewidth}{@{}p{.25\linewidth}*3{>{\centering\arraybackslash}X}@{}}
+	\toprule
+	Option&DEMO-TUDaThesis&DEMO-TUDaPhD&DEMO-TUDapub\\
+	\midrule
+	twoside&\FeatureFalse&\FeatureTrue&\FeatureFalse\\\midrule
+	parskip&\FeatureTrue&\FeatureFalse&\FeatureTrue\\\midrule
+	Kolophon&\FeatureFalse&\FeatureTrue&\FeatureFalse\\\midrule
+	Widmung&\FeatureFalse&\FeatureTrue&\FeatureFalse\\\midrule
+	Schriftgröße&11pt&11pt&9pt\\\midrule
+	ruledheaders&section&chapter&all\\\midrule
+	Basisklasse&scrreprt&scrbook&scrartcl\\\midrule
+	thesis&\ttfamily type=bachelor&\ttfamily type=dr, dr=rernat
+	&\FeatureFalse\\\midrule
+	marginpar&\FeatureFalse&\FeatureFalse&\FeatureTrue\\\midrule
+	Affidavit\newline\rlap{(Selbstständigkeitserklärung)}&\FeatureTrue&\FeatureTrue&\FeatureFalse\\\midrule
+	abstract&\FeatureFalse&\FeatureTrue&\FeatureTrue\\\midrule
+	custommargins&\FeatureTrue&\FeatureTrue&\FeatureFalse\\
+	\bottomrule
+\end{tabularx}

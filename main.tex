@@ -1,0 +1,109 @@
+%% This is file `DEMO-TUDaThesis.tex' version 3.07 (2020/10/21),
+%% it is part of
+%% TUDa-CI -- Corporate Design for TU Darmstadt
+%% ----------------------------------------------------------------------------
+%%
+%%  Copyright (C) 2018--2020 by Marei Peischl <marei@peitex.de>
+%%
+%% ============================================================================
+%% This work may be distributed and/or modified under the
+%% conditions of the LaTeX Project Public License, either version 1.3c
+%% of this license or (at your option) any later version.
+%% The latest version of this license is in
+%% http://www.latex-project.org/lppl.txt
+%% and version 1.3c or later is part of all distributions of LaTeX
+%% version 2008/05/04 or later.
+%%
+%% This work has the LPPL maintenance status `maintained'.
+%%
+%% The Current Maintainers of this work are
+%%   Marei Peischl <tuda-ci@peitex.de>
+%%   Markus Lazanowski <latex@ce.tu-darmstadt.de>
+%%
+%% The development respository can be found at
+%% https://github.com/tudace/tuda_latex_templates
+%% Please use the issue tracker for feedback!
+%%
+%% If you need a compiled version of this document, have a look at
+%% http://mirror.ctan.org/tex-archive/macros/latex/contrib/tuda-ci/doc
+%% or at the documentation directory of this package (if installed)
+%% <path to your LaTeX distribution>/doc/latex/tuda-ci
+%% ============================================================================
+%%
+% !TeX program = lualatex
+%%
+
+\documentclass[
+	%ngerman,
+	ruledheaders=section,%Ebene bis zu der die Überschriften mit Linien abgetrennt werden, vgl. DEMO-TUDaPub
+	class=report,% Basisdokumentenklasse. Wählt die Korrespondierende KOMA-Script Klasse
+	thesis={type=master},% Dokumententyp Thesis, für Dissertationen siehe die Demo-Datei DEMO-TUDaPhd
+	accentcolor=9c,% Auswahl der Akzentfarbe
+	custommargins=true,% Ränder werden mithilfe von typearea automatisch berechnet
+	marginpar=false,% Kopfzeile und Fußzeile erstrecken sich nicht über die Randnotizspalte
+	%BCOR=5mm,%Bindekorrektur, falls notwendig
+	parskip=half-,%Absatzkennzeichnung durch Abstand vgl. KOMA-Sript
+	fontsize=11pt,%Basisschriftgröße laut Corporate Design ist mit 9pt häufig zu klein
+	logofile=img/tuda_logo, %Falls die Logo Dateien nicht vorliegen
+]{tudapub}
+
+
+\input{includes}
+\input{definitions}
+
+% Select includes
+\includeonly{
+    %chapters/about_this_file,
+    %chapters/template_usage,
+    chapters/background,
+    chapters/related_work,
+    chapters/evaluation
+}
+
+\bibliography{bibliography}
+
+\begin{document}
+
+\Metadata{
+	title=Automatic compiler customization for novel hardware,
+	author=Janne Wulf
+}
+
+\title{Automatic compiler customization for novel hardware}
+\subtitle{Automatische Anpassung von Compilern für neuartige Hardwarearchitekturen}
+\author[J. Wulf]{Janne Wulf}%optionales Argument ist die Signatur,
+\birthplace{Oldenburg in Holstein}%Geburtsort, bei Dissertationen zwingend notwendig
+\reviewer{Dr. rer. nat. Stefan Guthe \and  Daniel Thuerck}%Gutachter
+
+%Diese Felder erden untereinander auf der Titelseite platziert.
+%\department ist eine notwendige Angabe, siehe auch dem Abschnitt `Abweichung von den Vorgaben für die Titelseite'
+\department{inf} % Das Kürzel wird automatisch ersetzt und als Studienfach gewählt, siehe Liste der Kürzel im Dokument.
+%\institute{Graphics, Capture and Massively Parallel Computing}
+%\group{Arbeitsgruppe}
+
+\submissiondate{August 9, 2021}
+\examdate{\today}
+
+%	\tuprints{urn=1234,printid=12345,doi=10.25534/tuprints-1234}
+%	\dedication{Für alle, die \TeX{} nutzen.}
+
+\maketitle
+
+\affidavit% oder \affidavit[digital] falls eine rein digitale Abgabe vorgesehen ist.
+
+\tableofcontents
+
+\listoftodos
+
+\include{chapters/about_this_file}
+\include{chapters/template_usage}
+\include{chapters/background}
+\include{chapters/related_work}
+\include{chapters/evaluation}
+
+\chapter*{Acronyms}
+\input{acronyms}
+
+\printbibliography
+
+\end{document}

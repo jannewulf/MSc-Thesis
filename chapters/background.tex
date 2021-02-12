@@ -1,0 +1,62 @@
+\chapter{Background}
+% NOTE: Assume that the reader has common computer science knowledge!
+In this chapter we are introducing knowledge which is required to understand the content of this thesis.
+In \cref{sec:bg:compilers} we give an overview about how a compiler is typically implemented and which problems it has to solve that we want to tackle.
+\todo{explain also the other sections}
+
+\section*{Motivation?}
+\cite{goodman1988code} state the important interdependence between instruction scheduling and register allocation.
+
+\section{Compilers}
+\label{sec:bg:compilers}
+%What is a compiler? \\
+% \todo{This is probably too basic and not required. Might maybe be used in introduction, though}
+% In the early days of computer programming, computers were programmed in assembly languages.
+% These languages are exclusive to specific processor architectures and only provide the instructions that are available by the \ac{isa} of the processor.
+% This approach has several disadvantages.
+% Lots of complicated code, that is hard to understand, is written to express even simple programs.
+% Also, each program has to be rewritten to execute on a processor with another architecture.
+%
+% Nowadays computers are programmed---almost exclusively---in high-level programming languages like C/C++, Java, Python, etc.
+% The processor is not able to execute code written in such high-level programming languages, though.
+% For this reason a compiler has to translate the code into a format that the processor can understand.
+Making computer programs, written in high-level programming languages, executable on a specific machine is not a trivial task.
+Compilers are only one piece in the tool-chain required to make a program executable.
+The compiler translates the high-level language into assembly language, which is translated into object code by the assembler.
+Basic functionality like allocating memory or outputting strings on the screen is implemented in a standard library.
+The object code of the standard library and potentially other libraries are linked together with the translated program by the linker.
+
+%Why are compilers important? \\
+The pure translation of the program is only one of the tasks a compiler has to fulfill.
+
+
+
+
+What are the different tasks a compiler has? \\
+How are compilers usually implemented? (Front-End, ...)\\
+Front End \\
+Optimization \\ 
+Back End \\
+Instruction Scheduling\\
+Register Allocation
+
+%\subsection{Front End}
+%\subsection{Optimizer}
+%\subsection{Back End}
+
+\subsection{Instruction Scheduling}
+Add Example: e.g. see \url{https://youtu.be/brpomKUynEA?t=271}
+
+\subsection{Register Allocation}
+
+\section{LLVM Compiler Infrastructure}
+\subsection{Intermediate Representation}
+\subsection{Instruction Selection DAG}
+\missingfigure[figwidth=\linewidth]{Selection DAG}
+\subsection{Pre-RA-Scheduling}
+Welche gibt es?\\
+Wie funktionieren sie?\\
+Welche Infos nutzen sie?\\
+\subsection{Post-RA-Scheduling}
+
+\section{Reinforcement Learning}

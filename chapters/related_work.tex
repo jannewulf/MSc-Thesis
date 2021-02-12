@@ -1,0 +1,95 @@
+\chapter{Related Work}
+\section{Instruction Scheduling}
+\subsection*{Code scheduling and register allocation in large basic blocks}\cite{goodman1988code}
+\subsection*{Learning Instruction Scheduling Heuristics from Optimal Data}\cite{russell2006learning}
+\subsection*{Learning to schedule straight-line code}\cite{moss1998learning}
+\subsection*{Using Genetic Algorithms to Fine-Tune Instruction-Scheduling Heuristics}\cite{beaty1996using}
+
+\section{Register Allocation}
+\subsection*{Deep Learning-based Hybrid Graph-Coloring Algorithm for Register Allocation}\cite{das2019deep}
+\subsection*{Graph colouring meets deep learning: Effective graph neural network models for combinatorial problems}\cite{lemos2019graph}
+\subsection*{Register Allocation for Intel Processor Graphics}\cite{chen2018register}
+
+\section{Compiler Phase-Ordering}
+%Static neural compiler optimization via deep reinforcement learning~\cite{mammadli2020static}\\
+% - Uses only static information extracted from IR 
+% - IR embedded by using ben2018neural
+% - Use deep q learning
+% - training is executed by running the modified IR and measure the speedup 
+% - reward is defined as ln(T(s_t)/T(s_t+1)) with T being the runtime
+
+
+\subsection*{Autophase: Compiler phase-ordering for hls with deep reinforcement learning}\cite{huang2019autophase}
+
+\section{Code Representation}
+For making use of data driven techniques in the area of compiler optimization, it is required to somehow extract features from the code to make it accessible for data driven algorithms.
+Older works usually made use of approaches that used hand-tuned features.
+\todo{Maybe add references used in https://chriscummins.cc/u/ed/phd-thesis.pdf (3.3.2.1)}
+
+Recent works are inspired by the advances in the the field of \ac{nlp}, which are caused by neural networks and continuous distributed vectors (referred to as embeddings) \eg, word2vec~\cite{mikolov2013efficient}. 
+Although, human language is different from codes of programming languages in many aspects, embeddings prove to be useful in code related tasks, too.
+
+Code inputs may be used directly in a high-level programming language or in an \ac{ir} (\eg, LLVM-IR~\cite{LLVM:CGO04}).
+The advantage of using an \ac{ir} is that it is independent of the source programming language and the target architecture.
+
+%Overviews:
+%\begin{itemize}
+%    \item ProGraML Paper under Motivation
+%    \item https://chriscummins.cc/u/ed/phd-thesis.pdf (3.3.2.1)
+%    \item https://arxiv.org/pdf/1904.03061.pdf
+%\end{itemize}
+
+Most approaches for representing high-level language code use some sort of the \ac{ast} in combination with various learning mechanisms.
+%code2vec: Learning distributed representations of code \cite{alon2019code2vec}
+% - works on source code
+% - sensitive to identifier names
+Alon et al.~\cite{alon2019code2vec} used paths of the \ac{ast} in combination with a Attention Neural Network model.
+Others have used the \ac{ast} in combination with Gated Graph Neural Networks~\cite{ye2020deep, allamanis2017learning}, with Support Vector Machines~\cite{park2012using} or with \ac{lstm} Networks for tree structures~\cite{dam2018deep}.
+%\cite{ye2020deep} % Deep Program Structure Modeling Through Multi-RelationalGraph-based Learning, graph-based deep learning (Gated Graph Neural Networks), AST
+%\cite{allamanis2017learning} % LEARNING  TO REPRESENT PROGRAMS WITH GRAPHS, graph-based deep learning (Gated Graph Neural Networks), AST
+%\cite{dam2018deep} % A deep tree-based model for software defect prediction, AST, tree-LSTM
+%\cite{park2012using} % Using Graph-Based ProgramCharacterization for Predictive Modeling, SVM
+
+%Neural code comprehension: A learnable representation of code semantics \cite{ben2018neural}
+% - Defines embedding space inst2vec
+% - Encodes LLVM-IR, independent of source programming language
+% - Leveraging data- and control flow (Contextual Flow Graphs)
+% - Use RNN
+% - Analyze the embeddings qualitatively using analogies and clustering, and evaluate the learned representation on three different high-level tasks
+% - See description in ProGraML Paper under Motivation
+With Neural Code Comprehension (inst2vec)~\cite{ben2018neural}, Ben-Nun et al. defined an embedding space for the LLVM-IR.
+Relevant information to discover code semantics are data and control flow. 
+To emphasize the semantics, the data and control flow are represented in a novel graph structure, called \acp{xfg}.
+%Before building the \ac{xfg}, the LLVM-IR code is split into basic blocks, so diverging control flow is eliminated.
+The context of an individual statement, with size $N$, is defined as the statement and its graph neighbors that are connected by a path of length $N$.
+This statement is then mapped to its embedding by using the skip-gram model~\cite{mikolov2013distributed}, which are known to work good in \ac{nlp} tasks.
+The \ac{xfg} captures features like data and control dependence's, instructions and data types, which are important for our task.
+
+\subsection*{ProGraML: Graph-based Deep Learning for Program Optimization and Analysis}\cite{cummins2020programl}
+%\begin{itemize}
+%    \item approach is insensitive to identifier names and preserves operand order and type information
+%    \item compared to inst2vec, it can do the same plus preserve operand order, important to distinguish non-commutative ops
+%    \item represent programs as directed multigraphs where statements, identifiers, and immediate values are vertices, and relations between vertices are edge
+%    \item encode IR into a graph which will be consumed by a Message Passing Neural Network to execute some task
+%\end{itemize}
+\todo{Write RW text for ProGraML}
+
+\subsection*{Compiler-based graph representations for deep learning models of code}\cite{brauckmann2020compiler}
+\todo{Find Paper PDF and write text}
+
+%IR2Vec: A Flow Analysis based Scalable Infrastructure for Program Encodings \cite{keerthy2019ir2vec}
+%\begin{itemize}
+%    \item Abstracts away the width of the datatype
+%\end{itemize}
+IR2Vec~\cite{keerthy2019ir2vec} is another approach that maps an \ac{ir} to a embedding space.
+\todo{Write roughly how IR2Vec works}[...]
+However, the datatype size, which is important for code optimizations, is abstracted away during the embedding process.
+
+\section{Applied Machine Learning on Code}
+\subsection*{Ithemal Accurate, portable and fast basic block throughput estimation using deep neural networks}\cite{mendis2019ithemal}
+\subsection*{NeuroVectorizer: End-to-End Vectorization with DeepReinforcement Learning}\cite{haj2020neurovectorizer}
+\subsection*{From Loop Fusion to Kernel Fusion: A Domain-Specific Approach to Locality Optimization}\cite{qiao2019loop}
+\subsection*{A Machine Learning Approach for Performance Prediction and Scheduling on Heterogeneous CPUs}\cite{nemirovsky2017machine}
+
+
+
