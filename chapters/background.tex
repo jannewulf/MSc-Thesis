@@ -2,10 +2,12 @@
 % NOTE: Assume that the reader has common computer science knowledge!
 In this chapter we are introducing knowledge which is required to understand the content of this thesis.
 In \cref{sec:bg:compilers} we give an overview about how a compiler is typically implemented and which problems it has to solve that we want to tackle.
+The \crefrange{sec:bg:compilers:frontend}{sec:bg:compilers:optimizer} give a superficial overview of the first two phases of a typical compiler.
+\Cref{sec:bg:compilers:backend} gives a more detailed introduction to compiler back ends, which we aim to optimize in this thesis.
 \todo{explain also the other sections}
 
-\section*{Motivation?}
-\cite{goodman1988code} state the important interdependence between instruction scheduling and register allocation.
+%\section{Motivation?}
+%\cite{goodman1988code} state the important interdependence between instruction scheduling and register allocation.
 
 \section{Compilers}
 \label{sec:bg:compilers}
@@ -20,34 +22,51 @@ In \cref{sec:bg:compilers} we give an overview about how a compiler is typically
 % Nowadays computers are programmed---almost exclusively---in high-level programming languages like C/C++, Java, Python, etc.
 % The processor is not able to execute code written in such high-level programming languages, though.
 % For this reason a compiler has to translate the code into a format that the processor can understand.
-Making computer programs, written in high-level programming languages, executable on a specific machine is not a trivial task.
+Making computer programs, that are written in high-level programming languages~(\eg C/C++, Java, Rust), executable on a specific machine is not a trivial task.
 Compilers are only one piece in the tool-chain required to make a program executable.
 The compiler translates the high-level language into assembly language, which is translated into object code by the assembler.
 Basic functionality like allocating memory or outputting strings on the screen is implemented in a standard library.
 The object code of the standard library and potentially other libraries are linked together with the translated program by the linker.
+There is more required to execute the code on a specific machine (\eg a runtime library), but explaining this would go beyond the scope of this thesis.
 
 %Why are compilers important? \\
+%What are the different tasks a compiler has? \\
 The pure translation of the program is only one of the tasks a compiler has to fulfill.
+It also has to assure that the program is written in correct syntax of the high-level language.
+Most compilers will also optimize the given code and the translated code since a simple one-to-one translation would have a very poor performance.
+Eventually there has to be a mapping from variables and to the main memory and the processors registers.
+These are all by itself complex problems which are handled by a compiler.
+
+%How are compilers usually implemented? (Front-End, ...)\\
+Compilers are usually implemented in different phases to seperate the different tasks and have a structured approach.
+A common approach to structure a compiler is by having a front end~(\cref{sec:bg:compilers:frontend}), an optional optimization~(\cref{sec:bg:compilers:optimizer}) and a back end phase~(\cref{sec:bg:compilers:backend}).
+These phases are explained in more detail in the following sub sections.
+
+\subsection{Front End}
+\label{sec:bg:compilers:frontend}
+The front end phase is the first step in the translation process.
+Its implementation is dependent on the source language that has to be translated.
+A typical front end includes a scanner, a syntax checker/parser, a context-sensitive analysis and translation into a \ac{ir}.
+The scanner translates a stream of characters into a stream of tokens that are classified as parts of the source language.
+These tokens are then taken by the parser and are checked against the grammer defined by the source language.
+Even with a syntactically correct program, there can still be errors in the code, \eg assignments of incompatible types.
+These are checked during the context-sensitive analysis phase.
+Eventually, the source code is translated into some kind of a \ac{ir} which will be used as input to the optimizer and the back end.
+
+There might be additional steps required depending on the source language.
+C/C++ compilers, for example, use a preprocessor to replace macros like \lstinline[language=C]|#include| and \lstinline[language=C]|#define| with their actual values.
+
+\subsection{Optimizer}
+\label{sec:bg:compilers:optimizer}
 
 
+\subsection{Back End}
+\label{sec:bg:compilers:backend}
 
-
-What are the different tasks a compiler has? \\
-How are compilers usually implemented? (Front-End, ...)\\
-Front End \\
-Optimization \\ 
-Back End \\
-Instruction Scheduling\\
-Register Allocation
-
-%\subsection{Front End}
-%\subsection{Optimizer}
-%\subsection{Back End}
-
-\subsection{Instruction Scheduling}
+\subsubsection{Instruction Scheduling}
 Add Example: e.g. see \url{https://youtu.be/brpomKUynEA?t=271}
 
-\subsection{Register Allocation}
+\subsubsection{Register Allocation}
 
 \section{LLVM Compiler Infrastructure}
 \subsection{Intermediate Representation}
