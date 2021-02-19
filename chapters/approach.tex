@@ -1,0 +1,23 @@
+\chapter{Approach}
+
+\section{Breaking down the problem (maybe just chapter introduction)}
+\begin{itemize}
+    \item Schedulers run on basic blocks -> Select the most executed BB's
+\end{itemize}
+
+\section{Experimentation Pipeline}
+Explain and illustrate the pipeline incl. injection of timers and counters
+
+\section{Benchmarking}
+\begin{itemize}
+    \item Benchmarking methods: Instrumentation, sampling -> only instrumentation makes sense here
+    \item Where to inject timer in BB DAG
+    \begin{itemize}
+        \item We only want to measure optimized code, but not too kleinteilig because of lacking accuracy. Problematic code is IO code
+        \item Time whole function?
+        \item Time only relevant BB's with surrounding ones (e.g., loop headers) -> Where exactly place the the timer
+        \item Provide data and examples to demonstrate decision making
+    \end{itemize} 
+\end{itemize}
+\subsection{Implementation}
+Injection of the \lstinline[language=C++]|std::chrono::high_resolution_clock|
