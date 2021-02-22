@@ -10,6 +10,7 @@ The \crefrange{sec:bg:compilers:frontend}{sec:bg:compilers:optimizer} give a sup
 %\cite{goodman1988code} state the important interdependence between instruction scheduling and register allocation.
 
 \section{CPU Functionality}
+\label{sec:bg:cpu}
 ISA\\
 Memory and Registers\\
 How do CPUs work in general? -> Fetch, Decode, etc.\\
@@ -75,11 +76,19 @@ They range from rather simple optimizations, like replacing constant variables w
 
 \subsection{Back End}
 \label{sec:bg:compilers:backend}
+The compilers back end takes the \ac{ir} as input and emits code for the target hardware and decides which variables will reside in registers only and which ones reside in memory.
+This last step consists of three main tasks.
+
+The first step is the instruction selection.
+Instruction selection translates the operations of the \ac{ir} to operations of the \ac{isa} of the target hardware.
+The next steps, instruction scheduling and register allocation are explained in a little more detail as they represent the main topic of this thesis.
 
 \subsubsection{Instruction Scheduling}
-Add Example: e.g. see \url{https://youtu.be/brpomKUynEA?t=271}
+Add Example: e.g. see \url{https://youtu.be/brpomKUynEA?t=271} \\
+Probably best to introduce an example in the \cref{sec:bg:cpu} and reuse/extend it here.
 
 \subsubsection{Register Allocation}
+The usage of an infinite amount of virtual registers in the \ac{ir} was ignored in the instruction selection step.
 
 \section{LLVM Compiler Infrastructure}
 \subsection{Intermediate Representation}
