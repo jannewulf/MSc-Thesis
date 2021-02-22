@@ -64,7 +64,14 @@ C/C++ compilers, for example, use a preprocessor to replace macros like \lstinli
 
 \subsection{Optimizer}
 \label{sec:bg:compilers:optimizer}
-
+The usage of a \ac{ir}, not only abstracts away the source language and the target hardware, but also permits to apply more passes in the compilation process.
+These addition passes transform \ac{ir} to \ac{ir}.
+Note that this step is optional and not required to produce correct translations.
+The purpose of this step is to optimize the code, in a source and target independent manner, for more efficient execution.
+Efficient can mean different things here. % \eg faster, lower memory usage, lower energy consumption.
+The transformed code might produce, \eg a faster program, a program that is smaller in size, or a program with less power consumption.
+There exist a large amount of optimization passes in most compilers.
+They range from rather simple optimizations, like replacing constant variables with their actual value, to more advanced ones that might, for example, simpliy computations with the rules of algebra.
 
 \subsection{Back End}
 \label{sec:bg:compilers:backend}
