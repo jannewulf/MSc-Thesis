@@ -11,6 +11,50 @@ The \crefrange{sec:bg:compilers:frontend}{sec:bg:compilers:optimizer} give a sup
 
 \section{CPU Functionality}
 \label{sec:bg:cpu}
+\begin{table}
+    \centering
+    \begin{tabular}{cclcl} 
+        \toprule
+        Start & Occupied & \multicolumn{3}{l}{Instruction} \\
+        Cycle &  Cycles &&&\\
+        \midrule
+        1  & 1-3   & \lstinline|load $a| & \rightarrow & \lstinline|a| \\
+        4  & 4-5   & \lstinline|mul a, a| & \rightarrow & \lstinline|a| \\
+        5  & 5-7   & \lstinline|load $b| & \rightarrow & \lstinline|b| \\
+        8  & 8-9   & \lstinline|mul b, b| & \rightarrow & \lstinline|b| \\
+        9  & 9-11  & \lstinline|load $c| & \rightarrow & \lstinline|c| \\
+        12 & 12-13 & \lstinline|mul c, c| & \rightarrow & \lstinline|c| \\
+        13 & 13    & \lstinline|add a, b| & \rightarrow & \lstinline|a| \\
+        14 & 14    & \lstinline|add a, c| & \rightarrow & \lstinline|a| \\
+        15 & 15-17 & \lstinline|store a| & \rightarrow & \lstinline|$a| \\
+        \bottomrule
+    \end{tabular}
+    \caption{Unscheduled example \lstinline|a=a*a+b*b+c*c|}
+    \label{table:1}
+\end{table}
+
+\begin{table}
+    \centering
+    \begin{tabular}{cclcl} 
+        \toprule
+        Start & Occupied & \multicolumn{3}{l}{Instruction} \\
+        Cycle &  Cycles &&&\\
+        \midrule
+        1 & 1-3  & \lstinline|load $a| & \rightarrow & \lstinline|a| \\
+        2 & 2-4  & \lstinline|load $b| & \rightarrow & \lstinline|b| \\
+        3 & 3-5  & \lstinline|load $c| & \rightarrow & \lstinline|c| \\
+        4 & 4-5  & \lstinline|mul a, a| & \rightarrow & \lstinline|a| \\
+        5 & 5-6  & \lstinline|mul b, b| & \rightarrow & \lstinline|b| \\
+        6 & 6-7  & \lstinline|mul c, c| & \rightarrow & \lstinline|c| \\
+        7 & 7    & \lstinline|add a, b| & \rightarrow & \lstinline|a| \\
+        8 & 8    & \lstinline|add a, c| & \rightarrow & \lstinline|a| \\
+        9 & 9-11 & \lstinline|store a| & \rightarrow & \lstinline|$a| \\
+        \bottomrule
+    \end{tabular}
+    \caption{Scheduled example \lstinline|a=a*a+b*b+c*c|}
+    \label{table:1}
+\end{table}
+
 ISA\\
 Memory and Registers\\
 How do CPUs work in general? -> Fetch, Decode, etc.\\
