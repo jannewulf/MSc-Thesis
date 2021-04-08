@@ -11,6 +11,39 @@ The \crefrange{sec:bg:compilers:frontend}{sec:bg:compilers:optimizer} give a sup
 
 \section{CPU Functionality}
 \label{sec:bg:cpu}
+
+
+\begin{figure}
+    \centering
+
+    % TODO: move these definitions somewhere else?
+    \definecolor{darkgray}{HTML}{3D4752}
+    \tikzstyle{instr} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered, text=white, fill=darkgray]
+    \tikzstyle{arrow} = [thick,->,>=stealth]
+    \begin{tikzpicture}[node distance=2cm]
+        \node (load_a) [instr] {\lstinline|load $a|};
+        \node (mul_a_a) [instr, below of=load_a] {\lstinline|mul|};
+        \node (load_b) [instr, right of=load_a, xshift=3cm] {\lstinline|load $b|};
+        \node (mul_b_b) [instr, below of=load_b] {\lstinline|mul|};
+        \node (load_c) [instr, right of=load_b, xshift=3cm] {\lstinline|load $c|};
+        \node (mul_c_c) [instr, below of=load_c] {\lstinline|mul|};
+        \node (add_a_b) [instr, below of=mul_b_b] {\lstinline|add|};
+        \node (add_ab_c) [instr, below of=add_a_b] {\lstinline|add|};
+        \node (store) [instr, below of=add_ab_c] {\lstinline|store $a|};
+        
+        \draw [arrow] (mul_a_a) -- (load_a);
+        \draw [arrow] (mul_b_b) -- (load_b);
+        \draw [arrow] (mul_c_c) -- (load_c);
+        \draw [arrow] (add_a_b) -- (mul_a_a);
+        \draw [arrow] (add_a_b) -- (mul_b_b);
+        \draw [arrow] (add_ab_c) -- (add_a_b);
+        \draw [arrow] (add_ab_c) -- (mul_c_c);
+        \draw [arrow] (store) -- (add_ab_c);    
+    \end{tikzpicture}
+    \caption{Example DAG a=a*a+b*b+c*c}
+    \label{fig:example_dag}
+\end{figure}
+
 \begin{table}
     \centering
     \begin{tabular}{cclcl} 
@@ -18,15 +51,15 @@ The \crefrange{sec:bg:compilers:frontend}{sec:bg:compilers:optimizer} give a sup
         Start & Occupied & \multicolumn{3}{l}{Instruction} \\
         Cycle &  Cycles &&&\\
         \midrule
-        1  & 1-3   & \lstinline|load $a| & \rightarrow & \lstinline|a| \\
+        1  & 1-3   & \lstinline|load $a|  & \rightarrow & \lstinline|a| \\
         4  & 4-5   & \lstinline|mul a, a| & \rightarrow & \lstinline|a| \\
-        5  & 5-7   & \lstinline|load $b| & \rightarrow & \lstinline|b| \\
+        5  & 5-7   & \lstinline|load $b|  & \rightarrow & \lstinline|b| \\
         8  & 8-9   & \lstinline|mul b, b| & \rightarrow & \lstinline|b| \\
-        9  & 9-11  & \lstinline|load $c| & \rightarrow & \lstinline|c| \\
+        9  & 9-11  & \lstinline|load $c|  & \rightarrow & \lstinline|c| \\
         12 & 12-13 & \lstinline|mul c, c| & \rightarrow & \lstinline|c| \\
         13 & 13    & \lstinline|add a, b| & \rightarrow & \lstinline|a| \\
         14 & 14    & \lstinline|add a, c| & \rightarrow & \lstinline|a| \\
-        15 & 15-17 & \lstinline|store a| & \rightarrow & \lstinline|$a| \\
+        15 & 15-17 & \lstinline|store a|  & \rightarrow & \lstinline|$a| \\
         \bottomrule
     \end{tabular}
     \caption{Unscheduled example \lstinline|a=a*a+b*b+c*c|}
@@ -40,15 +73,15 @@ The \crefrange{sec:bg:compilers:frontend}{sec:bg:compilers:optimizer} give a sup
         Start & Occupied & \multicolumn{3}{l}{Instruction} \\
         Cycle &  Cycles &&&\\
         \midrule
-        1 & 1-3  & \lstinline|load $a| & \rightarrow & \lstinline|a| \\
-        2 & 2-4  & \lstinline|load $b| & \rightarrow & \lstinline|b| \\
-        3 & 3-5  & \lstinline|load $c| & \rightarrow & \lstinline|c| \\
+        1 & 1-3  & \lstinline|load $a|  & \rightarrow & \lstinline|a| \\
+        2 & 2-4  & \lstinline|load $b|  & \rightarrow & \lstinline|b| \\
+        3 & 3-5  & \lstinline|load $c|  & \rightarrow & \lstinline|c| \\
         4 & 4-5  & \lstinline|mul a, a| & \rightarrow & \lstinline|a| \\
         5 & 5-6  & \lstinline|mul b, b| & \rightarrow & \lstinline|b| \\
         6 & 6-7  & \lstinline|mul c, c| & \rightarrow & \lstinline|c| \\
         7 & 7    & \lstinline|add a, b| & \rightarrow & \lstinline|a| \\
         8 & 8    & \lstinline|add a, c| & \rightarrow & \lstinline|a| \\
-        9 & 9-11 & \lstinline|store a| & \rightarrow & \lstinline|$a| \\
+        9 & 9-11 & \lstinline|store a|  & \rightarrow & \lstinline|$a| \\
         \bottomrule
     \end{tabular}
     \caption{Scheduled example \lstinline|a=a*a+b*b+c*c|}
@@ -130,6 +163,7 @@ The next steps, instruction scheduling and register allocation are explained in 
 \subsubsection{Instruction Scheduling}
 Add Example: e.g. see \url{https://youtu.be/brpomKUynEA?t=271} \\
 Probably best to introduce an example in the \cref{sec:bg:cpu} and reuse/extend it here.
+Typically works on Basic Blocks. What is a Basic Block?
 
 \subsubsection{Register Allocation}
 The usage of an infinite amount of virtual registers in the \ac{ir} was ignored in the instruction selection step.
@@ -144,4 +178,7 @@ Wie funktionieren sie?\\
 Welche Infos nutzen sie?\\
 \subsection{Post-RA-Scheduling}
 
-\section{Reinforcement Learning}
+\section{Data-Driven Methods}
+\subsection{Monte Carlo Tree Search}
+\subsection{Reinforcement Learning}
+\subsection{Probabilistic Graphical Models}
