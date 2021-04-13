@@ -1,4 +1,14 @@
-Potential exploration -> random scheduling
+Potential exploration \rightarrow random scheduling \\
+Problem: Most timings are very similar or even the same \\
+Reasons:
+\begin{itemize}
+    \item Many assemblies have equal or similar (e.g., switched add and sub) schedules
+    \item Where the schedules differ, there are different schedules
+    My impression is that the placement of loads and logic/arithmetic instructions has a big influence on the runtime
+    \item The LLVM IR makes heavy use of pseudo instructions.
+    This results in differently scheduled LLVM IR, but often produces the same or similar assembly files schedules.
+    This means the data is very noisy
+\end{itemize}
 
 Compare speedup with complexity of the problem (number of possible schedulings) vs speedup
 
