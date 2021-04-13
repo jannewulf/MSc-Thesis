@@ -1,0 +1,7 @@
+encode_line-for.inc
+Count:    151000
+Min:      416
+Median:   573
+Mean:     591.318
+Max:      155052
+StdDev:  ±567.775

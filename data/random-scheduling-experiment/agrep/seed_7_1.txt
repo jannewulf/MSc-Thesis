@@ -1,0 +1,7 @@
+s_output-while.body23
+Count:    2902
+Min:      573
+Median:   3958
+Mean:     4293.23
+Max:      251978
+StdDev:  ±5379.67

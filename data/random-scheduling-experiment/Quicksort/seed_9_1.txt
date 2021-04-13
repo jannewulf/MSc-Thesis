@@ -1,0 +1,7 @@
+Initarr-for.body
+Count:    100
+Min:      64426
+Median:   64530
+Mean:     68230.2
+Max:      132081
+StdDev:  ±11099

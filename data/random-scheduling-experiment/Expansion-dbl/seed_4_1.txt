@@ -1,0 +1,7 @@
+s1251-vector.body
+Count:    1
+Min:      21141891542
+Median:   8003586
+Mean:     1.05709e+10
+Max:      21141891542
+StdDev:  ±1.05709e+10

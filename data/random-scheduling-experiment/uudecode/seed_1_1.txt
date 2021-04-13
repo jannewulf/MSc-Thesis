@@ -1,0 +1,7 @@
+decode-for.inc
+Count:    100
+Min:      5094364
+Median:   5140197
+Mean:     5.15587e+06
+Max:      7124099
+StdDev:  ±105902

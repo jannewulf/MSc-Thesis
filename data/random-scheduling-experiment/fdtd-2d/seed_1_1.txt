@@ -1,0 +1,7 @@
+kernel_fdtd_2d_StrictFP-vector.body
+Count:    1
+Min:      2542201675
+Median:   8003586
+Mean:     1.2711e+09
+Max:      2542201675
+StdDev:  ±1.2711e+09

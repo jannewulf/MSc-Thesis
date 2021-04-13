@@ -1,0 +1,7 @@
+P0-entry
+Count:    61600000
+Min:      52
+Median:   104
+Mean:     107.567
+Max:      110000
+StdDev:  ±140.748

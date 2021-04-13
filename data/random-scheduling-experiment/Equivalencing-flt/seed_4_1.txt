@@ -1,0 +1,7 @@
+s422-for.body4
+Count:    1
+Min:      5543617169
+Median:   8003586
+Mean:     2.77181e+09
+Max:      5543617169
+StdDev:  ±2.77181e+09

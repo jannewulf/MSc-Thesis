@@ -1,0 +1,7 @@
+s4114-for.body3.us
+Count:    1
+Min:      11929353463
+Median:   8003586
+Mean:     5.96468e+09
+Max:      11929353463
+StdDev:  ±5.96468e+09

@@ -1,0 +1,7 @@
+s127-for.body3
+Count:    1
+Min:      5347440617
+Median:   8003586
+Mean:     2.67372e+09
+Max:      5347440617
+StdDev:  ±2.67372e+09

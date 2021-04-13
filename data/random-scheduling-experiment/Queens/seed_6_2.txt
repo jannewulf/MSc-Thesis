@@ -1,0 +1,7 @@
+Try-while.body.us
+Count:    5000
+Min:      16354
+Median:   16667
+Mean:     17765.7
+Max:      237185
+StdDev:  ±5095.58

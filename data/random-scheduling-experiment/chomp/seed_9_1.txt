@@ -1,0 +1,7 @@
+get_value-while.cond
+Count:    65179
+Min:      104
+Median:   31302
+Mean:     81603.5
+Max:      1174791
+StdDev:  ±137083

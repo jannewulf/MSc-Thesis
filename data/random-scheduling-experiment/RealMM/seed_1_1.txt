@@ -1,0 +1,7 @@
+rInnerproduct-for.body
+Count:    16000
+Min:      416
+Median:   521
+Mean:     606.901
+Max:      40572
+StdDev:  ±529.862

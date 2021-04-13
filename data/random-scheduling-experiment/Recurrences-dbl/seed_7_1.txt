@@ -1,0 +1,7 @@
+s322-for.body3
+Count:    1
+Min:      6125257282
+Median:   8003586
+Mean:     3.06263e+09
+Max:      6125257282
+StdDev:  ±3.06263e+09

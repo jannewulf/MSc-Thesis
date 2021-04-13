@@ -1,0 +1,7 @@
+Proc0-while.end
+Count:    1
+Min:      15164675433
+Median:   8003586
+Mean:     7.58234e+09
+Max:      15164675433
+StdDev:  ±7.58234e+09

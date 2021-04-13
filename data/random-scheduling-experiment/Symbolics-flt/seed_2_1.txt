@@ -1,0 +1,7 @@
+s173-vector.body
+Count:    1
+Min:      3459560793
+Median:   8003586
+Mean:     1.72978e+09
+Max:      3459560793
+StdDev:  ±1.72978e+09

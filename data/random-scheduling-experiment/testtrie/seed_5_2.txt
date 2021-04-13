@@ -1,0 +1,7 @@
+trie_insert-if.else
+Count:    28190
+Min:      156
+Median:   312
+Mean:     521.376
+Max:      80000
+StdDev:  ±1246.19

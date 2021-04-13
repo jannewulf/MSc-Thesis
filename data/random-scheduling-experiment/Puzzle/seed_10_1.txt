@@ -1,0 +1,7 @@
+Fit-if.then
+Count:    1533900
+Min:      104
+Median:   157
+Mean:     279.562
+Max:      140468
+StdDev:  ±339.268

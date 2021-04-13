@@ -1,0 +1,7 @@
+myrandom-entry
+Count:    40000000
+Min:      104
+Median:   104
+Mean:     107.76
+Max:      101405
+StdDev:  ±116.107

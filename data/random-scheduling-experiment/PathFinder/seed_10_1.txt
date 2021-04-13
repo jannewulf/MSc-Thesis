@@ -1,0 +1,7 @@
+Bitfield_nodeVisited-entry
+Count:    253393
+Min:      104
+Median:   104
+Mean:     112.931
+Max:      35260
+StdDev:  ±100.974

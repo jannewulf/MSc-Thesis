@@ -1,0 +1,7 @@
+main-vector.body31
+Count:    1
+Min:      9513370097
+Median:   8003586
+Mean:     4.75669e+09
+Max:      9513370097
+StdDev:  ±4.75669e+09

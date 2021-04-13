@@ -1,0 +1,7 @@
+incircle-entry
+Count:    3111971
+Min:      104
+Median:   104
+Mean:     131.824
+Max:      138801
+StdDev:  ±506.212

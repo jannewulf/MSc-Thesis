@@ -1,0 +1,7 @@
+fannkuch-for.body57
+Count:    1
+Min:      7158472243
+Median:   8003586
+Mean:     3.57924e+09
+Max:      7158472243
+StdDev:  ±3.57924e+09

@@ -1,0 +1,7 @@
+ApplyRGivens-for.body
+Count:    12765
+Min:      989
+Median:   1042
+Mean:     1179.5
+Max:      47239
+StdDev:  ±661.474

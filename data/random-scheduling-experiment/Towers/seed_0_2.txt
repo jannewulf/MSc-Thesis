@@ -1,0 +1,7 @@
+Pop-if.then
+Count:    1638300
+Min:      52
+Median:   104
+Mean:     106.009
+Max:      68906
+StdDev:  ±154.757

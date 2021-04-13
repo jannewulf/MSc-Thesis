@@ -1,0 +1,7 @@
+SegmentFree-if.then
+Count:    38866900
+Min:      52
+Median:   156
+Mean:     168.101
+Max:      271248
+StdDev:  ±185.742

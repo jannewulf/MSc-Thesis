@@ -1,0 +1,7 @@
+kernel_symm_StrictFP-for.body6
+Count:    1
+Min:      264901071819
+Median:   8003586
+Mean:     1.32451e+11
+Max:      264901071819
+StdDev:  ±1.32451e+11

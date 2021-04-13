@@ -1,0 +1,7 @@
+conquer-for.body9
+Count:    8192
+Min:      295467
+Median:   299999
+Mean:     302744
+Max:      515049
+StdDev:  ±13120.9

@@ -1,0 +1,7 @@
+read_11_bits-entry
+Count:    43080000
+Min:      52
+Median:   104
+Mean:     110.921
+Max:      179116
+StdDev:  ±157.172

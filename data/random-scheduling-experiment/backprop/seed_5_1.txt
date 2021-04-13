@@ -1,0 +1,7 @@
+bpnn_train_kernel-for.body138
+Count:    1
+Min:      14412700743
+Median:   8003586
+Mean:     7.20635e+09
+Max:      14412700743
+StdDev:  ±7.20635e+09

@@ -1,0 +1,7 @@
+decode_rs-if.then
+Count:    150000
+Min:      55833
+Median:   85209
+Mean:     85142.4
+Max:      209583
+StdDev:  ±5495.79

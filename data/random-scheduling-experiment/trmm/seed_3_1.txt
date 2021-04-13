@@ -1,0 +1,7 @@
+kernel_trmm_StrictFP-for.body6
+Count:    1
+Min:      7972747600
+Median:   8003586
+Mean:     3.98637e+09
+Max:      7972747600
+StdDev:  ±3.98637e+09

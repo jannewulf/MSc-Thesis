@@ -1,0 +1,7 @@
+CopyObject-for.end1122
+Count:    138350
+Min:      156
+Median:   313
+Mean:     1407.65
+Max:      354173
+StdDev:  ±4722.86

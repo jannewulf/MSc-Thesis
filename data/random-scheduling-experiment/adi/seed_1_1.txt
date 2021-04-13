@@ -1,0 +1,7 @@
+kernel_adi-for.body6
+Count:    2
+Min:      9243734142
+Median:   9243734142
+Mean:     9.24651e+09
+Max:      9249294902
+StdDev:  ±2.78038e+06

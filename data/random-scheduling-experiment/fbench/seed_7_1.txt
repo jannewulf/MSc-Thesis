@@ -1,0 +1,7 @@
+transit_surface-if.end28
+Count:    16000000
+Min:      156
+Median:   625
+Mean:     544.834
+Max:      178123
+StdDev:  ±378.438

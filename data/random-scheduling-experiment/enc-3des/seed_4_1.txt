@@ -1,0 +1,7 @@
+des3_crypt-entry
+Count:    4000000
+Min:      989
+Median:   990
+Mean:     1014.79
+Max:      115936
+StdDev:  ±402.92

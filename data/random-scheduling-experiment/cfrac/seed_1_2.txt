@@ -1,0 +1,7 @@
+pimod-do.body
+Count:    14595766
+Min:      104
+Median:   156
+Mean:     143.651
+Max:      134528
+StdDev:  ±181.941

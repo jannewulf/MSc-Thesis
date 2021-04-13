@@ -1,0 +1,7 @@
+s343-if.then.1
+Count:    1
+Min:      5154858095
+Median:   8003586
+Mean:     2.57743e+09
+Max:      5154858095
+StdDev:  ±2.57743e+09

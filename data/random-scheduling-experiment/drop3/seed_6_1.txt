@@ -1,0 +1,7 @@
+drop_0xx-if.end
+Count:    20
+Min:      56393212
+Median:   56457431
+Mean:     5.65047e+07
+Max:      58086540
+StdDev:  ±188544

@@ -1,0 +1,7 @@
+s116-for.body3
+Count:    1
+Min:      3480075306
+Median:   8003586
+Mean:     1.74004e+09
+Max:      3480075306
+StdDev:  ±1.74004e+09

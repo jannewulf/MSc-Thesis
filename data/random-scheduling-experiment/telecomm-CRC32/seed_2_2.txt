@@ -1,0 +1,7 @@
+crc32file-while.body
+Count:    1
+Min:      605128108
+Median:   8003586
+Mean:     3.02564e+08
+Max:      605128108
+StdDev:  ±3.02564e+08

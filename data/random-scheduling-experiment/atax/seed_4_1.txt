@@ -1,0 +1,7 @@
+kernel_atax_StrictFP-for.body8
+Count:    1
+Min:      279038791
+Median:   8003586
+Mean:     1.39519e+08
+Max:      279038791
+StdDev:  ±1.39519e+08

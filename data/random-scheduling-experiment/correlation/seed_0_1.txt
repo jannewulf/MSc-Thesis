@@ -1,0 +1,7 @@
+kernel_correlation-for.body105
+Count:    2
+Min:      27275687762
+Median:   27275687762
+Mean:     2.72803e+10
+Max:      27284975108
+StdDev:  ±4.64367e+06

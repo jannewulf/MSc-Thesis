@@ -1,0 +1,7 @@
+kernel_doitgen_StrictFP-for.body13
+Count:    1
+Min:      4621037067
+Median:   8003586
+Mean:     2.31052e+09
+Max:      4621037067
+StdDev:  ±2.31052e+09

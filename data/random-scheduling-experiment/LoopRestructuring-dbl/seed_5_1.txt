@@ -1,0 +1,7 @@
+s235-for.body11
+Count:    1
+Min:      15014675898
+Median:   8003586
+Mean:     7.50734e+09
+Max:      15014675898
+StdDev:  ±7.50734e+09

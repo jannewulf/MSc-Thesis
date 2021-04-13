@@ -1,0 +1,7 @@
+susan_smoothing-for.body89
+Count:    1
+Min:      141118323
+Median:   8003586
+Mean:     7.05592e+07
+Max:      141118323
+StdDev:  ±7.05592e+07

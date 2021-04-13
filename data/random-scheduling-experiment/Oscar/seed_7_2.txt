@@ -1,0 +1,7 @@
+Fft-do.body2
+Count:    200
+Min:      40885
+Median:   61354
+Mean:     53368.9
+Max:      192082
+StdDev:  ±16300.8

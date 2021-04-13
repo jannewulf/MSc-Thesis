@@ -1,0 +1,7 @@
+usqrt-for.body
+Count:    66384
+Min:      260
+Median:   261
+Mean:     276.436
+Max:      13906
+StdDev:  ±120.301

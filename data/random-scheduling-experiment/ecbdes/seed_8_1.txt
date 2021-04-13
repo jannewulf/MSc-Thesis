@@ -1,0 +1,7 @@
+des_encrypt-for.body
+Count:    16000000
+Min:      364
+Median:   417
+Mean:     413.812
+Max:      265363
+StdDev:  ±270.759

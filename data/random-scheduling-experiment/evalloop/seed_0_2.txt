@@ -1,0 +1,7 @@
+eval-indirectgoto
+Count:    100000
+Min:      26145
+Median:   26822
+Mean:     26923
+Max:      215258
+StdDev:  ±2208.26

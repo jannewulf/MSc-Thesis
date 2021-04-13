@@ -1,0 +1,7 @@
+wins-entry
+Count:    33120486
+Min:      52
+Median:   104
+Mean:     118.522
+Max:      174530
+StdDev:  ±304.459

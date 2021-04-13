@@ -1,0 +1,7 @@
+attenuate_fluxes-for.body262
+Count:    6031293
+Min:      1979
+Median:   2136
+Mean:     2179.2
+Max:      148179
+StdDev:  ±688.856

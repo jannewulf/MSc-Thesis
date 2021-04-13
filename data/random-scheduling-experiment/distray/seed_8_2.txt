@@ -1,0 +1,7 @@
+IntersectObjs-for.body
+Min:      260
+Median:   313
+Mean:     348.96
+Max:      41197
+StdDev:  ±229.913
+Binary file (standard input) matches

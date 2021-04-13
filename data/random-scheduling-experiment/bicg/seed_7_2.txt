@@ -1,0 +1,7 @@
+kernel_bicg_StrictFP-for.body8
+Count:    1
+Min:      375788901
+Median:   8003586
+Mean:     1.87894e+08
+Max:      375788901
+StdDev:  ±1.87894e+08

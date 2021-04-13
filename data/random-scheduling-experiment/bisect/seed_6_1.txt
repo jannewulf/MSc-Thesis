@@ -1,0 +1,7 @@
+sturm-if.end
+Count:    22965
+Min:      11874
+Median:   11927
+Mean:     12036.2
+Max:      101666
+StdDev:  ±1511.75

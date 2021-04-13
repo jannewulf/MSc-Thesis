@@ -1,0 +1,7 @@
+ycc_rgb_convert-for.body.us
+Count:    512
+Min:      11093
+Median:   11250
+Mean:     14412.8
+Max:      235209
+StdDev:  ±10736.2

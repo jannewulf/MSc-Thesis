@@ -1,0 +1,7 @@
+fourn-for.body80.1
+Count:    126
+Min:      91572187
+Median:   92248120
+Mean:     9.232e+07
+Max:      95476430
+StdDev:  ±402750
