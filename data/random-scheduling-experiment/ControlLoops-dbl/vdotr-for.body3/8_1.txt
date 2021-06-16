@@ -1,0 +1,7 @@
+vdotr-for.body3
+Count:    1
+Min:      4986975932
+Median:   8003586
+Mean:     2.49349e+09
+Max:      4986975932
+StdDev:  ±2.49349e+09

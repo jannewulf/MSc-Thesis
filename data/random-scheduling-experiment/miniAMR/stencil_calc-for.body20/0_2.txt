@@ -1,0 +1,7 @@
+stencil_calc-for.body20
+Count:    80000
+Min:      30677
+Median:   31771
+Mean:     32555
+Max:      130364
+StdDev:  ±4598.31

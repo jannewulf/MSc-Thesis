@@ -1,0 +1,7 @@
+srad_kernel-for.body616
+Count:    1
+Min:      3769027000
+Median:   8000017
+Mean:     1.88451e+09
+Max:      3769027000
+StdDev:  ±1.88451e+09

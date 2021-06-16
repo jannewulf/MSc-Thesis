@@ -1,0 +1,7 @@
+kernel_lu-vector.body
+Count:    2
+Min:      1884000
+Median:   1884000
+Mean:     1.8855e+06
+Max:      1887000
+StdDev:  ±1500

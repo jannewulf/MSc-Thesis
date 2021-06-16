@@ -1,0 +1,7 @@
+sha_transform-for.body5
+Count:    50744
+Min:      1000
+Median:   2000
+Mean:     1743.96
+Max:      4000
+StdDev:  ±465.04

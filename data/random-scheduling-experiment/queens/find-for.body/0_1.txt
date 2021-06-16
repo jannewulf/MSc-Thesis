@@ -1,0 +1,7 @@
+find-for.body
+Count:    1
+Min:      4813741287
+Median:   8003586
+Mean:     2.40687e+09
+Max:      4813741287
+StdDev:  ±2.40687e+09

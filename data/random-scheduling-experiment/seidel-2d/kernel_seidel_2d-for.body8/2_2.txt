@@ -1,0 +1,7 @@
+kernel_seidel_2d-for.body8
+Count:    2
+Min:      935390341
+Median:   935390341
+Mean:     9.36874e+08
+Max:      938356936
+StdDev:  ±1.4833e+06

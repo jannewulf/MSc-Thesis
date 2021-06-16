@@ -1,0 +1,7 @@
+kernel_dynprog-for.body31
+Count:    2
+Min:      840978000
+Median:   840978000
+Mean:     8.42768e+08
+Max:      844559000
+StdDev:  ±1.7905e+06

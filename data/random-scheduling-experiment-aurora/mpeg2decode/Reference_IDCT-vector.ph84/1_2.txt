@@ -1,0 +1,7 @@
+Reference_IDCT-vector.ph84
+Count:    6588
+Min:      5000
+Median:   6000
+Mean:     5683.39
+Max:      13000
+StdDev:  ±589.534

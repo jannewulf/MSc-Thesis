@@ -1,0 +1,7 @@
+_ZN6filter3outEv-while.body
+Count:    9592
+Min:      1000
+Median:   405000
+Mean:     404628
+Max:      816000
+StdDev:  ±232992

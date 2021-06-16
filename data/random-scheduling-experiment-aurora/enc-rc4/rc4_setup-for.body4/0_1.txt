@@ -1,0 +1,7 @@
+rc4_setup-for.body4
+Count:    1200000
+Min:      2000
+Median:   3000
+Mean:     2900.09
+Max:      5000
+StdDev:  ±299.879

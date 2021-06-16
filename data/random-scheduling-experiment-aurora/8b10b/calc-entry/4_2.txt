@@ -1,0 +1,7 @@
+calc-entry
+Count:    400000000
+Min:      0
+Median:   1000
+Mean:     907.327
+Max:      2000
+StdDev:  ±289.976

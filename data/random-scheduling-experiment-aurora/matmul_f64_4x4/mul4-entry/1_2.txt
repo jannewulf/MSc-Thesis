@@ -1,0 +1,7 @@
+mul4-entry
+Count:    50000000
+Min:      1000
+Median:   1000
+Mean:     1044.74
+Max:      2000
+StdDev:  ±206.739

@@ -1,0 +1,7 @@
+ht_hashcode-for.body
+Count:    7000000
+Min:      0
+Median:   1000
+Mean:     919.387
+Max:      2000
+StdDev:  ±275.333

@@ -1,0 +1,7 @@
+_ZplRK6DoubleS1_-entry
+Count:    3000000000
+Min:      0
+Median:   1000
+Mean:     882.752
+Max:      2125000
+StdDev:  ±323.716

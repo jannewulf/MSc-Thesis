@@ -1,0 +1,7 @@
+Random_nextDouble-entry
+Count:    2147380624
+Min:      0
+Median:   1000
+Mean:     860.365
+Max:      45885000
+StdDev:  ±1049.37

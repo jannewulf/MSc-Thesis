@@ -1,0 +1,7 @@
+rmatmult3-for.body146
+Count:    5000
+Min:      1977000
+Median:   1982000
+Mean:     1.98205e+06
+Max:      2000000
+StdDev:  ±2613.82

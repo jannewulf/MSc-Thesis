@@ -1,0 +1,7 @@
+ludcmp-for.body67.us34
+Count:    501
+Min:      1072000
+Median:   1074000
+Mean:     1.07374e+06
+Max:      1080000
+StdDev:  ±627.046

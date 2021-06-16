@@ -1,0 +1,7 @@
+advance-for.body3
+Count:    5000000
+Min:      1145
+Median:   1146
+Mean:     1175.01
+Max:      173643
+StdDev:  ±436.517

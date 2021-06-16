@@ -1,0 +1,7 @@
+grad-entry
+Count:    341508848
+Min:      0
+Median:   1000
+Mean:     906.191
+Max:      2000
+StdDev:  ±291.565

@@ -1,0 +1,7 @@
+s115-for.body6
+Count:    1
+Min:      4992349471
+Median:   8003586
+Mean:     2.49617e+09
+Max:      4992349471
+StdDev:  ±2.49617e+09

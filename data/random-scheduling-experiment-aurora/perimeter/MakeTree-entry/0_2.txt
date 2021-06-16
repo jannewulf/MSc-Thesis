@@ -1,0 +1,7 @@
+MakeTree-entry
+Count:    1
+Min:      973484000
+Median:   8000017
+Mean:     4.86742e+08
+Max:      973484000
+StdDev:  ±4.86742e+08

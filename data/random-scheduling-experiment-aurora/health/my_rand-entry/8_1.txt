@@ -1,0 +1,7 @@
+my_rand-entry
+Count:    1959928
+Min:      0
+Median:   1000
+Mean:     881.525
+Max:      2000
+StdDev:  ±323.316

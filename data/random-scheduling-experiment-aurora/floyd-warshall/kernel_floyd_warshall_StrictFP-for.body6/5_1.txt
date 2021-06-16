@@ -1,0 +1,7 @@
+kernel_floyd_warshall_StrictFP-for.body6
+Count:    1
+Min:      3492971000
+Median:   8000017
+Mean:     1.74649e+09
+Max:      3492971000
+StdDev:  ±1.74649e+09

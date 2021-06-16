@@ -1,0 +1,7 @@
+init_Toggle-entry
+Count:    140000002
+Min:      0
+Median:   1000
+Mean:     854.081
+Max:      2000
+StdDev:  ±353.025

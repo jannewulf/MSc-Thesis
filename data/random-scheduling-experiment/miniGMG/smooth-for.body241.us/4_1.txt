@@ -1,0 +1,7 @@
+smooth-for.body241.us
+Count:    400
+Min:      58228
+Median:   64218
+Mean:     2.29112e+07
+Max:      205367010
+StdDev:  ±6.03692e+07

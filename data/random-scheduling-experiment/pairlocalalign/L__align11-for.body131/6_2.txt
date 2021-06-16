@@ -1,0 +1,7 @@
+L__align11-for.body131
+Count:    4950
+Min:      4998347
+Median:   8891547
+Mean:     9.45946e+06
+Max:      19213031
+StdDev:  ±3.17675e+06

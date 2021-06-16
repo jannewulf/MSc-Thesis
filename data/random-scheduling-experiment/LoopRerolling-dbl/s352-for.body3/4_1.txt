@@ -1,0 +1,7 @@
+s352-for.body3
+Count:    1
+Min:      9554024893
+Median:   8003586
+Mean:     4.77701e+09
+Max:      9554024893
+StdDev:  ±4.77701e+09

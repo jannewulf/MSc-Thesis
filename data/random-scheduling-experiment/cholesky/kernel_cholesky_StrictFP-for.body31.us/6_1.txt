@@ -1,0 +1,7 @@
+kernel_cholesky_StrictFP-for.body31.us
+Count:    1
+Min:      2041733355
+Median:   8003586
+Mean:     1.02087e+09
+Max:      2041733355
+StdDev:  ±1.02087e+09

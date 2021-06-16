@@ -1,0 +1,7 @@
+calculate_micro_xs-entry
+Count:    15484486
+Min:      156
+Median:   417
+Mean:     464.11
+Max:      167341
+StdDev:  ±725.523

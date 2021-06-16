@@ -1,0 +1,7 @@
+value-for.body
+Count:    500142
+Min:      4427
+Median:   4479
+Mean:     4514.88
+Max:      278955
+StdDev:  ±881.487

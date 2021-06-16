@@ -1,0 +1,7 @@
+loop-for.body
+Count:    500000
+Min:      6000
+Median:   7000
+Mean:     6893.53
+Max:      8000
+StdDev:  ±308.445

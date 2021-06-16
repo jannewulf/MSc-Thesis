@@ -1,0 +1,7 @@
+kernel_gesummv_StrictFP-for.body5
+Count:    1
+Min:      128004000
+Median:   8000017
+Mean:     6.4002e+07
+Max:      128004000
+StdDev:  ±6.4002e+07

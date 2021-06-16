@@ -1,0 +1,7 @@
+Bubble-while.body3
+Count:    100
+Min:      455000
+Median:   456000
+Mean:     457066
+Max:      632000
+StdDev:  ±8994.23

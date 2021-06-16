@@ -1,0 +1,7 @@
+mandel-complex_mul_cont
+Count:    1
+Min:      31232123000
+Median:   8000017
+Mean:     1.56161e+10
+Max:      31232123000
+StdDev:  ±1.56161e+10

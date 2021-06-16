@@ -1,0 +1,7 @@
+benchmark_heapsort-land.lhs.true
+Count:    1
+Min:      13576769219
+Median:   8003586
+Mean:     6.78838e+09
+Max:      13576769219
+StdDev:  ±6.78838e+09

@@ -1,0 +1,7 @@
+eamForce-for.body70.us
+Count:    101
+Min:      125134683
+Median:   126546651
+Mean:     1.26336e+08
+Max:      127115338
+StdDev:  ±600641

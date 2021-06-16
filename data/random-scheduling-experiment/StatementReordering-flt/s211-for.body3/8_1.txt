@@ -1,0 +1,7 @@
+s211-for.body3
+Count:    1
+Min:      14477084577
+Median:   8003586
+Mean:     7.23854e+09
+Max:      14477084577
+StdDev:  ±7.23854e+09

@@ -1,0 +1,7 @@
+dfilter-if.end53.us152
+Min:      136827023
+Median:   136827023
+Mean:     1.38004e+08
+Max:      139180385
+StdDev:  ±1.17668e+06
+Binary file (standard input) matches

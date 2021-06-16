@@ -1,0 +1,7 @@
+Bimerge-tailrecurse
+Count:    524286
+Min:      1000
+Median:   1000
+Mean:     4005.71
+Max:      64662000
+StdDev:  ±171471

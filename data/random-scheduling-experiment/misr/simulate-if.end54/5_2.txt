@@ -1,0 +1,7 @@
+simulate-if.end54
+Count:    100000
+Min:      9687
+Median:   9740
+Mean:     9863.21
+Max:      229634
+StdDev:  ±1361.49

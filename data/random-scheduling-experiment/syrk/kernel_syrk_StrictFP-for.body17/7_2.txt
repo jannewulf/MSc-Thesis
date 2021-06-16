@@ -1,0 +1,7 @@
+kernel_syrk_StrictFP-for.body17
+Count:    1
+Min:      13886615931
+Median:   8003586
+Mean:     6.94331e+09
+Max:      13886615931
+StdDev:  ±6.94331e+09

@@ -1,0 +1,7 @@
+_ZN15loop_inner_bodyILi1EiE7do_workERiPKii-entry
+Count:    129824000
+Min:      0
+Median:   1000
+Mean:     913.818
+Max:      2000
+StdDev:  ±280.634

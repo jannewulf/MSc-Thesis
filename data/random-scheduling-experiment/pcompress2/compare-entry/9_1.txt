@@ -1,0 +1,7 @@
+compare-entry
+Count:    4949716
+Min:      104
+Median:   105
+Mean:     130.448
+Max:      140156
+StdDev:  ±215.367

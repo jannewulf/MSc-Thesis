@@ -1,0 +1,7 @@
+BubbleSort-for.body5
+Count:    2000
+Min:      17000
+Median:   18000
+Mean:     18558.8
+Max:      21000
+StdDev:  ±1124.14

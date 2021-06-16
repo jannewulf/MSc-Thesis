@@ -1,0 +1,7 @@
+kernel_trisolv-for.body5
+Count:    2
+Min:      107379366
+Median:   107379366
+Mean:     1.07852e+08
+Max:      108323994
+StdDev:  ±472314

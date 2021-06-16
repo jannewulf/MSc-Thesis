@@ -1,0 +1,7 @@
+fft_float_StrictFP-for.body39.us
+Count:    1
+Min:      19978063
+Median:   8003586
+Mean:     9.98903e+06
+Max:      19978063
+StdDev:  ±9.98903e+06

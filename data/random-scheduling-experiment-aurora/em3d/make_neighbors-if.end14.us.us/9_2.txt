@@ -1,0 +1,7 @@
+make_neighbors-if.end14.us.us
+Count:    2
+Min:      4329219000
+Median:   4329219000
+Mean:     4.33518e+09
+Max:      4341143000
+StdDev:  ±5.962e+06

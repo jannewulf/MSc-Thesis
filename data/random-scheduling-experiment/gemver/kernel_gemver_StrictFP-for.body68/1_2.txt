@@ -1,0 +1,7 @@
+kernel_gemver_StrictFP-for.body68
+Count:    1
+Min:      3764193260
+Median:   8003586
+Mean:     1.8821e+09
+Max:      3764193260
+StdDev:  ±1.8821e+09

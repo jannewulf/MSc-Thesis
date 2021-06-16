@@ -1,0 +1,7 @@
+ReverseBits64-entry
+Count:    16777216
+Min:      52
+Median:   104
+Mean:     98.794
+Max:      175208
+StdDev:  ±157.829

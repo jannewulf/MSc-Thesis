@@ -1,0 +1,7 @@
+BeamFirFilter-for.body
+Count:    2867200
+Min:      1041
+Median:   1093
+Mean:     1729.22
+Max:      131562
+StdDev:  ±2028.88

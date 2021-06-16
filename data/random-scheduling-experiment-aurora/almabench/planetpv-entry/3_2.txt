@@ -1,0 +1,7 @@
+planetpv-entry
+Count:    5844000
+Min:      13000
+Median:   18000
+Mean:     18219.5
+Max:      39000
+StdDev:  ±1216.74

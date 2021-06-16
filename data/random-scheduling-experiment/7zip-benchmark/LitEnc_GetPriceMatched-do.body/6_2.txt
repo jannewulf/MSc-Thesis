@@ -1,0 +1,7 @@
+LitEnc_GetPriceMatched-do.body
+Count:    7996498
+Min:      156
+Median:   209
+Mean:     227.7
+Max:      130259
+StdDev:  ±528.125

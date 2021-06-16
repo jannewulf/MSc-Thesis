@@ -1,0 +1,7 @@
+compdecomp-while.body234
+Count:    30
+Min:      1313548000
+Median:   1314081000
+Mean:     1.31414e+09
+Max:      1314775000
+StdDev:  ±298659

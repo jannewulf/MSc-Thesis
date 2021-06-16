@@ -1,0 +1,7 @@
+jacobi-for.body11
+Count:    1
+Min:      17954283000
+Median:   8000017
+Mean:     8.97714e+09
+Max:      17954283000
+StdDev:  ±8.97714e+09

@@ -1,0 +1,7 @@
+glibc_compat_rand-entry
+Count:    50000000
+Min:      52
+Median:   104
+Mean:     110.577
+Max:      152290
+StdDev:  ±159.976

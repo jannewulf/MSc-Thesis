@@ -1,0 +1,7 @@
+s244-for.body3
+Count:    1
+Min:      11355122418
+Median:   8003586
+Mean:     5.67756e+09
+Max:      11355122418
+StdDev:  ±5.67756e+09

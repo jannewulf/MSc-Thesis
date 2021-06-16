@@ -1,0 +1,7 @@
+CAiBj-for.body8
+Count:    35579250
+Min:      0
+Median:   1000
+Mean:     980.089
+Max:      5000
+StdDev:  ±230.517

@@ -1,0 +1,7 @@
+hypre_SMGResidual-vector.body
+Count:    7238
+Min:      3646
+Median:   202237
+Mean:     1.5951e+06
+Max:      63974783
+StdDev:  ±4.42067e+06

@@ -1,0 +1,7 @@
+fib-if.else
+Count:    1
+Min:      28900478607
+Median:   8003586
+Mean:     1.44502e+10
+Max:      28900478607
+StdDev:  ±1.44502e+10

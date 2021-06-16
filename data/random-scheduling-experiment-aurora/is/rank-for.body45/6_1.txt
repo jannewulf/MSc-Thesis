@@ -1,0 +1,7 @@
+rank-for.body45
+Count:    11
+Min:      694066000
+Median:   695510000
+Mean:     6.95525e+08
+Max:      697014000
+StdDev:  ±725613

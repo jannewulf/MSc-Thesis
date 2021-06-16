@@ -1,0 +1,7 @@
+_ZN6living4sumsEPA40_PS_Pi-entry
+Count:    14440000
+Min:      208
+Median:   312
+Mean:     302.587
+Max:      112916
+StdDev:  ±245.278

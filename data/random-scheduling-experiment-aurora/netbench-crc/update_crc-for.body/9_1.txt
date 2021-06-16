@@ -1,0 +1,7 @@
+update_crc-for.body
+Count:    1
+Min:      222000
+Median:   8000017
+Mean:     111000
+Max:      222000
+StdDev:  ±111000

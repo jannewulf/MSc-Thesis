@@ -1,0 +1,7 @@
+dijkstra-for.body14
+Count:    100
+Min:      1723000
+Median:   3244000
+Mean:     3.3446e+06
+Max:      5193000
+StdDev:  ±776636

@@ -1,0 +1,7 @@
+cofactor-if.then22
+Count:    11082
+Min:      364
+Median:   7500
+Mean:     12441.1
+Max:      77603
+StdDev:  ±9938.87

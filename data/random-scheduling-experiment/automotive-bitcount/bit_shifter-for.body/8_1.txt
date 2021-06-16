@@ -1,0 +1,7 @@
+bit_shifter-for.body
+Count:    1125000
+Min:      104
+Median:   208
+Mean:     188.371
+Max:      62136
+StdDev:  ±190.106

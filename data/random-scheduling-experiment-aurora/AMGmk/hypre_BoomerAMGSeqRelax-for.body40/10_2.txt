@@ -1,0 +1,7 @@
+hypre_BoomerAMGSeqRelax-for.body40
+Count:    2000
+Min:      9534000
+Median:   9536000
+Mean:     9.53572e+06
+Max:      9538000
+StdDev:  ±562.155

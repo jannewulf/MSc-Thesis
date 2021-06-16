@@ -1,0 +1,7 @@
+list_push_tail-entry
+Count:    600000000
+Min:      0
+Median:   1000
+Mean:     916.168
+Max:      2000
+StdDev:  ±277.139

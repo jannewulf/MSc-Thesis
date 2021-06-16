@@ -1,0 +1,7 @@
+count-entry
+your move? Count:    48451
+Min:      104
+Median:   1510
+Mean:     4004.32
+Max:      49010
+StdDev:  ±4318.21

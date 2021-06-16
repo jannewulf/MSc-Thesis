@@ -23,27 +23,31 @@ def plot_benchmark(benchmark, value_name, save):
     count = None
     seed_to_values = {}
 
-    files = os.listdir(benchmark)
-    for f in files:
-        seed = int(f.split('.')[0].split('_')[1])
-        run = int(f.split('.')[0].split('_')[2])
-        if not seed in seed_to_values.keys():
-            seed_to_values[seed] = {}
-        with open(os.path.join(benchmark, f), 'r') as stats_file:
-            function, basic_block = stats_file.readline().strip().split('-')
-            for line in stats_file.readlines():
-                line = line.strip().lower()
-                if line.startswith('count:'):
-                    count = int(line.split(':')[-1].strip())
-                if line.startswith(value_name.lower()):
-                    seed_to_values[seed][run] = float(line.split(':')[-1].strip())
-                    break
+    funcbbs = os.listdir(benchmark)
+    for funcbb in funcbbs:
+        files = os.listdir(os.path.join(benchmark, funcbb))
+        for f in files:
+            seed = int(f.split('.')[0].split('_')[0])
+            run = int(f.split('.')[0].split('_')[1])
+            if not seed in seed_to_values.keys():
+                seed_to_values[seed] = {}
+            with open(os.path.join(benchmark, funcbb, f), 'r') as stats_file:
+                function, basic_block = stats_file.readline().strip().split('-')
+                for line in stats_file.readlines():
+                    line = line.strip().lower()
+                    if line.startswith('count:'):
+                        count = int(line.split(':')[-1].strip())
+                    if line.startswith(value_name.lower()):
+                        seed_to_values[seed][run] = float(line.split(':')[-1].strip())
+                        break
 
     x = np.array(sorted(seed_to_values.keys()))
     try:
         times_run1 = np.array([seed_to_values[k][1] for k in x])
         times_run2 = np.array([seed_to_values[k][2] for k in x])
-    except KeyError:
+    except KeyError as e:
+        print(f'*** Warning: Value not found for {benchmark} {function} {basic_block}')
+        print(e)
         return
     #normalize_by = times_run1[0]
     #times_run1 /= normalize_by

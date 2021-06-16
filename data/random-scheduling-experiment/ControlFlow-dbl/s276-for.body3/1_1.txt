@@ -1,0 +1,7 @@
+s276-for.body3
+Count:    1
+Min:      6188498994
+Median:   8003586
+Mean:     3.09425e+09
+Max:      6188498994
+StdDev:  ±3.09425e+09

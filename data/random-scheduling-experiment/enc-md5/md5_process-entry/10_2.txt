@@ -1,0 +1,7 @@
+md5_process-entry
+Count:    7999570
+Min:      520
+Median:   573
+Mean:     570.519
+Max:      119061
+StdDev:  ±320.007

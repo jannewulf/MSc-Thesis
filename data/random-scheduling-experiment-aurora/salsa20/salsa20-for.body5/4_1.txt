@@ -1,0 +1,7 @@
+salsa20-for.body5
+Count:    33619969
+Min:      1000
+Median:   2000
+Mean:     1740.38
+Max:      3000
+StdDev:  ±438.428

@@ -1,0 +1,7 @@
+runcont-for.body22
+Count:    30
+Min:      3118584
+Median:   3210041
+Mean:     2.14232e+07
+Max:      255052346
+StdDev:  ±5.25157e+07

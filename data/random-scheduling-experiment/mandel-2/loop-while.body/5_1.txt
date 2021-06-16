@@ -1,0 +1,7 @@
+loop-while.body
+Count:    6084
+Min:      156
+Median:   469
+Mean:     762833
+Max:      2045348
+StdDev:  ±946768

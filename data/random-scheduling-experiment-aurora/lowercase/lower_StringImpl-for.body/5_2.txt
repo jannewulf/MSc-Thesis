@@ -1,0 +1,7 @@
+lower_StringImpl-for.body
+Count:    320000000
+Min:      0
+Median:   1000
+Mean:     1045.07
+Max:      2000
+StdDev:  ±309.533

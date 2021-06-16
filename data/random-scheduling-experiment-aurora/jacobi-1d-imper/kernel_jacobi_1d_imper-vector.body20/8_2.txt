@@ -1,0 +1,7 @@
+kernel_jacobi_1d_imper-vector.body20
+Count:    2
+Min:      4258000
+Median:   4258000
+Mean:     4.2625e+06
+Max:      4267000
+StdDev:  ±4500

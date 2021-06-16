@@ -1,0 +1,7 @@
+code-entry
+Count:    79999984
+Min:      0
+Median:   1000
+Mean:     930.989
+Max:      2000
+StdDev:  ±253.473

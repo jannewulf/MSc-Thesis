@@ -1,0 +1,7 @@
+find_gradient_f-entry
+Count:    17553624
+Min:      156
+Median:   157
+Mean:     184.625
+Max:      194894
+StdDev:  ±181.913

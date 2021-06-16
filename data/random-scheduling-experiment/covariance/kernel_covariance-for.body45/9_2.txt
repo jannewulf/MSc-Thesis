@@ -1,0 +1,7 @@
+kernel_covariance-for.body45
+Count:    2
+Min:      27255786583
+Median:   27255786583
+Mean:     2.72594e+10
+Max:      27262922938
+StdDev:  ±3.56818e+06

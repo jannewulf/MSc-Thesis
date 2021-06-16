@@ -1,0 +1,7 @@
+tak-if.then
+Count:    1
+Min:      5378875000
+Median:   8000017
+Mean:     2.68944e+09
+Max:      5378875000
+StdDev:  ±2.68944e+09

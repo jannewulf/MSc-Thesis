@@ -1,0 +1,7 @@
+boyer_moore-while.cond6
+Count:    360000
+Min:      156
+Median:   9531
+Mean:     18492.8
+Max:      202551
+StdDev:  ±22407.8

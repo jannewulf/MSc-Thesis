@@ -1,0 +1,7 @@
+init_array-for.body14
+Count:    2
+Min:      297190000
+Median:   297190000
+Mean:     2.97191e+08
+Max:      297192000
+StdDev:  ±1000

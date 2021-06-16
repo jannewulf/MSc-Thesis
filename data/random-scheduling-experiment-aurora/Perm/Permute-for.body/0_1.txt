@@ -1,0 +1,7 @@
+Permute-for.body
+Count:    500
+Min:      691000
+Median:   694000
+Mean:     693615
+Max:      697000
+StdDev:  ±1043.36

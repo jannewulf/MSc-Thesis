@@ -1,0 +1,7 @@
+shuffle-for.body
+Count:    5
+Min:      34508000
+Median:   34509000
+Mean:     3.45239e+07
+Max:      34544000
+StdDev:  ±15342.6

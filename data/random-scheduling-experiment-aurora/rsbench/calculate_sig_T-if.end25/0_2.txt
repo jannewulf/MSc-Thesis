@@ -1,0 +1,7 @@
+calculate_sig_T-if.end25
+Count:    1553256
+Min:      7000
+Median:   8000
+Mean:     8459.93
+Max:      29000
+StdDev:  ±654.17

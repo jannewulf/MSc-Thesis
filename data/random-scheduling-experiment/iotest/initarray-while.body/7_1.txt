@@ -1,0 +1,7 @@
+initarray-while.body
+Count:    3
+Min:      19489292
+Median:   19489292
+Mean:     2.09721e+07
+Max:      25412965
+StdDev:  ±2.09695e+06

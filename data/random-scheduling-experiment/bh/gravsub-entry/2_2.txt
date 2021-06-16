@@ -1,0 +1,7 @@
+gravsub-entry
+Count:    19424766
+Min:      156
+Median:   208
+Mean:     198.178
+Max:      153698
+StdDev:  ±278.138

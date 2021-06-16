@@ -1,0 +1,7 @@
+getSumBinaryTree-if.then
+Count:    2
+Min:      8838000
+Median:   8838000
+Mean:     8.8395e+06
+Max:      8841000
+StdDev:  ±1500

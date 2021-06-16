@@ -1,0 +1,7 @@
+byte-entry
+Count:    9984390
+Min:      0
+Median:   1000
+Mean:     941.67
+Max:      2000
+StdDev:  ±236.124

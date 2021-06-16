@@ -1,0 +1,7 @@
+kernel_mvt_StrictFP-for.body3
+Count:    1
+Min:      261273000
+Median:   8000017
+Mean:     1.30636e+08
+Max:      261273000
+StdDev:  ±1.30636e+08

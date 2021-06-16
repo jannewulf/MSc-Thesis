@@ -1,0 +1,7 @@
+cftmdl-for.body314
+Count:    900009
+Min:      11406
+Median:   12917
+Mean:     13021
+Max:      143124
+StdDev:  ±1826.89

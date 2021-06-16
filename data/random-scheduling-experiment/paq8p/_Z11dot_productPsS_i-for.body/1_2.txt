@@ -1,0 +1,13 @@
+_Z11dot_productPsS_i-for.body
+Count:    16777536
+Min:      104
+Median:   782
+Mean:     845.669
+Max:      206818
+StdDev:  ±1060.94
+Count:    16777536
+Min:      104
+Median:   833
+Mean:     861.238
+Max:      228850
+StdDev:  ±1071.98

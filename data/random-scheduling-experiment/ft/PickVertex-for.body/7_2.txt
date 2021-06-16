@@ -1,0 +1,7 @@
+PickVertex-for.body
+Count:    208173
+Min:      52
+Median:   8229
+Mean:     8447.61
+Max:      207133
+StdDev:  ±5846.97

@@ -1,0 +1,7 @@
+kernel_jacobi_2d_imper_StrictFP-vector.body29
+Count:    1
+Min:      128896000
+Median:   8000017
+Mean:     6.4448e+07
+Max:      128896000
+StdDev:  ±6.4448e+07

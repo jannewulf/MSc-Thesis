@@ -1,0 +1,7 @@
+MultMatrixHPoint-entry
+Count:    1350000
+Min:      104
+Median:   156
+Mean:     139.173
+Max:      46146
+StdDev:  ±180.415

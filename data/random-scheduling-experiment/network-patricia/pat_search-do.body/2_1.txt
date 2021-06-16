@@ -1,0 +1,7 @@
+pat_search-do.body
+Count:    62721
+Min:      156
+Median:   313
+Mean:     354.697
+Max:      25624
+StdDev:  ±241.644

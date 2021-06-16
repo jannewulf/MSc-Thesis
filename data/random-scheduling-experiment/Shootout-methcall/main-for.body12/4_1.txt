@@ -1,0 +1,7 @@
+main-for.body12
+Count:    1
+Min:      16112007970
+Median:   8003586
+Mean:     8.056e+09
+Max:      16112007970
+StdDev:  ±8.056e+09

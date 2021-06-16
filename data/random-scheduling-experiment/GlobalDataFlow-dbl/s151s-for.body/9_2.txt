@@ -1,0 +1,7 @@
+s151s-for.body
+Count:    17250
+Min:      202971
+Median:   210731
+Mean:     215996
+Max:      509744
+StdDev:  ±20430.9

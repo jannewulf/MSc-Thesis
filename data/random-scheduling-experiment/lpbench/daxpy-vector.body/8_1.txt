@@ -1,0 +1,7 @@
+daxpy-vector.body
+Count:    2002999
+Min:      104
+Median:   11770
+Mean:     11520.1
+Max:      255935
+StdDev:  ±6478.46

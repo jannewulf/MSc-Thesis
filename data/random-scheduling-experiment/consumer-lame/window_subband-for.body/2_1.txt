@@ -1,0 +1,7 @@
+window_subband-for.body
+Count:    41400
+Min:      5312
+Median:   5416
+Mean:     5507.03
+Max:      112239
+StdDev:  ±1264.57

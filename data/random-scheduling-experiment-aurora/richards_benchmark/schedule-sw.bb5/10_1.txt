@@ -1,0 +1,7 @@
+schedule-sw.bb5
+Count:    1
+Min:      4111999000
+Median:   8000017
+Mean:     2.056e+09
+Max:      4111999000
+StdDev:  ±2.056e+09

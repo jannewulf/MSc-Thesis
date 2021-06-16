@@ -1,0 +1,7 @@
+Crystal_div-for.body92.us
+Count:    2000000
+Min:      3124
+Median:   3177
+Mean:     3222.48
+Max:      349841
+StdDev:  ±747.344

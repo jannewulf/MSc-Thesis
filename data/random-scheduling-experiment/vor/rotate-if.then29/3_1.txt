@@ -1,0 +1,7 @@
+rotate-if.then29
+Count:    2664220
+Min:      104
+Median:   156
+Mean:     135.852
+Max:      158437
+StdDev:  ±354.528

@@ -1,0 +1,7 @@
+FindAnagram-while.body
+Count:    560
+Min:      35000
+Median:   3963000
+Mean:     3.08325e+06
+Max:      4033000
+StdDev:  ±990644

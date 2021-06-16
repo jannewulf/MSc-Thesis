@@ -1,0 +1,7 @@
+mmult-for.body6.us.us
+Count:    3000000
+Min:      4000
+Median:   4000
+Mean:     4229.18
+Max:      6000
+StdDev:  ±420.304

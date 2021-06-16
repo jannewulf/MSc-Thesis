@@ -1,0 +1,7 @@
+kernel_reg_detect_StrictFP-vector.body160
+Count:    1
+Min:      71210506
+Median:   8003586
+Mean:     3.56053e+07
+Max:      71210506
+StdDev:  ±3.56053e+07

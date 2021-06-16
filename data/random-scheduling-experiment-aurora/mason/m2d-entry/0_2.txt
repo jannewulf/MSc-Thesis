@@ -1,0 +1,7 @@
+m2d-entry
+Count:    2492598
+Min:      0
+Median:   1000
+Mean:     896.664
+Max:      2000
+StdDev:  ±304.397
