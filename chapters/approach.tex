@@ -8,6 +8,11 @@
     The process covers the selection of basic blocks, the instruction schedule generation, the execution model, the learning process and the derivation of the final scheduler.}
     \label{fig:approach:overview}
 \end{figure}
+In the rest of this chapter, we will present the approach used for this thesis (compare \cref{fig:approach:overview}).
+We start with an overview of the benchmark programs we used (\cref{sec:approach:dataset}).
+Then we discuss the importance of basic blocks for instruction scheduling in general and our approach specifically (\cref{sec:approach:basicblock}).
+That is followed by explaining the MCTS approach (\cref{subsec:approach:ml:mcts}).
+Eventually, we introduce how we combine individual MCTS models into a global model (\cref{subsec:approach:ml:global}) and derive an applicable scheduler(\cref{sec:approach:ml-scheduler}).
 
 \section{Dataset}
 \label{sec:approach:dataset}
