@@ -16,21 +16,66 @@ Eventually, we introduce how we combine individual \ac{mcts} models into a globa
 
 \section{Dataset}
 \label{sec:approach:dataset}
-\begin{enumerate}
-    \item 
-    \begin{itemize}
-        \item What: LLVM test suite
-        \item Why: free and ready to use collection of many benchmarks and test programs
-        \item How: describe the dataset, add list of benchmarks?, how many benchmarks, how many basic blocks
-    \end{itemize}
-    \item
-    \begin{itemize}
-        \item What: Custom compilation process
-        \item Why: More control about the compilation process is required. Insertion of optimizer passes, selection of custom schedulers
-        \item How: Extract compilation arguments and execution arguments (flags, files to be read) from test suite
-    \end{itemize}
-\end{enumerate}
-    
+For our experiments, we use benchmarks from the LLVM project called LLVM Test Suite~\footnote{\url{https://llvm.org/docs/TestSuiteGuide.html}}.
+The test suite contains benchmarks in the following categories
+\begin{itemize}
+    \item Single-Source --- built from a single C/C++ source file
+    \item Multi-Source --- built from multiple C/C++ source files
+    \item Micro-Benchmarks --- seperate functions, that are executed by google-benchmark
+    \item Bitcode --- tests that are written in LLVM bitcode
+    \item CTMark --- symbolic links to the other benchmarks to measure compilation performance
+\end{itemize}
+We select the 273 benchmarks from the Single-Source and Multi-Source categories for our experiments.
+\todo{Add table?}
+The benchmarks are all written in C or C++.
+These categories contain benchmarks that are compiled from a single source file or multiple source files, respectively.
+In addition, the test suite contains more benchmarks that are not relevant to our experiments or took too long to integrate.
+
+\subsection{Modified build process}
+The test suite comes with Makefile's and CMake configuration to automatically build all the benchmarks.
+However, these are not sufficient for our approach.
+We need a modified build process for all the benchmarks because we are manipulating it in several cases.
+Furthermore, the compilation cannot be done with a single command because not all arguments of the separate compilation steps are available in the main compiler.
+We execute the front-end, optimization, and back-end phase separately to have complete control over the build process.
+
+We have to set some compiler arguments to make the LLVM compiler front-end eject LLVM \ac{ir} instead of compiling the program completely.
+For C programs we use \lstinline{clang}~\footnote{\url{https://clang.llvm.org/}} and for C++ programs we use \lstinline{clang++}.
+However, the compiler arguments are the same.
+We pass the following arguments to the front-end:
+\begin{itemize}
+    \item \lstinline{-O0}: to prevent optimization in this first step
+    \item \lstinline{-Xclang -disable-O0-optnone}: the \lstinline{-O0} flag alone also prevents optimization in further steps, which is not what we want
+    \item \lstinline{-S -emit-llvm}: to emit LLVM \ac{ir} for further processing --- instead of compiling the program completely
+\end{itemize}
+
+The LLVM optimizer \lstinline{opt}~\footnote{\url{https://llvm.org/docs/CommandGuide/opt.html}} gives a choice to select one of the predefined optimization levels or select specific optimizer runs.
+When we compile a benchmark for measuring the runtime, we only use the flag \lstinline{-O3} for optimizing the LLVM \ac{ir}.
+The LLVM framework makes it easy to implement new optimizer passes.
+We do this to count how often a basic block is executed (see \cref{sec:approach:basicblock:selection}) and measure a function's execution time (see \cref{sec:approach:datageneration:runtime:function}).
+
+We manipulate the instruction scheduling by adjusting how we call the compiler back-end.
+The LLVM static compiler implements two instruction schedulers before the register allocation and one after the register allocation.
+The former inherit either from the C++ class \lstinline{SelectionDAG} or from \lstinline{MIScheduler}.
+Which one will be executed by the compiler depends on the target architecture. 
+It is also possible that the compiler executes both.
+
+We manipulate the back-end by passing arguments to the LLVM static compiler \lstinline{llc}~\footnote{\url{https://llvm.org/docs/CommandGuide/llc.html}}.
+This program represents the back-end phase and executes the instruction scheduling.
+We use the following arguments for the back-end:
+\begin{itemize}
+    \item \lstinline{--pre-RA-sched=}: to select our new \lstinline{SelectionDAG} schedulers for the pre-register-allocation phase
+    \item \lstinline{--misched-cutoff=0}: to disable the \lstinline{MIScheduler}
+    \item \lstinline{--disable-post-ra}: to disable the post-register-allocation scheduler
+\end{itemize}
+
+We analyze the CMake configurations and extract required compiler arguments on a per benchmark level.
+We categorize the extracted arguments into front-end, optimizer, and back-end phases.
+Finally, we append them to the previously described arguments in the respective compilation phase.
+
+We also analyze the test suite for execution arguments.
+For example, some benchmarks read data from files or require arguments when calling them.
+To execute them, we generate a shell script that calls the compiled benchmark with the required arguments.
+
 \section{Basic Block --- scheduling unit}
 \label{sec:approach:basicblock}
 \begin{itemize}
@@ -40,6 +85,7 @@ Eventually, we introduce how we combine individual \ac{mcts} models into a globa
 \end{itemize}
 
 \subsection{Selection process}
+\label{sec:approach:basicblock:selection}
 \begin{itemize}
     \item What: Select BB's for our dataset
     \item Why: Too many to work on all of them, time intensive, compilation time, execution time, ML
@@ -98,6 +144,7 @@ It would be optimal to just measure the the scheduled instructions with perfect 
     \todo{Plot basic block length distribution}
 \end{itemize}
 \subsubsection{Function}
+\label{sec:approach:datageneration:runtime:function}
 A specific basic block of a function might be executed multiple times during function execution.
 In this situation, this is relevant in to different aspects.
 
