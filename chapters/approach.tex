@@ -32,6 +32,7 @@ These categories contain benchmarks that are compiled from a single source file 
 In addition, the test suite contains more benchmarks that are not relevant to our experiments or took too long to integrate.
 
 \subsection{Modified build process}
+\label{sec:approach:build_process}
 The test suite comes with Makefile's and CMake configuration to automatically build all the benchmarks.
 However, these are not sufficient for our approach.
 We need a modified build process for all the benchmarks because we are manipulating it in several cases.
@@ -78,41 +79,85 @@ To execute them, we generate a shell script that calls the compiled benchmark wi
 
 \section{Basic Block --- scheduling unit}
 \label{sec:approach:basicblock}
-\begin{itemize}
-    \item What: We choose basic blocks as the scheduling unit
-    \item Why: Used by the LLVM compiler framework and most other compilers, Limits scope and complexity
-    \item How: Code split into BB's and scheduling of BB's independently
-\end{itemize}
+Even though there exists some research on instruction scheduling on more extensive units, most compilers schedule instructions on a per basic block level.
+This is also true for the LLVM compiler framework.
+The advantage of this is that the limited scope avoids complicated situations and thus simplifies the scheduling problem.
+For Example, do not have to deal with jump instructions.
+
+Consequently, we also choose the basic block as the unit for instruction scheduling.
+That means that we execute our experiments on individual basic blocks and learn to schedule individual basic blocks.
+Later, we combine the models to generalize the knowledge.
+We describe this process in detail in \cref{sub:approach:ml}.
 
 \subsection{Selection process}
 \label{sec:approach:basicblock:selection}
-\begin{itemize}
-    \item What: Select BB's for our dataset
-    \item Why: Too many to work on all of them, time intensive, compilation time, execution time, ML
-    \item How: Develop heuristics for the selection
-\end{itemize}
+Not all basic blocks provide an equal value to our experiments.
+It also consumes too much time to work on all the basic blocks within the scope of this thesis (\eg compilation time, execution time, machine learning time).
+Therefore, we sort our basic blocks by heuristics. 
+From this list, we select as many as we need and can handle in our experiments.
+We designed three heuristics which we will explain in the following paragraphs.
+See \cref{tab:approach:bb_heuristics} for an example overview.
+
+\begin{table}
+    \centering
+    \begin{tabular}{@{}llrrr@{}}
+        \toprule
+        Function & Basic Block & Length & \(\#\) Executions & Product \\
+        \midrule
+        kernel\_floyd\_warshall\_StrictFP & for.body6 & 23 & 536,870,912 & 12,348,030,976 \\
+        kernel\_floyd\_warshall & for.body6 & 23 & 536,870,912 & 12,348,030,976 \\
+        print\_element & entry & 25 & 1,048,576 & 26,214,400 \\
+        kernel\_floyd\_warshall\_StrictFP & for.cond4.preheader & 17 & 1,048,576 & 17,825,792 \\
+        \(\cdots\) & \(\cdots\) & \(\cdots\) & \(\cdots\) & \(\cdots\) \\
+        xmalloc & entry & 8 & 2 & 16 \\
+        main & entry & 11 & 1 & 11 \\
+        \bottomrule
+    \end{tabular}
+    \caption[Basic block heuristics for the floyd-warshall benchmark]
+    {
+        The tables shows an excerpt of the basic block heuristics (see \cref{sec:approach:basicblock:selection}) for the floyd-warshall benchmark. 
+        The basic blocks are sorted by the last heuristic, which is the product of the length and execution count. 
+        From this list the table shows the top four and last two basic blocks in the benchmark.
+    }
+    \label{tab:approach:bb_heuristics}
+\end{table}
+
 \subsubsection{Longest basic blocks}
-\begin{itemize}
-    \item What: The BB's with the most instructions in them
-    \item Why: Good heuristic for number of scheduling decisions. From many scheduling decisions we can learn more. Short BBs have very few scheduling decisions
-    \item How: Count the number of instructions in the intermediate LLVM IR files of that basic block
-\end{itemize}
+The number of instructions in a basic block correlates with the number of possible schedules.
+Consequently, we can learn more from a basic block when there are more different scheduling situations available.
+For example, we will see more scheduling situations in a basic block containing 20 instructions than in a basic block containing only three instructions.
+
+We implemented a hook into the LLVM framework to count the number of instructions in a basic block.
+This hook prints the number of instructions in each basic block during the compilation process.
+From this output, we put together a list with all basic blocks and their lengths (see \cref{tab:approach:bb_heuristics}).
+
 \subsubsection{Most executed basic blocks}
-\begin{itemize}
-    \item What: The BB's that are executed the most often
-    \item Why: Most important blocks. Good decisions here can lead to higher speedup
-    \item How: Implement LLVM optimizer pass to inject counters into each BB. Execute to count. Generate List of counts
-\end{itemize}
-\todo{Show example numbers}
+Some basic blocks are significantly more often executed than others.
+For example, basic blocks in the bodies of loops run often.
+A basic block in the error checking code of the beginning of a program might only execute once.
+Often executed basic blocks influence the overall runtime a lot.
+Hence, we are more interested in optimizing these.
+See \cref{tab:approach:bb_heuristics} for an example.
+
+We implemented a LLVM optimizer pass for injecting counters into a program.
+Optimizer passes take LLVM \ac{ir} files as input and output the code in the same file format.
+Our pass injects one global 64 bit counter variable for each basic block into the code.
+Next, the pass adds instructions into the beginning of each basic block, which increase the corresponding counter by one.
+At the end of the main function the pass adds a format string and injects a call to the \lstinline{printf} function to print all the counter values and corresponding basic block names.
+
+The optimizer pass must be compiled with the LLVM framework.
+We include the optimizer pass into our build process (see \cref{sec:approach:build_process}).
+There, we add a call to the LLVM optimizer \lstinline{opt} with the argument \mbox{\lstinline{-passes=dyn-bb-count}}.
+To actually get the counts, we build a benchmark with this optimizer pass and and execute it.
+The benchmark will then print the counter values.
+
 \subsubsection{Most executed and longest basic blocks}
-\begin{itemize}
-    \item What: Combine the two previous heuristics
-    \item Why: Most executed, can still be very short BB's. Like initilization of for loops
-    \item How: Multiply both numbers
-\end{itemize}
-\todo{Show example}
+The previous two heuristics are helpful on their own, but we are most interested in basic blocks that combine the two aspects.
+For example, the most executed basic block can still come from a very simple loop with few instructions in the loop body.
+We compute the product of the two heuristics to get a combined heuristic.
 
 \section{Learning to schedule}
+\label{sub:approach:ml}
 \subsection{Local MCTS model}
 \label{subsec:approach:ml:mcts}
 \subsection{Global model}
