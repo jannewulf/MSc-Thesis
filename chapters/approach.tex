@@ -239,8 +239,28 @@ Accessed by assembly instructions.
 Measurements in CPU cycles.
 Lowest overhead available.
 Access might be protected (Linux module required).
-\subsection{Basic block isolation}
-\subsubsection{Basic block extraction}
+
+\subsection{Execution unit}
+\label{sec:approach:exec_unit}
+For the learning process, we have to execute the differently scheduled basic blocks many times.
+This can be time intensive, and many lines of code are executed that we are not interested in.
+The scope of the thesis forces us to extract the basic block from the benchmark and execute it in isolation.
+Here, we discuss the advantages and disadvantages of the two possible approaches.
+
+\subsubsection{Benchmark}
+The first option is to execute the complete benchmark for every new schedule that was generated during the learning process.
+The advantage is, that we execute the original basic block like it would appear in the real benchmark.
+The problem with this approach is that the execution time of a benchmark can be high and makes the execution the bottleneck in our pipeline.
+Many benchmarks in our dataset take several minutes to execute on a RaspberryPi 3B.
+So, executing always the whole benchmark is costly to even get only one runtime measurement per schedule.
+In order to get statistically relevant runtimes, we have to measure them multiple times because.
+
+\subsubsection{Basic Block}
+The alternative to executing the whole benchmark is to extract the scheduled basic block from the benchmark and execute in isolation.
+By using this approach we reduce the execution time to a minimum and do not execute code we are not interested in.
+Consequently, we can execute the benchmark many times and get statistically reliable runtime measurements.
+The disadvantage is that we have to slightly modify the basic block or the program will crash.
+
 How to get the assembly (compilation process).
 Problems: function calls (remove), jumps(only in last instr, remove), load/access (memory access, readress to stack variable)
 \todo{Create table with removed instructions}
