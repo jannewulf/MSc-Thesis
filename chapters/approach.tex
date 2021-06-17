@@ -261,9 +261,35 @@ By using this approach we reduce the execution time to a minimum and do not exec
 Consequently, we can execute the benchmark many times and get statistically reliable runtime measurements.
 The disadvantage is that we have to slightly modify the basic block or the program will crash.
 
-How to get the assembly (compilation process).
-Problems: function calls (remove), jumps(only in last instr, remove), load/access (memory access, readress to stack variable)
-\todo{Create table with removed instructions}
+\subsection{Basic Block Isolation}
+As discussed in \cref{sec:approach:exec_unit}, we are forced to execute basic blocks isolated from the benchmark.
+To make a basic block executable we isolate it and insert it as inline assembly into our minimal C++ framework.
+
+\subsubsection{Basic Block Extraction}
+First, we compile the benchmark and schedule the basic block with our modified compilation process (see \cref{sec:approach:build_process}) into assembly files.
+Next, we extract the basic block instructions from the assembly file.
+Then, we modify the basic block instructions slightly to prevent execution and compilation errors and as a last step we inject it into our C++ framework.
+
+The assembly code can contain some lines that will make our framwork crash.
+We are forced to modify or delete these lines.
+
+Assembly files contain comments, labels and assembler directives which will be removed.
+Comments are useless lines for the execution task. 
+The labels are not required, as we will not jump to other instructions from other instructions.
+And assembler directives represent commands to the assembler program for bookkeeping, storage reservation and other purposes.
+These could interfere with our compilation process and are also removed.
+
+Basic blocks can contain jump instructions as the last instruction and function calls in any position.
+To prevent uncontrolled program execution, we simply remove these instructions.
+The removal of these instructions might slightly reduce the execution time, but the reduction is constant over all executions with different schedules.
+
+In order to prevent segmentation faults, we have to redirect all memory accesses to a memory area that we are allowed to read and write to.
+This affects all load and store instructions.
+In our framwork we allocate 8 byte on the stack where we redirect all memory accesses to.
+This means also that all memory accesses are cache hits and we have a controlled environment in this aspect.
+
+\todo{Show example}
+
 \subsubsection{Isolated basic block execution}
 From extracted basic block create inline assembly with stack variable. Now executable from C/C++.
 Warmup 100 runs. Timings 1000 runs. 
