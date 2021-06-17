@@ -31,7 +31,7 @@ The benchmarks are all written in C or C++.
 These categories contain benchmarks that are compiled from a single source file or multiple source files, respectively.
 In addition, the test suite contains more benchmarks that are not relevant to our experiments or took too long to integrate.
 
-\subsection{Modified build process}
+\subsection{Modified Build Process}
 \label{sec:approach:build_process}
 The test suite comes with Makefile's and CMake configuration to automatically build all the benchmarks.
 However, these are not sufficient for our approach.
@@ -77,7 +77,7 @@ We also analyze the test suite for execution arguments.
 For example, some benchmarks read data from files or require arguments when calling them.
 To execute them, we generate a shell script that calls the compiled benchmark with the required arguments.
 
-\section{Basic Block --- scheduling unit}
+\section{Basic Block --- Scheduling Unit}
 \label{sec:approach:basicblock}
 Even though there exists some research on instruction scheduling on more extensive units, most compilers schedule instructions on a per basic block level.
 This is also true for the LLVM compiler framework.
@@ -89,7 +89,7 @@ That means that we execute our experiments on individual basic blocks and learn 
 Later, we combine the models to generalize the knowledge.
 We describe this process in detail in \cref{sec:approach:ml}.
 
-\subsection{Selection process}
+\subsection{Selection Process}
 \label{sec:approach:basicblock:selection}
 Not all basic blocks provide an equal value to our experiments.
 It also consumes too much time to work on all the basic blocks within the scope of this thesis (\eg compilation time, execution time, machine learning time).
@@ -122,7 +122,7 @@ See \cref{tab:approach:bb_heuristics} for an example overview.
     \label{tab:approach:bb_heuristics}
 \end{table}
 
-\subsubsection{Longest basic blocks}
+\subsubsection{Longest Basic Blocks}
 The number of instructions in a basic block correlates with the number of possible schedules.
 Consequently, we can learn more from a basic block when there are more different scheduling situations available.
 For example, we will see more scheduling situations in a basic block containing 20 instructions than in a basic block containing only three instructions.
@@ -131,7 +131,7 @@ We implemented a hook into the LLVM framework to count the number of instruction
 This hook prints the number of instructions in each basic block during the compilation process.
 From this output, we put together a list with all basic blocks and their lengths (see \cref{tab:approach:bb_heuristics}).
 
-\subsubsection{Most executed basic blocks}
+\subsubsection{Most Executed Basic Blocks}
 Some basic blocks are significantly more often executed than others.
 For example, basic blocks in the bodies of loops run often.
 A basic block in the error checking code of the beginning of a program might only execute once.
@@ -151,19 +151,19 @@ There, we add a call to the LLVM optimizer \lstinline{opt} with the argument \mb
 To actually get the counts, we build a benchmark with this optimizer pass and and execute it.
 The benchmark will then print the counter values.
 
-\subsubsection{Most executed and longest basic blocks}
+\subsubsection{Most Executed and Longest Basic Blocks}
 The previous two heuristics are helpful on their own, but we are most interested in basic blocks that combine the two aspects.
 For example, the most executed basic block can still come from a very simple loop with few instructions in the loop body.
 We compute the product of the two heuristics to get a combined heuristic.
 
-\section{Learning to schedule}
+\section{Learning to Schedule}
 \label{sec:approach:ml}
-\subsection{Local MCTS model}
+\subsection{Local MCTS Model}
 \label{subsec:approach:ml:mcts}
-\subsection{Global model}
+\subsection{Global Model}
 \label{subsec:approach:ml:global}
 
-\section{Data generation}
+\section{Data Generation}
 We cannot build our data-driven models (see \cref{sec:approach:ml}) directly from our dataset, described in \cref{sec:approach:dataset}.
 Learning from this dataset requires some transformation from the code to a metric we are interested in.
 Many metrics can be chosen for optimization \eg runtime, energy consumption, cache misses, processor stalls.
@@ -172,7 +172,7 @@ To generate data for our MCTS approach we need a mapping from instruction schedu
 Therefore, we compile the code with varying instruction schedules and execute it to measure its runtime.
 We discuss various aspects of this in the remainder of this section.
 
-\subsection{Runtime measurement unit}
+\subsection{Runtime Measurement Unit}
 It would be optimal to just measure the the scheduled instructions with perfect precision and reliability.
 \subsubsection{Basic Block}
 \begin{itemize}
@@ -212,7 +212,7 @@ We are more interested in speedups, rather than precise execution times.
     \todo{Show visualization}
 \end{itemize}
 
-\subsection{Runtime measurement methods}
+\subsection{Runtime Measurement Methods}
 \todo{Could add little experiment where we compare hardware timers vs OS access}
 \subsubsection{Profiling}
 \begin{itemize}
@@ -222,7 +222,7 @@ We are more interested in speedups, rather than precise execution times.
         There is no measurement from point A to point B which leads to inaccuracies
     \item How: Read e.g. the paper of gperf \cite{graham1982gprof}
 \end{itemize}
-\subsubsection{Operating system methods}
+\subsubsection{Operating System Methods}
 % In linux(C): clock_gettime().
 % Windows: QueryPerformanceCounter().
 % C++: std::high_resolution_clock().
@@ -230,7 +230,7 @@ These might return different clocks depending on the used hardware.
 Returns the time from the hardware the OS runs on.
 Has overhead but also handles problems.
 Typically best for measurements in microseconds range and longer.
-\subsubsection{Hardware performance counters}
+\subsubsection{Hardware Performance Counters}
 Accessed by assembly instructions.
 % x86: 'rdtsc' Saves current value into EDX:EAX registers
 % ARM32: mrc p15m, 0, \%0, c15, c12, 1
@@ -240,7 +240,7 @@ Measurements in CPU cycles.
 Lowest overhead available.
 Access might be protected (Linux module required).
 
-\subsection{Execution unit}
+\subsection{Execution Unit}
 \label{sec:approach:exec_unit}
 For the learning process, we have to execute the differently scheduled basic blocks many times.
 This can be time intensive, and many lines of code are executed that we are not interested in.
@@ -290,15 +290,15 @@ This means also that all memory accesses are cache hits and we have a controlled
 
 \todo{Show example}
 
-\subsubsection{Isolated basic block execution}
+\subsubsection{Isolated Basic Block Execution}
 From extracted basic block create inline assembly with stack variable. Now executable from C/C++.
 Warmup 100 runs. Timings 1000 runs. 
-\subsection{Computing rewards from runtimes}
+\subsection{Computing Rewards From Runtimes}
 There are some outliers in the runtimes. Sort runtimes, cutoff lower and upper 5\% of the runtimes to remove outliers and compute avg of the rest.
 What could be reasons for outliers?
 Show some distributions of measurements to justify why we are throwing away data.
 
-\section{Application of the learned model}
+\section{Application of the Learned Model}
 \label{sec:approach:ml-scheduler}
 
 % Probably wrong place here, but compare approach with auto-tuning approach.
