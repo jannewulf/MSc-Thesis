@@ -164,20 +164,13 @@ We compute the product of the two heuristics to get a combined heuristic.
 \label{subsec:approach:ml:global}
 
 \section{Data generation}
-\begin{enumerate}
-    \item 
-    \begin{itemize}
-        \item What: Need to generate data from which we can learn
-        \item Why: Dataset has only the code, we need som metric to learn from
-        \item How: Execute the code and measure the metric
-    \end{itemize}
-    \item
-    \begin{itemize}
-        \item What: We choose to optimize for the runtime
-        \item Why: That's what users in the most situations are interested in
-        \item How: Execute the BB and measure the runtime
-    \end{itemize}
-\end{enumerate}
+We cannot build our data-driven models (see \cref{sec:approach:ml}) directly from our dataset, described in \cref{sec:approach:dataset}.
+Learning from this dataset requires some transformation from the code to a metric we are interested in.
+Many metrics can be chosen for optimization \eg runtime, energy consumption, cache misses, processor stalls.
+We focus on optimizing the instruction scheduling for fast runtimes.
+To generate data for our MCTS approach we need a mapping from instruction schedules to runtimes.
+Therefore, we compile the code with varying instruction schedules and execute it to measure its runtime.
+We discuss various aspects of this in the remainder of this section.
 
 \subsection{Runtime measurement unit}
 It would be optimal to just measure the the scheduled instructions with perfect precision and reliability.
