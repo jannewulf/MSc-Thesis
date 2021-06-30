@@ -8,39 +8,39 @@
     The process covers the selection of basic blocks, the instruction schedule generation, the execution model, the learning process and the derivation of the final scheduler.}
     \label{fig:approach:overview}
 \end{figure}
-In the rest of this chapter, we will present the approach used for this thesis (compare~\cref{fig:approach:overview}).
+In the rest of this chapter, we present the approach used for this thesis (compare~\cref{fig:approach:overview}).
 We start with an overview of the benchmark programs we used~(\cref{sec:approach:dataset}).
 Then we discuss the importance of basic blocks for instruction scheduling in general and our approach specifically~(\cref{sec:approach:basicblock}).
 That is followed by explaining the \ac{mcts} approach~(\cref{subsec:approach:ml:mcts}).
-Eventually, we introduce how we combine individual \ac{mcts} models into a global model~(\cref{subsec:approach:ml:global}) and derive an applicable scheduler~(\cref{sec:approach:ml-scheduler}).
+Eventually, we introduce our approach for combining individual \ac{mcts} models into a global model~(\cref{subsec:approach:ml:global}) and derive an applicable scheduler~(\cref{sec:approach:ml-scheduler}).
 
 \section{Dataset}
 \label{sec:approach:dataset}
-For our experiments, we use benchmarks from the LLVM project called LLVM Test Suite~\footnote{\url{https://llvm.org/docs/TestSuiteGuide.html}}.
-The test suite contains benchmarks in the following categories
+For our experiments, we use benchmarks from the LLVM project~\cite{LLVM:CGO04} called LLVM Test Suite~\footnote{\url{https://llvm.org/docs/TestSuiteGuide.html}}.
+The test suite contains benchmarks from the following categories
 \begin{itemize}
     \item Single-Source --- built from a single C/C++ source file
     \item Multi-Source --- built from multiple C/C++ source files
-    \item Micro-Benchmarks --- seperate functions, that are executed by google-benchmark
+    \item Micro-Benchmarks --- separate functions that are executed by google-benchmark
     \item Bitcode --- tests that are written in LLVM bitcode
     \item CTMark --- symbolic links to the other benchmarks to measure compilation performance
 \end{itemize}
 We select the 273 benchmarks from the Single-Source and Multi-Source categories for our experiments.
 \todo{Add table?}
-The benchmarks are all written in C or C++.
 These categories contain benchmarks that are compiled from a single source file or multiple source files, respectively.
-In addition, the test suite contains more benchmarks that are not relevant to our experiments or took too long to integrate.
+The benchmarks are all written in C or C++.
+In addition, the test suite contains more benchmarks that are not relevant to our experiments. \todo{Why not?}
 
 \subsection{Modified Build Process}
 \label{sec:approach:build_process}
-The test suite comes with Makefile's and CMake configuration to automatically build all the benchmarks.
+The test suite comes with Makefiles and CMake configurations to automatically build all benchmarks.
 However, these are not sufficient for our approach.
 We need a modified build process for all the benchmarks because we are manipulating it in several cases.
-Furthermore, the compilation cannot be done with a single command because not all arguments of the separate compilation steps are available in the main compiler.
-We execute the front-end, optimization, and back-end phase separately to have complete control over the build process.
+Furthermore, the compilation cannot be done by a single command because not all arguments of the separate compilation steps are available in the main compiler.
+We execute the front-end, optimization, and back-end compiler phases separately to have complete control over the build process.
 
-We have to set some compiler arguments to make the LLVM compiler front-end eject LLVM \ac{ir} instead of compiling the program completely.
-For C programs we use \lstinline{clang}~\footnote{\url{https://clang.llvm.org/}} and for C++ programs we use \lstinline{clang++}.
+We have to set some compiler arguments to make the LLVM compiler front-end output LLVM \ac{ir} instead of compiling the program to an executable format.
+For C programs we use \lstinline{clang}~\footnote{\url{https://clang.llvm.org/}} and for C++ programs we use \lstinline{clang++} as compilers.
 However, the compiler arguments are the same.
 We pass the following arguments to the front-end:
 \begin{itemize}
@@ -54,11 +54,11 @@ When we compile a benchmark for measuring the runtime, we only use the flag \lst
 The LLVM framework makes it easy to implement new optimizer passes.
 We do this to count how often a basic block is executed (see \cref{sec:approach:basicblock:selection}) and measure a function's execution time (see \cref{sec:approach:datageneration:runtime:function}).
 
-We manipulate the instruction scheduling by adjusting how we call the compiler back-end.
-The LLVM static compiler implements two instruction schedulers before the register allocation and one after the register allocation.
+The LLVM back-end compiler implements two instruction schedulers before the register allocation and one after the register allocation.
 The former inherit either from the C++ class \lstinline{SelectionDAG} or from \lstinline{MIScheduler}.
-Which one will be executed by the compiler depends on the target architecture. 
+It depends on the target architecture which instruction scheduler will be executed by the compiler. 
 It is also possible that the compiler executes both.
+\todo{Maybe move this also to the bg chapter}
 
 We manipulate the back-end by passing arguments to the LLVM static compiler \lstinline{llc}~\footnote{\url{https://llvm.org/docs/CommandGuide/llc.html}}.
 This program represents the back-end phase and executes the instruction scheduling.
@@ -79,7 +79,7 @@ To execute them, we generate a shell script that calls the compiled benchmark wi
 
 \section{Basic Block --- Scheduling Unit}
 \label{sec:approach:basicblock}
-Even though there exists some research on instruction scheduling on more extensive units, most compilers schedule instructions on a per basic block level.
+Even though there exists some research \todo{add references} on instruction scheduling on more extensive units, most compilers schedule instructions on a per basic block level.
 This is also true for the LLVM compiler framework.
 The advantage of this is that the limited scope avoids complicated situations and thus simplifies the scheduling problem.
 For Example, do not have to deal with jump instructions.
@@ -123,6 +123,8 @@ See \cref{tab:approach:bb_heuristics} for an example overview.
 \end{table}
 
 \subsubsection{Longest Basic Blocks}
+\todo{Add note about influence of pipeline length}
+\todo{More different instructions use more functional units of the processor}
 The number of instructions in a basic block correlates with the number of possible schedules.
 Consequently, we can learn more from a basic block when there are more different scheduling situations available.
 For example, we will see more scheduling situations in a basic block containing 20 instructions than in a basic block containing only three instructions.
@@ -152,6 +154,8 @@ To actually get the counts, we build a benchmark with this optimizer pass and an
 The benchmark will then print the counter values.
 
 \subsubsection{Most Executed and Longest Basic Blocks}
+\todo{Include discussion about variance in resulting basic blocks}
+\todo{most influence on overall runtime}
 The previous two heuristics are helpful on their own, but we are most interested in basic blocks that combine the two aspects.
 For example, the most executed basic block can still come from a very simple loop with few instructions in the loop body.
 We compute the product of the two heuristics to get a combined heuristic.
@@ -177,7 +181,7 @@ We discuss various aspects of this in the remainder of this section.
 It would be optimal to just measure the the scheduled instructions with perfect precision and reliability.
 \subsubsection{Basic Block}
 \begin{itemize}
-    \item What: Measuring the basic block itself is complicated
+    \item What: Measuring the basic block itself is complicated, pipelining makes it hard
     \item Why: we need very precise time measurements
     \item How: the typical length of a basic block ranges from a hand full of instructions to a few dozens
     \todo{Plot basic block length distribution}
@@ -231,6 +235,7 @@ These might return different clocks depending on the used hardware.
 Returns the time from the hardware the OS runs on.
 Has overhead but also handles problems.
 Typically best for measurements in microseconds range and longer.
+Include pinning processes to cores and isolating cores.
 \subsubsection{Hardware Performance Counters}
 Accessed by assembly instructions.
 % x86: 'rdtsc' Saves current value into EDX:EAX registers
@@ -267,6 +272,7 @@ As discussed in \cref{sec:approach:exec_unit}, we are forced to execute basic bl
 To make a basic block executable we isolate it and insert it as inline assembly into our minimal C++ framework.
 
 \subsubsection{Basic Block Extraction}
+\todo{include numbers on speedup vs. benchmarking full function}
 First, we compile the benchmark and schedule the basic block with our modified compilation process (see \cref{sec:approach:build_process}) into assembly files.
 Next, we extract the basic block instructions from the assembly file.
 Then, we modify the basic block instructions slightly to prevent execution and compilation errors and as a last step we inject it into our C++ framework.
