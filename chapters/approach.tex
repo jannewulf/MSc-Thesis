@@ -321,12 +321,14 @@ We are forced to modify or delete these lines.
 
 Assembly files contain comments, labels and assembler directives which will be removed.
 Comments are useless lines for the execution task. 
-The labels are not required, as we will not jump to other instructions from other instructions.
+The labels are not required, as we will not jump to other instructions.
 And assembler directives represent commands to the assembler program for bookkeeping, storage reservation and other purposes.
 These could interfere with our compilation process and are also removed.
 
 Basic blocks can contain jump instructions as the last instruction and function calls in any position.
-To prevent uncontrolled program execution, we simply remove these instructions.
+We only schedule the instructions in the given basic block, so we are also only interested in its own runtime.
+Executing other code, which could internally chosse different paths would add noise to our measurements.
+To prevent this uncontrolled program execution, we simply remove jump and call instructions.
 The removal of these instructions might slightly reduce the execution time, but the reduction is constant over all executions with different schedules.
 
 In order to prevent segmentation faults, we have to redirect all memory accesses to a memory area that we are allowed to read and write to.
