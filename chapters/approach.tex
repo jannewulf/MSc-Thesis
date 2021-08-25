@@ -53,6 +53,7 @@ The LLVM optimizer \lstinline{opt}~\footnote{\url{https://llvm.org/docs/CommandG
 When we compile a benchmark for measuring the runtime, we only use the flag \lstinline{-O3} for optimizing the LLVM \ac{ir}.
 The LLVM framework makes it easy to implement new optimizer passes.
 We do this to count how often a basic block is executed (see \cref{sec:approach:basicblock:selection}) and measure a function's execution time (see \cref{sec:approach:datageneration:runtime:function}).
+\todo{This is not true anymore}
 
 The LLVM back-end compiler implements two instruction schedulers before the register allocation and one after the register allocation.
 The former inherit either from the C++ class \lstinline{SelectionDAG} or from \lstinline{MIScheduler}.
@@ -280,6 +281,7 @@ Lowest overhead available.
 Access might be protected (Linux module required).
 
 \subsection{Execution Unit}
+\todo{Provide runtime example data}
 \label{sec:approach:exec_unit}
 For the learning process, we have to execute the differently scheduled basic blocks many times.
 This can be time intensive, and many lines of code are executed that we are not interested in.
