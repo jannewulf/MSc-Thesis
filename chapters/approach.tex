@@ -169,55 +169,87 @@ We compute the product of the two heuristics to get a combined heuristic.
 \label{subsec:approach:ml:global}
 
 \section{Data Generation}
+\tobechecked
 We cannot build our data-driven models (see \cref{sec:approach:ml}) directly from our dataset, described in \cref{sec:approach:dataset}.
 Learning from this dataset requires some transformation from the code to a metric we are interested in.
 Many metrics can be chosen for optimization \eg runtime, energy consumption, cache misses, processor stalls.
-We focus on optimizing the instruction scheduling for fast runtimes.
+We focus on optimizing the instruction scheduling for short runtimes.
 To generate data for our MCTS approach we need a mapping from instruction schedules to runtimes.
+
+The most reliable approach is to measure the runtime while executing the code.
+\todo{Discuss these in related work. Check Ithemal paper for more ressources}
+However, research on approaches that rely on analytical models exists~\cite{llvm:mca, mendis2019ithemal, taha2003instruction, laukemann2018automated}.
+We will choose the classical approach of runtime measurements, since we have access to the hardware and the resulting data will be more accurate.
 Therefore, we compile the code with varying instruction schedules and execute it to measure its runtime.
 We discuss various aspects of this in the remainder of this section.
 
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.8]{img/ppt/runtime_measurement_scopes-crop.pdf}
+    \caption[Possibile scopes for measuring runtimes]{The outer box represents a function. 
+    The function consists of multiple basic blocks (BB) where different possible branches are caused by if/else statements and loops. 
+    The diagram shows three possible runtime measuring scopes to measure the runtime of the filled basic block.
+    Method 1 shows a measuring inside of a basic block. 
+    With method 2, the measurement starts with the end of the last basic block and ends with the start of the next one.
+    Method 3 measures the complete function which surrounds the basic block.}
+    \label{fig:approach:runtime_scopes}
+\end{figure}
+
 \subsection{Runtime Measurement Unit}
-It would be optimal to just measure the the scheduled instructions with perfect precision and reliability.
-\subsubsection{Basic Block}
-\begin{itemize}
-    \item What: Measuring the basic block itself is complicated, pipelining makes it hard
-    \item Why: we need very precise time measurements
-    \item How: the typical length of a basic block ranges from a hand full of instructions to a few dozens
-    \todo{Plot basic block length distribution}
-\end{itemize}
+\tobechecked
+The metric we are interested in specifically, is the relative runtime compared to a baseline runtime.
+Runtime overheads can be ignored in our approach, as long as they are constant over multiple runs.
+Thus, various possibilities for placing the start and stop events of the timer exist to accomplish runtime measurements of fractions of the applications code.
+The objective is to minimize noise and get reliable, reproducable measurements.
+We discuss the possibilities of making measurements on basic block, function and application scope and relevant aspects to these possibilities.
+
+\subsubsection{Application}
+\tobechecked
+\label{sec:approach:datageneration:runtime:app}
+The most straight forward approach to measuring the runtime of a piece of code is to measure the runtime of its whole application.
+The disadvantage is, that we include many more instructions in the measurement than we are interested in.
+This generates lots of noise from various possible sources (\eg from \ac{io} instructions like opening files, printing to the screen or varying latencies for memory accesses).
+Also, the longer the runtime of a program, the higher is the probablity that the operating system will interrupt the execution for more important processes.
+Depending on the used measurement method (see \cref{sec:approach:datageneration:runtime_methods}), this will be included or not be included in the measurement.
+These disadvantages make this approach unreliable and not usable for us because we are interested in the short runtime of a single basic block.
+
 \subsubsection{Function}
+\tobechecked
 \label{sec:approach:datageneration:runtime:function}
-A specific basic block of a function might be executed multiple times during function execution.
-In this situation, this is relevant in to different aspects.
+A finer grained approach is to start the timer at the beginning of the function or method that contains the basic block of interest and stop the timer at the end of the function (see method 3 in \cref{fig:approach:runtime_scopes}).
+There come several problems with this approach.
 
-% \begin{itemize}
-%     \item What: Advantage: BB is executed multiple times, so its runtime is easier to measure
-%     \item Why: 
-%     \item How: 
-% \end{itemize}
-We are more interested in speedups, rather than precise execution times.
+Compared to measuring the runtime of the whole application (see \cref{sec:approach:datageneration:runtime:app}) this approach executes only a small fraction of the code.
+This results in a lower probablity for variances in the measured runtimes due to less \ac{os} interrupts, less memory and \ac{io} accesses.
+Thus, the precision of these measurements is higher.
 
+Notice in \cref{fig:approach:runtime_scopes} that there are different control paths are possible in a function, based on if/else statements or loops.
+This can be problematic in a general setup.
+However, the benchmarks we use and the data we insert to them are deterministic, \ie the same paths are taken with each benchmark execution.
+Theoretically, if there were no variance in the measurements, the shortest measured execution time would always correspond to the same execution path.
+In practice, we get many varying measurements because of different execution paths.
+That makes it difficult to differentiate between execution paths and variance in the measurements.
 
+\subsubsection{Basic Block}
+\tobechecked
+The most intuitive approach is to measure only the runtime of the basic block we are interested in.
+We eliminate all extra processor instructions that we are not interested in.
+However, we can still get runtime variations for different reasons:
 \begin{itemize}
-    \item What: Measure the function which contains the basic block is bad in general
-    \item Why: Different paths could be taken throught the function, e.g. if-else, loops
-    \item How: 
-\end{itemize}
-\begin{itemize}
-    \item What: In this case it is okay
-    \item Why: the benchmarks are deterministic, each path is taken the same number of times between executions
-    \item How: 
-\end{itemize}
-\subsubsection{Program}
-\begin{itemize}
-    \item What: Measure the execution time of the whole program
-    \item Why: Easy, but unreliable because of IO operations and other noise (e.g. OS), we are only interested in a small fraction of the code
-    \item How: 
-    \todo{Show visualization}
+    \item The basic block could call other functions which could execute varying branches. 
+          See \cref{sec:approach:bbisolation} for a discussion about this.
+    \item The \ac{os} could interrupt the execution. 
+          But the probablity decreases with shorter code fragments.
 \end{itemize}
 
+One requirement can not be met in all situations is that we require a very precise timer.
+These timers usually depend on the hardware directly, \ie the hardware must provide such functionality to measure runtimes.
+This is possible on our chosen hardware and is discussed in more detail in \cref{sec:approach:hwpercounter}.
+
+Thus, as this is a feasible solution for our experiments we have chosen to measure the runtime of basic blocks alone.
+    
 \subsection{Runtime Measurement Methods}
+\label{sec:approach:datageneration:runtime_methods}
 \todo{Could add little experiment where we compare hardware timers vs OS access}
 \subsubsection{Profiling}
 \begin{itemize}
@@ -237,6 +269,7 @@ Has overhead but also handles problems.
 Typically best for measurements in microseconds range and longer.
 Include pinning processes to cores and isolating cores.
 \subsubsection{Hardware Performance Counters}
+\label{sec:approach:hwpercounter}
 Accessed by assembly instructions.
 % x86: 'rdtsc' Saves current value into EDX:EAX registers
 % ARM32: mrc p15m, 0, \%0, c15, c12, 1
@@ -268,6 +301,7 @@ Consequently, we can execute the benchmark many times and get statistically reli
 The disadvantage is that we have to slightly modify the basic block or the program will crash.
 
 \subsection{Basic Block Isolation}
+\label{sec:approach:bbisolation}
 As discussed in \cref{sec:approach:exec_unit}, we are forced to execute basic blocks isolated from the benchmark.
 To make a basic block executable we isolate it and insert it as inline assembly into our minimal C++ framework.
 
