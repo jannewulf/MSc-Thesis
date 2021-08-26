@@ -413,9 +413,54 @@ The actual execution where we measure the runtime is repeated until 1,000 valid 
 Invalid measurements can occur when the runtime is negative, this happens when the cycle counter overflows.
 
 \subsection{Computing Rewards From Runtimes}
-There are some outliers in the runtimes. Sort runtimes, cutoff lower and upper 5\% of the runtimes to remove outliers and compute avg of the rest.
-What could be reasons for outliers?
-Show some distributions of measurements to justify why we are throwing away data.
+\tobechecked
+Even though we do the warmup rounds, we still get few datapoints that are clearly outliers and should not be included into our experiments.
+We sort the 1,000 runtime measurements and strip the top and bottom 50 measurements.
+Spot checks have shown that we remove all the outliers in almost all the experiments.
+\begin{table}
+    \centering
+    \begin{tabular}{@{}rr@{}}
+        \toprule
+        Runtime & Num. Occurances \\
+        \midrule
+        140 & 998 \\
+        143 & 1 \\
+        711 & 1 \\
+        \bottomrule
+    \end{tabular}
+    \hspace{0.8cm}
+    \begin{tabular}{@{}rr@{}}
+        \toprule
+        Runtime & Num. Occurances \\
+        \midrule
+        121 & 708 \\
+        120 & 289 \\
+        123 & 1 \\
+        163 & 1 \\
+        1491 & 1 \\
+        \bottomrule
+    \end{tabular}
+    \hspace{0.8cm}
+    \begin{tabular}{@{}rr@{}}
+        \toprule
+        Runtime & Num. Occurances \\
+        \midrule
+        114 & 994 \\
+        121 & 2 \\
+        115 & 1 \\
+        129 & 1 \\
+        130 & 1 \\
+        694 & 1 \\
+        \bottomrule
+    \end{tabular}
+    \caption[Example runtime measurement distribution]{Example runtime measurement distribution for three different schedules. (Benchmark: almabench, Function: anpm, Basic Block: entry)}
+    \label{tab:approach:example_runtimes}
+\end{table}
+See \cref{tab:approach:example_runtimes} for an example with three different schedules for the same experiment.
+
+Because different basic blocks have their different runtimes, the absolute measured speedups between two basic blocks are not comparable.
+To have a metric $m$ that we can compare with all other basic blocks in the data set, we normalize the experiment runtime $r_e$ it with the runtime of the baseline scheduler $r_b$.
+\[m=\frac{r_b}{r_e}\]
 
 \section{Application of the Learned Model}
 \label{sec:approach:ml-scheduler}
