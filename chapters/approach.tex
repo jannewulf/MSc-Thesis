@@ -402,8 +402,16 @@ This means also that all memory accesses are cache hits and we have a controlled
 
 \subsubsection{Isolated Basic Block Execution}
 \label{sec:approach:isol_bb_exec}
-From extracted basic block create inline assembly with stack variable. Now executable from C/C++.
-Warmup 100 runs. Timings 1000 runs. 
+\tobechecked
+To execute the extracted basic block, have to surround it with some other code to generate a valid C/C++ program.
+For this we have written a small benchmarking framework.
+This framework is compiled together with the given basic block in the inline assembly format.
+The optimization is turned off in this compilation step, so the basic blocks are executed as given.
+
+The executbale first executes the basic block in 100 warmup rounds to prevent side effects from caches and other reasons.
+The actual execution where we measure the runtime is repeated until 1,000 valid measurements are done.
+Invalid measurements can occur when the runtime is negative, this happens when the cycle counter overflows.
+
 \subsection{Computing Rewards From Runtimes}
 There are some outliers in the runtimes. Sort runtimes, cutoff lower and upper 5\% of the runtimes to remove outliers and compute avg of the rest.
 What could be reasons for outliers?
