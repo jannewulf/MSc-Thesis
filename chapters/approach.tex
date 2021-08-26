@@ -253,35 +253,97 @@ This is possible on our chosen hardware and is discussed in more detail in \cref
 Thus, as this is a feasible solution for our experiments we have chosen to measure the runtime of basic blocks alone.
     
 \subsection{Runtime Measurement Methods}
+\tobechecked
 \label{sec:approach:datageneration:runtime_methods}
 \todo{Could add little experiment where we compare hardware timers vs OS access}
+Various possibilities to observe execution times exist in systems that we are using for our reasearch.
+These can typically be classified in the categories of profiling, \ac{os} utilities or hardware utilities.
+We discuss these here in more detail.
+
 \subsubsection{Profiling}
+\tobechecked
+Profilers are programs that observe the execution of other processes running on the system (\eg gperf \cite{graham1982gprof}).
+They are designed to observe the execution from start to end and to return various metrics. Some examples are:
 \begin{itemize}
-    \item What: Profilers are a bad choice for measuring precise runtimes
-    \item Why: They are just not designed for it, they serve other purposes.
-        Profilers are making snapshots of the running system to measure performance. 
-        There is no measurement from point A to point B which leads to inaccuracies
-    \item How: Read e.g. the paper of gperf \cite{graham1982gprof}
+    \item execution times per function
+    \item memory consumption
+    \item cache misses
 \end{itemize}
+The observation is done by doing snapshots of the process of interest.
+Thus, profilers are good for finding \eg performance problems and memory leaks in software.
+
+However, we need precise measurements from instruction A to instruction B for our experiments.
+Profilers are not able to make such precise measurements, \ie they are not helpful to us because they are designed for other purposes.
+
 \subsubsection{Operating System Methods}
-% In linux(C): clock_gettime().
-% Windows: QueryPerformanceCounter().
-% C++: std::high_resolution_clock().
-These might return different clocks depending on the used hardware.
-Returns the time from the hardware the OS runs on.
-Has overhead but also handles problems.
-Typically best for measurements in microseconds range and longer.
-Include pinning processes to cores and isolating cores.
+\tobechecked
+\acp{os} typically need to work with times and also provide an user interface to use its timing functions.
+These are using some \ac{cpu} functionality to get times.
+However, often there are various possibilities to retrieve timing values from the hardware with varying precision.
+The most precise timers are usually good for measuring intervals in the microseconds range or longer.
+The \ac{os} functions have some overhead because they also handle errors.
+\begin{table}
+    \centering
+    \begin{tabular}{@{}ll@{}}
+        \toprule
+        Operating System & Timer in C language \\
+        \midrule
+        Linux & \lstinline|clock_gettime()| \\
+        Windows & \lstinline|QueryPerformanceCounter()| \\
+        \bottomrule
+    \end{tabular}
+    \caption[Operating System interfaces to their timing functions]
+    {
+        The table shows examples for interfaces in \acp{os} to their timing functions in the C programming language.
+    }
+    \label{tab:approach:timing_functions}
+\end{table}
+See \cref{tab:approach:timing_functions} for selected \acp{os}.
+The C++ function \lstinline|std::high_resolution_clock()| from the standard library falls back to one of these \ac{os} functions.
+
+\acp{os} somtimes not only provides timing methods, but also allows us to manage how a process will be executed.
+Linux provides different methods to avoid or reduce the probablity of \ac{os} interrupts during the execution of a process.
+\begin{itemize}
+    \item Isolating \ac{cpu} cores: 
+    The Linux kernel command line option \lstinline|isolcpus=[cpu_number]| in the boot loader instructs linux to not schedule tasks to the given \ac{cpu} cores automatically.
+    \item Pinning a process to a \ac{cpu} core: 
+    The Linux program \lstinline|taskset| can specify on which \ac{cpu} core a process will be scheduled.
+    This can also be used to schedule processes on isolated \ac{cpu} cores.
+\end{itemize}
+When we pin a process to a isolated \ac{cpu} core, this task will not be interrupted by the \ac{os}.
+This makes the measuring of runtimes more reliable.
+
 \subsubsection{Hardware Performance Counters}
+\tobechecked
 \label{sec:approach:hwpercounter}
-Accessed by assembly instructions.
-% x86: 'rdtsc' Saves current value into EDX:EAX registers
-% ARM32: mrc p15m, 0, \%0, c15, c12, 1
-% AARCH64: mrs \%0, PMCCNTR_EL0
-% Aurora: fencei; smir \%0, \%usrcc
-Measurements in CPU cycles.
-Lowest overhead available.
-Access might be protected (Linux module required).
+The most code blocks we want to measure are only 5-50 instructions long, \ie we need very precise measurements.
+We use the assembly instructions of the given hardware directly to get the most precise timing values with the lowest overhead.
+These instructions typically return the value of a processor cycle counter register.
+
+Using assembly instructions can be complicated (depending on the used high-level language and hardware).
+But it is not a problem in our experiments because the code blocks we want to measure are already written in assembly language of the given hardware.
+That means we only add a timer instruction in the beginning and one in the end.
+We do some error checking after the execution has stopped (see \cref{sec:approach:isol_bb_exec} for details).
+\begin{table}
+    \centering
+    \begin{tabular}{@{}ll@{}}
+        \toprule
+        Hardware & Assembly instruction \\
+        \midrule
+        x86 & \lstinline|rdtsc| \\
+        ARM32 & \lstinline|mrc p15m, 0, r0, c15, c12, 1| \\
+        AARCH64 & \lstinline|mrs x0, PMCCNTR_EL0| \\
+        NEC SX-Aurora TSUBASA & \lstinline|smir %s60, %usrcc| \\
+        \bottomrule
+    \end{tabular}
+    \caption{Assembly instructions for getting the cycle counter value of a given hardware.}
+    \label{tab:approach:asm_instrs_timing}
+\end{table}
+See \cref{tab:approach:asm_instrs_timing} for the assembly instructions per hardware.
+
+Depending on the hardware and the \ac{os}, access to these instructions or registers might not be permitted.
+For the AARCH64 architecture and a Linux \ac{os}, we had to implement and load a kernel module which granted the access to this register.
+ 
 
 \subsection{Execution Unit}
 \todo{Provide runtime example data}
@@ -339,6 +401,7 @@ This means also that all memory accesses are cache hits and we have a controlled
 \todo{Show example}
 
 \subsubsection{Isolated Basic Block Execution}
+\label{sec:approach:isol_bb_exec}
 From extracted basic block create inline assembly with stack variable. Now executable from C/C++.
 Warmup 100 runs. Timings 1000 runs. 
 \subsection{Computing Rewards From Runtimes}
