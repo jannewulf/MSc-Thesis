@@ -490,7 +490,9 @@ See \cref{tab:approach:example_runtimes} for an example with three different sch
 
 Because different basic blocks have their different runtimes, the absolute measured speedups between two basic blocks are not comparable.
 To have a metric $m$ that we can compare with all other basic blocks in the data set, we normalize the experiment runtime $r_e$ it with the runtime of the baseline scheduler $r_b$.
-\[m=\frac{r_b}{r_e}\]
+\begin{equation}
+    m=\frac{r_b}{r_e}
+\end{equation}
 
 \section{Application of the Learned Model}
 \label{sec:approach:ml-scheduler}
