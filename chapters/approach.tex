@@ -163,6 +163,36 @@ We compute the product of the two heuristics to get a combined heuristic.
 
 \section{Learning to Schedule}
 \label{sec:approach:ml}
+Our goal is to to create a model that can generate good instruction schedules for basic blocks.
+Therefore, we have to define a mapping that we want to solve with this model.
+The possible inputs can be complex, like characteristics of the hardware, the register states or others.
+However, we decided for the purposes of the thesis to begin with a rather simple model and limit our input to the $n$ last scheduled instructions and the set of instructions that can be scheduled.
+We define this mapping as
+\begin{equation}
+    (h_n, \ldots, h_1) \times \{i_1, \ldots, i_m\} \mapsto i_k
+    \label{eqn:mlmapping1}
+\end{equation}
+where $h$ defines the instructions in the history of scheduled instructions, $i$ are instructions that can be scheduled and $k \in \{1, \ldots, m\}$.
+However, we define a second, easier to implement, mapping
+\begin{equation}
+    (h_n, \ldots, h_1) \times i \mapsto r
+    \label{eqn:mlmapping2}
+\end{equation}
+where we map from the history and a single instruction to a reward value $r$.
+We loose some input information in this model about the other available instructions.
+But we can now simply run the model for all the available instructions and select the one with the best reward.
+
+We need lots of data samples to utilize data-driven or machine learning approaches.
+One way would be to generate valid random schedules.
+The downside of this approach is that we will generate many bad schedules because the better ones are rare.
+A better way is to use \ac{mcts} to iteratively find better schedules (see \cref{subsec:approach:ml:mcts}).
+The \ac{mcts} approach searches good schedules locally, \ie for a single basic block.
+So, the search is not generalized for other basic blocks.
+
+To generate a model that works globally, \ie also for unseen basic blocks, we have to add a second step and learn from the locally good schedules.
+Therefore, we extract data samples matching the input format of \cref{eqn:mlmapping1}, or respectively \cref{eqn:mlmapping2}.
+We have trained different models that are explained in detail in \cref{subsec:approach:ml:global}.
+
 \subsection{Local MCTS Model}
 \label{subsec:approach:ml:mcts}
 \todo{Explain why we use max instead of avg. See \eg transition from data/mcts-max-vs-avg/svg/8752639012199.svg to data/mcts-max-vs-avg/svg/8749356177210.svg LoopRestructuring-dbl,s2233,for.body20}
