@@ -277,7 +277,65 @@ Therefore, we can see how much of our potential improvements we are able to reac
 
 \subsection{Global Model}
 \label{subsec:approach:ml:global}
-\subsubsection{Look Up Model}
+Once we have found good schedules by generating \ac{mcts} trees for many basic blocks we want to generalize this knowledge.
+This is necessary to transfer the knowledge to unseen basic blocks and, make the model usable in practice by generating good schedules directly, in contrast to searching them with \ac{mcts}.
+Therefore, we have developed three different models that we discuss here.
+
+\subsubsection{Look-Up Model}
+Our first model involved no complex algorithms but only searched for similar scheduling situations.
+That meas we search our \ac{mcts} trees and build up a big model in which we can search for situations and see what decision performed best.
+
+% Dataformat: (h_n, ..., h_1) x (i_1, i_2) -> (w_1, d, w_2)
+In order to build the model, we first define the data that we want to save and want to access.
+A scheduling situation has the format
+\begin{equation}
+    (h_n, \ldots, h_1) \times {i_1, \ldots, i_m}
+    \label{eqn:approach:example-scheduling-situation}
+\end{equation}
+where instructions $h$ build a sequence of last scheduled instructions and instructions $i$ build the set of available instructions for scheduling.
+To simplify our model and have more data per scheduling situation, we limited the size of the set of available instructions to two.
+The disadvantage is that we lose some context information on which other instructions are available.
+The data we are interested in per scheduling situation is how often instruction $x$ was better than instruction $y$ or vice versa and or often they were equally good.
+This results in the data format
+\begin{equation}
+    (h_n, \ldots, h_1) \times (i_1, i_2) \mapsto (w_1, d, w_2)
+\end{equation}
+where $w_1$ and $w_2$ represent how often instruction $i_1$, or $i_2$ were the better choice.
+How often they were equally good is counted by the variable $d$.
+
+% How to build this model?
+To build the model we iterate the \ac{mcts} trees and extract the contained data.
+\begin{figure}
+    \centering
+    \begin{forest}
+        [$h_n$
+            [$\vdots$
+                [$h_1$
+                    [$i_1$] [$i_2 $] [$i_3$]
+                ]
+            ]
+        ]
+    \end{forest}
+    \caption[Example scheduling situation]{Example scheduling situation with the already scheduled instructions $h$ and the instructions $i$ to choose from.}
+    \label{fig:approach:example-scheduling-situation}
+\end{figure}
+For every scheduling situation (compare \cref{eqn:approach:example-scheduling-situation} and \cref{fig:approach:example-scheduling-situation}) we take every combination of instructions $i$.
+For each combination we check which instruction choice resulted in the better reward.
+We add this situation to our model if it was not already present.
+Otherwise, we increase the corresponding counter variable in this situation.
+
+In addition to this situation, we can also learn from this situation for a scheduling situation with a shorter history.
+So we also add the situation for all partial histories.
+For example, when we have a scheduling situation with the history $(h_3, h_2, h_1)$, we also add our learnings to the model with the histories $(h_2, h_1)$, $(h_1)$ and the empty history $()$.
+
+% How to make scheduling decisions from this model?
+This model can be easily applied for scheduling.
+In a given scheduling situation we just search for the history and all combinations of available instructions.
+If we have found all the combinations we can make our decision based on the counts.
+For the situation where we did not find all the required combinations, we define a percentage threshold $t_c$.
+If we found more than $t_c$ instruction combinations, we make the choice based on the instructions that we have found.
+If we found less than $t_c$ instructions, we remove the oldest instruction $h_n$ from the history and search again for all the instruction combinations. 
+
 \subsubsection{Support Vector Machine Model}
 \subsubsection{Neural Network Model}
 
