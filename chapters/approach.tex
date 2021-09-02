@@ -342,6 +342,7 @@ Further, we want to learn regression models.
 Therefore, we need a different mapping that we learn because our output will be a scalar value.
 \begin{equation}
     (h_n, \ldots, h_1) \times i \mapsto r
+    \label{eqn:approach:regression-mapping}
 \end{equation}
 We choose to have a sequence of history instructions $h$ with a defined length $n$.
 From the history and the choosable instruction $i$ we map to the reward value extracted from the \ac{mcts} data.
@@ -359,6 +360,21 @@ With this data we train a \ac{svm} regression model.
 The details and results of the experiments can be found in \cref{eval:svm}.
 
 \subsubsection{Neural Network Model}
+We chose to use a neural network as a second regression model.
+With hthis mode, we try to learn the same mapping as we did with our \ac{svm} model, which is defined in \cref{eqn:approach:regression-mapping}.
+Consequently, we use the same dataset that we have already built for the \ac{svm} model.
+
+In contrast to our \ac{svm} model, we chose to not encode the instructions into ordinary values.
+The instructions are encoded into one-hot vectors because neural networks can better handle high dimensional inputs.
+Further, the scaling of numerical values into the range $[0,1]$ is also done in this case.
+
+We trained a neural network with this data setup but also tried a modification.
+To reduce the dimensionality of the data, we clustered the similar instructions.
+Especially instructions that only vary in the number of bits in the inputs.
+The instructions addition instruction \lstinline|ADDWri| and \lstinline|ADDXri| of the AARCH64 architecture are clustered into the same cluster.
+These two instruction only differ in that the one takes 32 bit values and the other 64 bit values.
+\todo{Add clusterings into appendix}
+See \cref{tab:xxx} for exact clusterings.
 
 \section{Data Generation}
 \tobechecked
