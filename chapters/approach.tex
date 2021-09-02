@@ -337,6 +337,27 @@ If we found more than $t_c$ instruction combinations, we make the choice based o
 If we found less than $t_c$ instructions, we remove the oldest instruction $h_n$ from the history and search again for all the instruction combinations. 
 
 \subsubsection{Support Vector Machine Model}
+% What mapping are we trying to learn?
+Further, we want to learn regression models.
+Therefore, we need a different mapping that we learn because our output will be a scalar value.
+\begin{equation}
+    (h_n, \ldots, h_1) \times i \mapsto r
+\end{equation}
+We choose to have a sequence of history instructions $h$ with a defined length $n$.
+From the history and the choosable instruction $i$ we map to the reward value extracted from the \ac{mcts} data.
+
+% How was the input data generated?
+To build a dataset with these mappings we iterate the \ac{mcts} trees and for every instruction node, we take its past scheduled instructions and the reward value it has.
+This way, we collected 4.8 million data points.
+
+% Data preprocessing
+However, we cannot insert these data points into the \ac{svm} model because it requires numerical values only.
+We transform the instructions from their textual representation into a ordinal encoding, \ie every instruction gets a unique numerical representation.
+Further, we scale all numerical values into the range $[0,1]$ because \acp{svm} typically learn better when inputs are in this range.
+
+With this data we train a \ac{svm} regression model.
+The details and results of the experiments can be found in \cref{eval:svm}.
+
 \subsubsection{Neural Network Model}
 
 \section{Data Generation}
