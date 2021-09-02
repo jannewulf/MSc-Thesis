@@ -194,8 +194,87 @@ Therefore, we extract data samples matching the input format of \cref{eqn:mlmapp
 We have trained different models that are explained in detail in \cref{subsec:approach:ml:global}.
 
 \subsection{Local MCTS Model}
-\label{subsec:approach:ml:mcts}
-\todo{Explain why we use max instead of avg. See \eg transition from data/mcts-max-vs-avg/svg/8752639012199.svg to data/mcts-max-vs-avg/svg/8749356177210.svg LoopRestructuring-dbl,s2233,for.body20}
+\label{subsec:bg:ml:mcts}
+We have chosen \ac{mcts} for finding examples of schedules that perform best.
+\ac{mcts} tries all possible next steps in a given situation and chooses the further steps randomly because there is no information available.
+When all possibilities in a situation are already examined, the algorithm takes the best option (based on a defined metric) and tries to improve from there on.
+It does not choose the best option every time, but also incorporates exploration choices.
+This enables us to search for good instruction schedules.
+See \cref{sec:bg:mcts} for more details.
+
+% Explain structure of the tree: nodes = instructions, edges = valid traversion of dag
+The input to our \ac{mcts} approach is a \ac{dag} from the LLVM compiler which defines the valid instruction schedules.
+See \cref{fig:approach:dag} for an example.
+The LLVM instruction \ac{dag} still contains, many instructions that exist just for internal reasons and are not translated to machine instructions.
+We remove these pseudo instructions from the instruction \ac{dag} and adjust the dependencies between the nodes.
+
+The nodes in a \ac{mcts} tree represent a state in the underlying model and the edges correspond to transitions between these states.
+Compare \cref{fig:approach:max-vs-avg:a} to see that our \ac{mcts} nodes represent a (partial) instruction schedule.
+The edges in our \ac{mcts} tree represent a legal scheduling of a new instruction to the previous schedule.
+When you iterate back from any node to the root node, you get the (partial) instruction schedule in reverse ordering.
+\begin{figure}[p]
+    \centering
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=18cm,angle=90]{data/mcts-max-vs-avg/svg/selected/8752639012199.pdf}
+        \caption{\ac{mcts} tree}
+        \label{fig:approach:max-vs-avg:a}
+    \end{subfigure}
+    \hspace{0.2\textwidth}
+    \begin{subfigure}[b]{0.3\textwidth}
+        \centering
+        \includegraphics[width=18cm,angle=90]{data/mcts-max-vs-avg/svg/selected/8752639012199-next.pdf}
+        \caption{\ac{mcts} tree after next iteration}
+        \label{fig:approach:max-vs-avg:b}
+    \end{subfigure}
+    \caption[\ac{mcts} tree with the consequences of maximum and average metric]{
+        \Cref{fig:approach:max-vs-avg:a} shows a given \ac{mcts} tree and \cref{fig:approach:max-vs-avg:b} shows two different choices on different \ac{mcts} metrics.
+        The boxes represent a \ac{mcts} node, at the top is the name of the instruction, on the left are the cumuluated metric and the number of visits, on the right is the reduced metric.
+        In this example, the value used for the metric is the negative runtime, because we try to maximize the metric.
+        The red path is chosen when we used the average metric. But if we choose the maximum metric (green path) we can see, that we find a better runtime.\\
+        (Benchmark: LoopRestructuring-dbl, Function: s2233, Basic Block: for.body20)
+    }
+    \label{fig:approach:max-vs-avg}
+\end{figure}
+
+We do not use the default choice of node evaluation metric.
+Typically, to evaluate the reward of a node in the \ac{mcts} tree, you compute the average of the children nodes.
+In our approach, this leads to situations where we have already found a good schedule, but keep searching for schedules in another area of the tree.
+The reason for that is, that the good schedule might surrounded by relatively bad schedules which have a negative effect on the average evaluation.
+When you train \ac{mcts} for games, that makes sense because you do not want to get into situations where only one good state exists and the surrounding ones would let you loose the game.
+But we are only interested in a single best schedule, therefore we do not care about similar but bad schedules.
+The consequence is that we do not take the average but the maximum.
+This means, that in the exploitation phase, we always follow the path to best found schedule.
+You can observe the consequences in \cref{fig:approach:max-vs-avg:b}, where the green numbers represent the maximum metric and the black numbers represent the average metric.
+
+% Explain process: Generate schedule -> compile -> measure runtime -> train mcts -> go to 1
+The \ac{mcts} learning process is seperated into four phases:
+\begin{enumerate}
+    \item Generate schedule: \\
+    Apply the exploration or exploitation phase and generate a new schedule based on our previous experience.
+    \item Compile the generated schedule: \\
+    The generated schedule is transformed into a C++ file with a function that contains the inline assembly of the scheduled basic block.
+    We then compile the schedule with our benchmarking framework (see \cref{sec:approach:isol_bb_exec}).
+    \item Execute and measure the runtime: \\
+    The compiled executable is transfered to our target machine and executed there to measure the runtime of the basic block (see \cref{sec:approach:isol_bb_exec}).
+    \item Progress the \ac{mcts} tree with the measured runtime: \\
+    Then the measurement data is copied back to the machine where we run the experiment.
+    The measurement data is preprocessed and used to train the \ac{mcts} tree.
+\end{enumerate}
+This process is repeated many times, depending on the experiment.
+See \cref{sec:bg:mcts} for more information.
+
+% Technically possible to use for production, but slow
+Note, that this \ac{mcts} approach is not only able to generate data for our global model.
+It can theoretically also be used in a normal compilation process.
+It is not practical to use it for a whole program, because of the many compilation steps and the bad runtime performance.
+But critical parts of a software could be optimized with this approach.
+
+% Positive sideeffect: Also there to define a possible range of improvement
+A positive sideeffect of this \ac{mcts} approach is that we generate a upper limit for the improvements of the instruction scheduling phase.
+This is at the same time an upper limit for the global models in our second step.
+Therefore, we can see how much of our potential improvements we are able to reach with our global models.
+
 \subsection{Global Model}
 \label{subsec:approach:ml:global}
 \subsubsection{Look Up Model}
