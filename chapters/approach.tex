@@ -347,9 +347,20 @@ Therefore, we need a different mapping that we learn because our output will be 
 We choose to have a sequence of history instructions $h$ with a defined length $n$.
 From the history and the choosable instruction $i$ we map to the reward value extracted from the \ac{mcts} data.
 
+One 
+\todo{Why exactly did we do this? Pipeline?}
+additional metric that we added to our input is, how far in the history the direct \ac{dag} predecessor instructions are scheduled.
+For example, a instruction $a$ depends on a instruction $b$ and we are in the situation in which we want to schedule $a$.
+That means, we have already scheduled $b$.
+There usually also exist other instructions that we scheduled after $b$.
+We count the number of instructions that we scheduled between $a$ and $b$.
+There are typically more than one instructions that $a$ depends on, so we decided to take the maximum and the minimum number of instructions between $a$ and its predecessors for the dataset.
+We refer to these values as $d_{max}$ and $d_{min}$ in \cref{eqn:approach:regression-mapping}.
+
 % How was the input data generated?
 To build a dataset with these mappings we iterate the \ac{mcts} trees and for every instruction node, we take its past scheduled instructions and the reward value it has.
-This way, we collected 4.8 million data points.
+This way, we collected 4.8 million data points for the AARCH64 architecture.
+\todo{Add number for aurora}
 
 % Data preprocessing
 However, we cannot insert these data points into the \ac{svm} model because it requires numerical values only.
