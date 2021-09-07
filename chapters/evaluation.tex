@@ -1,5 +1,6 @@
 \chapter{Evaluation}
 \label{eval:svm}
+\section{Potential evalutation}
 Potential exploration \rightarrow random scheduling \\
 Problem: Most timings are very similar or even the same \\
 Reasons:
@@ -12,6 +13,14 @@ Reasons:
     This means the data is very noisy
 \end{itemize}
 
+\section{MCTS evaluation}
+Shows that there is $~8\%$ range for improvements that we have found.
+
+\section{Global model evaluation}
+\subsection{Look up}
+\subsection{SVM}
+\subsection{NN}
+
 Compare speedup with complexity of the problem (number of possible schedulings) vs speedup
 
 Compare CPU Architectures, In-Order vs Out-Of-Order (\url{https://en.wikipedia.org/wiki/Out-of-order_execution})
@@ -20,9 +29,13 @@ Might be interesting for the discussion: \url{http://www.irisa.fr/alf/downloads/
 
 Mean vs. Median discussion in runtime measurements
 
-\section{Hardware}
-\subsection{Arm Cortex-A53}
-\subsection{NEC Aurora}
+\begin{itemize}
+    \item Hardware
+    \begin{itemize}
+        \item Arm Cortex-A53
+        \item NEC Aurora
+    \end{itemize}
+\end{itemize}
 
 
 
