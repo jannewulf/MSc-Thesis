@@ -22,4 +22,11 @@
 }
 
 \newcommand{\eg}{e.g., }
-\newcommand{\ie}{i.e.}
+\newcommand{\ie}{i.e., }
+
+% ILOC simplifications
+\newcommand{\iloc}[1]{\texttt{\small#1}}
+\newcommand{\ilocreg}[1]{\iloc{r\textsubscript{#1}}}
+\newcommand{\ilocarrow}{$\Rightarrow$}
+\newcommand{\iloccmd}[3]{\iloc{#1} & \iloc{#2} & \ilocarrow & \iloc{#3}}
+\newcommand{\iloccmdinl}[3]{\iloc{#1}~\iloc{#2}~\ilocarrow~\iloc{#3}}
