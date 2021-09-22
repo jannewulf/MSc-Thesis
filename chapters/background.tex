@@ -1,10 +1,10 @@
 \chapter{Background}
 In this chapter, we introduce knowledge that is required to understand the content of this thesis.
-We start with an introduction to processors in \cref{sec:bg:cpu}.
-In \cref{sec:bg:compilers}, we overview how a compiler is typically implemented and which problems it has to solve that we want to tackle.
+We start with an introduction to processors in \Cref{sec:bg:cpu}.
+In \Cref{sec:bg:compilers}, we overview how a compiler is typically implemented and which problems it has to solve that we want to tackle.
 \Cref{sec:bg:compilers:backend} gives a more detailed introduction to compiler back-ends, which we aim to optimize in this thesis.
-The compiler framework that we use as a basis is LLVM, which we introduce in \cref{sec:bg:llvm}.
-Eventually, we give a brief overview of the thesis's machine learning or data-driven approaches (\cref{sec:bg:ml}).
+The compiler framework that we use as a basis is LLVM, which we introduce in \Cref{sec:bg:llvm}.
+Eventually, we give a brief overview of the thesis's machine learning or data-driven approaches (\Cref{sec:bg:ml}).
 
 % NOTE: Assume that the reader has common computer science knowledge!
 
@@ -82,7 +82,7 @@ we have to load the data from the variables $a$, $b$, and $c$, make the computat
         \caption{}
         \label{tbl:bg:schedule-b}
     \end{subtable}
-    \caption[Example instruction schedules]{Example instruction schedules for \cref{eqn:bg:abc}}
+    \caption[Example instruction schedules]{Example instruction schedules for \Cref{eqn:bg:abc}}
     \label{tbl:bg:schedules}
 \end{table}
 
@@ -117,7 +117,7 @@ The \ac{cpu} executest one instruction at a time in this classical execution sch
 It means that instructions can only start after all execution stages of the previous instruction have finished.
 % Consequently, the throughput of instructions per cycle $t$ is always $t>1$, given that instructions require more than one cycle to execute.
 
-\Cref{tbl:bg:pipeline} compares different execution models for the computation in \cref{eqn:bg:abc}.
+\Cref{tbl:bg:pipeline} compares different execution models for the computation in \Cref{eqn:bg:abc}.
 \Cref{tbl:bg:schedule-a} defines the used instruction schedule for this example.
 In this example, we assume that each of the stages, Fetch (F), Decode (D), Execution (E), and Writeback (W), take a single \ac{cpu} cycle to finish.
 \Cref{tbl:bg:wo-pipeline} shows the execution for this classical execution model.
@@ -269,8 +269,8 @@ We see that the execution takes 36 cycles to finish in this example.
             \end{tabular}
         }
     }
-    \caption[Comparison of CPU pipeline implementations]{Comparison of CPU pipeline implementations for the example in \cref{eqn:bg:abc}. 
-    The used instruction schedule is defined in \cref{tbl:bg:schedule-a}.}
+    \caption[Comparison of CPU pipeline implementations]{Comparison of CPU pipeline implementations for the example in \Cref{eqn:bg:abc}. 
+    The used instruction schedule is defined in \Cref{tbl:bg:schedule-a}.}
     \label{tbl:bg:pipeline}
 \end{table}
 
@@ -282,7 +282,7 @@ This behavior is ineffective and addressed by the following execution model.
 This execution model uses the fact that most stages are waiting most of the time.
 The improvement is that now, one execution can be scheduled in every \ac{cpu} cycle.
 
-See in \cref{tbl:bg:scalar-pipeline} that this change introduces parallelism, and the \ac{cpu} executes the first three instructions concurrently.
+See in \Cref{tbl:bg:scalar-pipeline} that this change introduces parallelism, and the \ac{cpu} executes the first three instructions concurrently.
 The theoretically best case is that all the stages are working in every cycle and are never waiting.
 This is not always possible, as we can see in the example.
 We cannot start instruction $i_4$ (\iloccmdinl{mult}{\ilocreg{1},~\ilocreg{1}}{\ilocreg{1}}) in the fourth \ac{cpu} cycle, because we have a dependency on the result of instruction $i_1$ (\iloccmdinl{load}{\ilocreg{arp},~@a}{\ilocreg{1}}).
@@ -315,7 +315,7 @@ Consequently, this increases the level of parallelism.
 The number of instructions that can start simultaneously depends on the specific hardware. % A53 2-way
 
 \Cref{tbl:bg:superscalar-pipeline} shows an example execution of a two-way superscalar pipeline.
-This is especially interesting to compare with the scalar pipeline in \cref{tbl:bg:scalar-pipeline}.
+This is especially interesting to compare with the scalar pipeline in \Cref{tbl:bg:scalar-pipeline}.
 Note that now, instructions 1 and 2 are scheduled in the same \ac{cpu} cycle.
 If we had simulated a three-way superscalar pipeline, we could have started instructions 1-3 in the first cycle.
 However, we still have a runtime improvement of one cycle compared to the scalar pipeline.
@@ -336,16 +336,16 @@ The three most typical implementations are:
 
 \subsection{Instruction Schedules}
 \label{sec:bg:cpu-schedule}
-Looking at \cref{fig:bg:example-dag}, we see that the dependencies allow different instruction schedules.
+Looking at \Cref{fig:bg:example-dag}, we see that the dependencies allow different instruction schedules.
 For example, we could use a breadth-first approach and execute all the load instructions first, then all the multiplications, et cetera.
 On the contrary, we could use a depth-first approach and execute the load and multiplication for variable a, then for b, et cetera.
-These two schedules are defined in \cref{tbl:bg:schedules} and compared in this section.
+These two schedules are defined in \Cref{tbl:bg:schedules} and compared in this section.
 
 With the classical execution scheme with no pipeline, the instructions schedule is irrelevant for the runtime
 However, the runtime improvements that \acp{cpu} gain by pipelines depend heavily on the instruction schedule.
-We demonstrate this on two instruction schedules that we defined in \cref{tbl:bg:schedules}.
+We demonstrate this on two instruction schedules that we defined in \Cref{tbl:bg:schedules}.
 
-We illustrate the execution of the two schedules in \cref{tbl:bg:schedule-comparison}.
+We illustrate the execution of the two schedules in \Cref{tbl:bg:schedule-comparison}.
 This example assumes that load and store instruction need three cycles to finish, multiplications need two cycles and add instruction need one cycle.
 Here, we ignore the phases of the instruction execution for simplicity.
 We demonstrate the execution of a two-way superscalar in-order processor.
@@ -379,7 +379,7 @@ The goal here is to have an instruction schedule that allows maximum parallelism
             10 &   &   &   &   &   &   &   &   & X \\
             \bottomrule
         \end{tabular}
-        \caption{Execution of instruction schedule from \cref{tbl:bg:schedule-a}}
+        \caption{Execution of instruction schedule from \Cref{tbl:bg:schedule-a}}
         \label{tbl:bg:schedule-comparison-a}
     \end{subtable}
     \hfill
@@ -415,19 +415,19 @@ The goal here is to have an instruction schedule that allows maximum parallelism
             15 &   &   &   &   &   &   &   &   & X \\
             \bottomrule
         \end{tabular}
-        \caption{Execution of instruction schedule from \cref{tbl:bg:schedule-b}}
+        \caption{Execution of instruction schedule from \Cref{tbl:bg:schedule-b}}
         \label{tbl:bg:schedule-comparison-b}
     \end{subtable}
-    \caption[Schedule comparison on a two-way superscalar in-order architecture]{Execution of the instruction schedules \cref{tbl:bg:schedule-a} and \cref{tbl:bg:schedule-b} on a two-way superscalar in-order architecture. 
+    \caption[Schedule comparison on a two-way superscalar in-order architecture]{Execution of the instruction schedules \Cref{tbl:bg:schedule-a} and \Cref{tbl:bg:schedule-b} on a two-way superscalar in-order architecture. 
     We assume that load and store instructions require three cycles, multiplies two cycles and adds one cycle.}
     \label{tbl:bg:schedule-comparison}
 \end{table}
 
-We achieve parallel execution in \cref{tbl:bg:schedule-comparison-a} for the instructions $i_1$ and $i_2$ and $i_4$ and $i_5$.
+We achieve parallel execution in \Cref{tbl:bg:schedule-comparison-a} for the instructions $i_1$ and $i_2$ and $i_4$ and $i_5$.
 We cannot schedule the instructions $i_3$ and $i_4$ together because $i_4$ has to wait for $i_1$ to finish.
 
-In the execution in \cref{tbl:bg:schedule-comparison-b}, we can schedule the instructions $i_4$ and $i_2$, $i_5$ and $i_3$, and $i_6$ and $i_7$ together in pairs of two.
-However, the overall execution is with 15 cycles slower than the 10 cycles of the execution in \cref{tbl:bg:schedule-comparison-a}.
+In the execution in \Cref{tbl:bg:schedule-comparison-b}, we can schedule the instructions $i_4$ and $i_2$, $i_5$ and $i_3$, and $i_6$ and $i_7$ together in pairs of two.
+However, the overall execution is with 15 cycles slower than the 10 cycles of the execution in \Cref{tbl:bg:schedule-comparison-a}.
 
 Instruction scheduling is not a trivial task, and much research was published to optimize this problem.
 However, the more complicated \acp{cpu} become, the harder it gets to generate fast instruction schedules.
@@ -454,7 +454,7 @@ We explain these three phases in more detail, especially the back-end phase, whi
 
 \subsubsection{Basic Block}
 Compilers typically perform their transformations on a per basic block level.
-This includes the instruction scheduling in the back-end phase (see \cref{sec:bg:compilers:backend}).
+This includes the instruction scheduling in the back-end phase (see \Cref{sec:bg:compilers:backend}).
 
 A basic block is a sequential collection of instructions.
 They have a single defined starting instruction and a single defined ending instruction.
@@ -509,13 +509,13 @@ In the instruction scheduling phase, the compiler tries to generate an optimal o
 Optimal in this context usually means to optimize for short runtimes.
 
 % Mixed: why important
-We have seen how different schedules influence the runtime performance in \cref{tbl:bg:schedule-comparison}.
+We have seen how different schedules influence the runtime performance in \Cref{tbl:bg:schedule-comparison}.
 The objective of this thesis is to optimize this instruction scheduling step in the compiler back-end.
 Here we explain how instruction scheduling typically works.
 
 % Why important - but rewrite this probably
-As stated in \cref{sec:bg:cpu-schedule}, different types of \ac{cpu} pipelines are influenced by the instruction schedule.
-When we look at the superscalar pipelines (see \cref{sec:bg:superscalar-cpu}), the out-of-order pipeline will benefit the least from better instruction schedules because it can reschedule the instructions themselves.
+As stated in \Cref{sec:bg:cpu-schedule}, different types of \ac{cpu} pipelines are influenced by the instruction schedule.
+When we look at the superscalar pipelines (see \Cref{sec:bg:superscalar-cpu}), the out-of-order pipeline will benefit the least from better instruction schedules because it can reschedule the instructions themselves.
 The other two superscalar pipelines benefit more from better instruction schedules because they might stall completely until a hazard is cleared.
 However, all pipelined execution models might benefit from better instruction schedules.
 
@@ -546,7 +546,7 @@ The edges point from a given instruction to all the instructions on which it dep
 Dependency graphs are modeled as \acp{dag}, and the valid schedules are defined as the set of the valid traversals for the given \ac{dag}.
 
 % How
-In \cref{fig:bg:example-dag} we see that before we can execute the \iloc{store} ($i_9$) instruction to move the result back to memory, we have to run the last \iloc{add} ($i_8$) instruction.
+In \Cref{fig:bg:example-dag} we see that before we can execute the \iloc{store} ($i_9$) instruction to move the result back to memory, we have to run the last \iloc{add} ($i_8$) instruction.
 This \iloc{add} ($i_8$) instruction depends on another \iloc{add} ($i_7$) and a \iloc{mult} ($i_6$) instruction.
 The nodes that have no outgoing edge are leafs ($i_1$, $i_2$, and $i_3$) and can be scheduled directly in the beginning without any constraint.
 \begin{figure}
@@ -576,7 +576,7 @@ The nodes that have no outgoing edge are leafs ($i_1$, $i_2$, and $i_3$) and can
         \draw [arrow] (add_ab_c) -- (mul_c_c);
         \draw [arrow] (store) -- (add_ab_c);    
     \end{tikzpicture}
-    \caption[Dependency Graph]{Dependency graph for the example in \cref{eqn:bg:abc}.}
+    \caption[Dependency Graph]{Dependency graph for the example in \Cref{eqn:bg:abc}.}
     \label{fig:bg:example-dag}
 \end{figure}
 
@@ -588,7 +588,7 @@ Multiple scores can be assigned to break ties between instructions.
 
 Eventually, the compiler collects the instructions that are ready to schedule.
 In the beginning, that are the leafs of the \ac{dag}.
-In the example in \cref{fig:bg:example-dag} those are the instructions $i_1$, $i_2$, and $i_3$.
+In the example in \Cref{fig:bg:example-dag} those are the instructions $i_1$, $i_2$, and $i_3$.
 It schedules one of these instructions.
 This process is repeated until all instructions are scheduled.
 If the compiler chooses to schedule instruction $i_1$ first, then the instructions available in the next round are $i_2$, $i_3$, and $i_4$.
@@ -623,8 +623,8 @@ It can be reduced to the graph coloring problem, which is NP-complete.
 
 The runtime performance impact of the register allocation is also highly interdependent with the instruction scheduling~\cite{goodman1988code}.
 Instruction schedules can be optimized for reducing the number of live variables.
-The instruction schedules in \cref{tbl:bg:schedules} both use the three registers \ilocreg{1}, \ilocreg{2}, and \ilocreg{3}.
-However, the instruction schedule in \cref{tbl:bg:schedule-reduced-regs} only uses the two registers \ilocreg{1}, and \ilocreg{2}.
+The instruction schedules in \Cref{tbl:bg:schedules} both use the three registers \ilocreg{1}, \ilocreg{2}, and \ilocreg{3}.
+However, the instruction schedule in \Cref{tbl:bg:schedule-reduced-regs} only uses the two registers \ilocreg{1}, and \ilocreg{2}.
 The variable \iloc{b} is not used after instruction $i_7$, so its register \ilocreg{2} can be reused for variable \iloc{c}.
 It does not mean that this is always faster,\eg thus it is not always helpful to optimize for reduced register pressure when there are enough registers to prevent spills.
 
@@ -669,7 +669,7 @@ Eventually, we can translate the LLVM \ac{ir} into object or assembly code by ca
 
 % \subsection{Intermediate Representation}
 \subsection{Directed Acyclic Graph}
-As explained in \cref{sec:bg:compilers:backend}, LLVM also uses a \ac{dag} representation for basic blocks internally.
+As explained in \Cref{sec:bg:compilers:backend}, LLVM also uses a \ac{dag} representation for basic blocks internally.
 The C++ class \lstinline|SelectionDAG| defines the LLVM \ac{dag}.
 LLVM comes with functionality to plot their internal \acp{dag}.
 \Cref{fig:bg:llvm-dag} shows an example.
@@ -686,7 +686,7 @@ Three different types of edges exist that represent different types of dependenc
 \begin{itemize}
     \item Black: Represents a data flow dependency. That means that an instruction consumes the result of the previous instruction.
     \item Dashed Blue: This edge ensures that two unrelated instructions in terms of data flow remain scheduled in the correct order.
-        In \cref{fig:bg:llvm-dag}, the conditional jump instruction \lstinline|t24| must be scheduled before the unconditional jump instruction \lstinline|t14|, even though there is no data-flow dependency between these two.
+        In \Cref{fig:bg:llvm-dag}, the conditional jump instruction \lstinline|t24| must be scheduled before the unconditional jump instruction \lstinline|t14|, even though there is no data-flow dependency between these two.
     \item Red: This edge represents two instructions that must be scheduled together without any instructions between them.
 \end{itemize}
 
@@ -740,8 +740,8 @@ We use the \lstinline|default| scheduler as our baseline in all experiments.
 \label{sec:bg:ml}
 Throughout this thesis, we utilize data-driven methods for different tasks.
 We use Monte Carlo Tree Search for finding good instruction schedules and build a dataset.
-We describe this method in \cref{sec:bg:mcts}.
-For learning how to generate good schedules for unseen basic blocks, we use Support Vector Machines and Neural Networks, which we explain in \cref{sec:bg:svm} and \cref{sec:bg:nn}.
+We describe this method in \Cref{sec:bg:mcts}.
+For learning how to generate good schedules for unseen basic blocks, we use Support Vector Machines and Neural Networks, which we explain in \Cref{sec:bg:svm} and \Cref{sec:bg:nn}.
 
 \subsection{Monte Carlo Tree Search}
 \label{sec:bg:mcts}
