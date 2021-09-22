@@ -204,7 +204,7 @@ See \cref{sec:bg:mcts} for more details.
 
 % Explain structure of the tree: nodes = instructions, edges = valid traversion of dag
 The input to our \ac{mcts} approach is a \ac{dag} from the LLVM compiler, which defines the valid instruction schedules.
-See \cref{fig:approach:dag} for an example.
+See \cref{fig:bg:llvm-dag} for an example.
 The LLVM instruction \ac{dag} still contains many instructions that exist just for internal reasons and are not translated to machine instructions.
 We remove these pseudo instructions from the instruction \ac{dag} and adjust the dependencies between the nodes.
 
