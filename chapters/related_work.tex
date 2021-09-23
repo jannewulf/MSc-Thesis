@@ -40,9 +40,17 @@ A newer work in this field was published by \citeauthor{jain2019learning}~\cite{
 They trained a neural network to imitate the instruction schedules by the GCC compiler.
 
 \section{Register Allocation}
-\subsection*{Deep Learning-based Hybrid Graph-Coloring Algorithm for Register Allocation}\cite{das2019deep}
-\subsection*{Graph colouring meets deep learning: Effective graph neural network models for combinatorial problems}\cite{lemos2019graph}
-\subsection*{Register Allocation for Intel Processor Graphics}\cite{chen2018register}
+\label{sec:rw:register-allocation}
+We have disussed the implications of the instruction scheduling phase on the register allocation \Cref{sec:bg:compilers:backend}.
+This interdependence was also shown in by \citeauthor{goodman1988code}~\cite{goodman1988code}.
+\citeauthor{lavrov1962store} showed the connection between the graph-coloring problem and register allocation and the NP-completeness~\cite{lavrov1962store}.
+This knowledge was first implemented in a compiler by \citeauthor{chaitin1982register}~\cite{chaitin1982register}.
+
+In the field of register allocation also appeared research that builds the connection to data-driven methods.
+\citeauthor{das2019deep} used a deep learning approach to solve the graph coloring problem~\cite{das2019deep}.
+The newer and naturally better fitting technique of graph neural networks was used by \citeauthor{lemos2019graph} to approach the graph coloring problem~\cite{lemos2019graph}. 
+
+% \subsection*{Register Allocation for Intel Processor Graphics}\cite{chen2018register}
 
 \section{Compiler Phase-Ordering}
 %Static neural compiler optimization via deep reinforcement learning~\cite{mammadli2020static}\\
