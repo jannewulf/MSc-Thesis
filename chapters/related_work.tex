@@ -1,9 +1,43 @@
 \chapter{Related Work}
+
 \section{Instruction Scheduling}
-\subsection*{Code scheduling and register allocation in large basic blocks}\cite{goodman1988code}
-\subsection*{Learning Instruction Scheduling Heuristics from Optimal Data}\cite{russell2006learning}
-\subsection*{Learning to schedule straight-line code}\cite{moss1998learning}
-\subsection*{Using Genetic Algorithms to Fine-Tune Instruction-Scheduling Heuristics}\cite{beaty1996using}
+\label{sec:rw:instruction-scheduling}
+Scheduling problems appear in many fields.
+This is why general scheduling is a topic where much research exists.
+Also the research on instruction scheduling has a long history.
+
+Algorithms exist that can generate perfect instruction schedules for simple situations with perfect information.
+The requirements are met for architectures with only one functional unit and uniform instruction latencies.
+The best-known algorithm in this field is the Sethi-Ullman labelling algorithm~\cite{sethi1970generation}, which also served as a base for other algorithms~\cite{proebsting1991linear}.
+
+However, these conditions are not existent in modern processors.
+In more complex situations, the instruction scheduling problem is NP-complex~\cite{hennessy1983postpass}.
+Modern processors use pipelines to achieve instruction parallelism, see \Cref{sec:bg:cpu}.
+Consequently, most instruction schedulers that are used nowadays are based on the list scheduling framework.
+The algorithms, that follow this approach, are better able to generate instruction schedules for pipelined processors.
+Heller~\cite{heller1961sequencing} published an early work on how to approach instruction scheduling for these processors.
+Well-known is the work of Landskov~\cite{landskov1980local} for introducing the list scheduling framework.
+% Much research on further developments of the list scheduling was published~\cite{bernstein1991global,gibbons1986efficient,hennessy1983postpass}.
+
+As elaborated in \Cref{sec:bg:cpu}, the available information on instruction latencies is mostly uncertain.
+The reasons are instruction-level parallelism and uncertain memory latencies.
+One approach to approach this problem, is balanced scheduling~\cite{kerns1993balanced,lo1995improving}.
+Another idea that was elaborated was to use stochastic instruction scheduling~\cite{schielke2000stochastic}.
+
+Instruction scheduling typically works on a basic block level.
+This also means that transitions between basic blocks are not scheduled to work well together.
+However, there is research on extending the scope to greater regions~\cite{fisher1981trace,bernstein1991global,hwu1993superblock}.
+
+The first work that combined data-driven methods with instruction scheduling was a patent by \citeauthor{tarsy1994method}~\cite{tarsy1994method}, filed in \citeyear{tarsy1994method}.
+They used a simple perceptron to optimize weights that are used in heuristics, which are used in list scheduling.
+\citeauthor{beaty1996using}~\cite{beaty1996using} published a work in \citeyear{beaty1996using}, in which they have used genetic algorithms to generate heuristcs.
+Reinforcement learning in combination with rollouts were used for instruction scheduling by \citeauthor{mcgovern1999scheduling}~\cite{mcgovern1999scheduling,mcgovern2002building}.
+Priority functions that would prefer one over another instruction when presented a pair were built with decision trees by \citeauthor{moss1998learning}~\cite{moss1998learning}.
+\citeauthor{cavazos2004inducing} showed that instruction scheduling only makes a difference on some basic blocks.
+They used decision trees for selecting basic blocks for instruction scheduling~\cite{cavazos2004inducing}.
+\citeauthor{russell2006learning} used hand-crafted feature vectors and decision trees to create heuristics~\cite{russell2006learning} to improve instruction scheduling decisions.
+A newer work in this field was published by \citeauthor{jain2019learning}~\cite{jain2019learning}.
+They trained a neural network to imitate the instruction schedules by the GCC compiler.
 
 \section{Register Allocation}
 \subsection*{Deep Learning-based Hybrid Graph-Coloring Algorithm for Register Allocation}\cite{das2019deep}
