@@ -359,7 +359,7 @@ We refer to these values as $d_{max}$ and $d_{min}$ in \Cref{eqn:approach:regres
 
 % How was the input data generated?
 To build a dataset with the mapping defined in \Cref{eqn:approach:regression-mapping} we iterate the \ac{mcts} trees, and for every instruction node, we take its past scheduled instructions and the reward value it has.
-This way, we collected 4.8 million data points for the AARCH64 architecture.
+This way, we collected 4.8 million data points for the AArch64 architecture.
 \todo{Add number for aurora}
 
 % Data preprocessing
@@ -382,7 +382,7 @@ Further, the scaling of numerical values into the range $[0,1]$ is also done in 
 We trained a neural network with this data setup but also tried a modification.
 To reduce the dimensionality of the data, we clustered similar instructions.
 Especially instructions that only vary in the number of bits in the inputs.
-The addition instructions \lstinline|ADDWri| and \lstinline|ADDXri| of the AARCH64 architecture are clustered into the same cluster.
+The addition instructions \lstinline|ADDWri| and \lstinline|ADDXri| of the AArch64 architecture are clustered into the same cluster.
 These two instructions only differ in that one takes 32-bit values and the other 64-bit values.
 \todo{Add clusterings into appendix}
 See \Cref{tab:xxx} for exact clusterings.
@@ -548,8 +548,8 @@ We do some error checking after the execution has stopped (see \Cref{sec:approac
         \midrule
         x86 & \lstinline|rdtsc| \\
         ARM32 & \lstinline|mrc p15m, 0, r0, c15, c12, 1| \\
-        AARCH64 & \lstinline|mrs x0, PMCCNTR_EL0| \\
-        NEC SX-Aurora TSUBASA & \lstinline|smir %s60, %usrcc| \\
+        AArch64 & \lstinline|mrs x0, PMCCNTR_EL0| \\
+        \aurora & \lstinline|smir %s60, %usrcc| \\
         \bottomrule
     \end{tabular}
     \caption{Assembly instructions for getting the cycle counter value of a given hardware.}
@@ -558,7 +558,7 @@ We do some error checking after the execution has stopped (see \Cref{sec:approac
 See \Cref{tab:approach:asm_instrs_timing} for the assembly instructions per hardware.
 
 Depending on the hardware and the \ac{os}, access to these instructions or registers might not be permitted.
-For the AARCH64 architecture and a Linux \ac{os}, we had to implement and load a kernel module that granted access to this register.
+For the AArch64 architecture and a Linux \ac{os}, we had to implement and load a kernel module that granted access to this register.
  
 
 \subsection{Execution Unit}
