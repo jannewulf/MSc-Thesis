@@ -1,10 +1,10 @@
 \chapter{Background}
-In this chapter, we introduce knowledge that is required to understand the content of this thesis.
+In this chapter, we introduce knowledge that is required to understand the contents of this thesis.
 We start with an introduction to processors in \Cref{sec:bg:cpu}.
-In \Cref{sec:bg:compilers}, we overview how a compiler is typically implemented and which problems it has to solve that we want to tackle.
+In \Cref{sec:bg:compilers}, we give an overview on how a compiler is typically implemented and which problems it has to solve.
 \Cref{sec:bg:compilers:backend} gives a more detailed introduction to compiler back-ends, which we aim to optimize in this thesis.
-The compiler framework that we use as a basis is LLVM, which we introduce in \Cref{sec:bg:llvm}.
-Eventually, we give a brief overview of the thesis's machine learning or data-driven approaches (\Cref{sec:bg:ml}).
+We base the implementation of our proposed system on LLVM, which we introduce in \Cref{sec:bg:llvm}.
+Lastly, we give a brief overview of the thesis's machine learning or data-driven approaches (\Cref{sec:bg:ml}).
 
 % NOTE: Assume that the reader has common computer science knowledge!
 
@@ -23,7 +23,7 @@ Eventually, we give a brief overview of the thesis's machine learning or data-dr
 
 \section{Central Processing Unit}
 \label{sec:bg:cpu}
-Almost all computer systems use some \acp{cpu}.
+Almost all computer systems use one or more \acp{cpu}.
 It is the primary execution unit and executes the vast majority of computer programs on most systems.
 It also handles access to other parts of the system.
 These other parts can be the main memory, hard drives, network cards, or co-processors like a Graphics Processing Unit.
@@ -82,19 +82,21 @@ we have to load the data from the variables $a$, $b$, and $c$, make the computat
         \caption{}
         \label{tbl:bg:schedule-b}
     \end{subtable}
-    \caption[Example instruction schedules]{Example instruction schedules for \Cref{eqn:bg:abc}}
+    \caption[Example instruction schedules]{Example instruction schedules for \Cref{eqn:bg:abc}.
+    All the assembly code examples are written in the ILOC pseudo-code language~\cite{engineeringcompiler2007}.
+    Its instructions are of the form \iloccmdinl{instruction}{source}{target}.
+    The register \ilocreg{arp} is defined to point to the start of a memory block where all variables are stored.
+    Variables are addressed by adding an offset to the memory address in \ilocreg{arp}.
+    This is done by adding, \eg \iloc{@a} for the variable \iloc{a}.
+    }
     \label{tbl:bg:schedules}
 \end{table}
-
-All the assembly code examples are written in the ILOC pseudo-code language~\cite{engineeringcompiler2007}.
-Its instructions are of the form \iloccmdinl{instruction}{source}{target}.
-The register \ilocreg{arp} is defined to point to the start of a memory block where all variables are stored.
-Variables are addressed by adding an offset to the memory address in \ilocreg{arp}.
-This is done by adding, \eg \iloc{@a} for the variable \iloc{a}.
 
 Instructions that a \ac{cpu} executes are separated into different processing units.
 Typical processing units on modern \acp{cpu} are arithmetic logical units, load/store units, floating-point units, or encryption units.
 These units often exist redundantly on the \acp{cpu}.
+For more information on this topic , see \eg~\cite{harris2010digital}.
+\todo{system diagram?}
 
 \subsection{Classical Instruction Execution}
 The execution of instructions works in multiple stages.
@@ -113,7 +115,7 @@ These stages are:
         The computed result will be written back to the specified register during this stage.
 \end{enumerate}
 
-The \ac{cpu} executest one instruction at a time in this classical execution scheme.
+The \ac{cpu} executes one instruction at a time in this classical execution scheme.
 It means that instructions can only start after all execution stages of the previous instruction have finished.
 % Consequently, the throughput of instructions per cycle $t$ is always $t>1$, given that instructions require more than one cycle to execute.
 
@@ -269,7 +271,7 @@ We see that the execution takes 36 cycles to finish in this example.
             \end{tabular}
         }
     }
-    \caption[Comparison of CPU pipeline implementations]{Comparison of CPU pipeline implementations for the example in \Cref{eqn:bg:abc}. 
+    \caption[Comparison of CPU pipeline implementations]{Comparison of CPU pipeline implementations for the example in \Cref{eqn:bg:abc} with the pipeline stages Fetch (F), Decode (D), Execution (E), and Writeback (W). 
     The used instruction schedule is defined in \Cref{tbl:bg:schedule-a}.}
     \label{tbl:bg:pipeline}
 \end{table}
@@ -279,42 +281,42 @@ Only one stage is working at a time, and the rest of the stages are doing nothin
 This behavior is ineffective and addressed by the following execution model.
 
 \subsection{Scalar Pipeline Execution}
-This execution model uses the fact that most stages are waiting most of the time.
-The improvement is that now, one execution can be scheduled in every \ac{cpu} cycle.
+This execution model uses the fact that most stages are idle most of the time.
+The improvement is that now, one instruction can be scheduled in every \ac{cpu} cycle.
 
-See in \Cref{tbl:bg:scalar-pipeline} that this change introduces parallelism, and the \ac{cpu} executes the first three instructions concurrently.
-The theoretically best case is that all the stages are working in every cycle and are never waiting.
-This is not always possible, as we can see in the example.
+\Cref{tbl:bg:scalar-pipeline} illustrates that this change introduces parallelism, and the \ac{cpu} executes the first three instructions interleaved.
+The theoretically best case is that all the stages are busy in every cycle and are never idle.
+This is not always possible, as we can see in the example \Cref{tbl:bg:scalar-pipeline}.
 We cannot start instruction $i_4$ (\iloccmdinl{mult}{\ilocreg{1},~\ilocreg{1}}{\ilocreg{1}}) in the fourth \ac{cpu} cycle, because we have a dependency on the result of instruction $i_1$ (\iloccmdinl{load}{\ilocreg{arp},~@a}{\ilocreg{1}}).
 In the fifth cycle, the result of instruction $i_1$ was written back and we can start instruction $i_4$.
 Different reasons of hazards exist that cause these bubbles in the pipeline.
 \begin{itemize}
     \item Resource Hazards:
-        When the \ac{cpu} needs to access a resource, which is already accessed and thus blocked, the access cannot happen and has to wait.
-        This could, for example, happen with registers that have only one access line.
+        When the \ac{cpu} needs to access a resource, which is already being accessed and thus blocked, the access cannot happen and has to wait.
+        This could, for example, happen with registers that have only one connection to read their content.
         Redundancy of hardware units can solve or mitigate this problem.
     \item Data Hazards:
-        Three types of different data hazards exist when two instructions want to access the same register:
+        Three types of different data hazards exist when two instructions attempt to access the same register:
         \begin{itemize}
-            \item Read after write: A instruction has to wait until a previous instruction has produced the result that the latter has to read.
-            \item Write after read: A instruction has to wait until a previous instruction has read a register, that the latter has to overwrite.
-            \item Write after write: A instruction has to wait until a previous instruction has written a register, that the latter wants to write to, too.
+            \item Read after write (RAW): A instruction has to wait until a previous instruction has produced the result that the latter has to read.
+            \item Write after read (WAR): A instruction has to wait until a previous instruction has read a register, that the latter has to overwrite.
+            \item Write after write (WAW): A instruction has to wait until a previous instruction has written a register, that the latter wants to write to, too.
         \end{itemize}
-        These hazards are typically solved by sorting the instructions or waiting and introducing bubbles into the pipeline when it is unavoidable.
+        These hazards are typically solved by sorting the instructions or waiting and introducing NOP (no-operation) instructions into the pipeline when it is unavoidable.
     \item Control Hazards:
         It is not always obvious which instruction should be executed next due to if/else constructs or loops.
         Usually, the \ac{cpu} will execute one branch speculatively and abort the instructions if it is the wrong branch.
-        This problem is typically approached by branch prediction mechanisms that can be done in the compiler and on the hardware.
+        This problem is typically approached by branch prediction mechanisms that can be implemented in the compiler and on the hardware.
 \end{itemize}
 
 \subsection{Superscalar Pipeline Execution}
 \label{sec:bg:superscalar-cpu}
-The next progression from the scalar pipeline is this pipeline model.
+The next progression from the scalar pipeline is the superscalar pipeline model.
 The difference is that we can start multiple instructions in the same \ac{cpu} cycle.
 Consequently, this increases the level of parallelism.
 The number of instructions that can start simultaneously depends on the specific hardware. % A53 2-way
 
-\Cref{tbl:bg:superscalar-pipeline} shows an example execution of a two-way superscalar pipeline.
+\Cref{tbl:bg:superscalar-pipeline} shows an exemplary execution of a two-way superscalar pipeline.
 This is especially interesting to compare with the scalar pipeline in \Cref{tbl:bg:scalar-pipeline}.
 Note that now, instructions 1 and 2 are scheduled in the same \ac{cpu} cycle.
 If we had simulated a three-way superscalar pipeline, we could have started instructions 1-3 in the first cycle.
@@ -323,33 +325,34 @@ However, we still have a runtime improvement of one cycle compared to the scalar
 Various ways exist to implement superscalar pipelines.
 The three most typical implementations are:
 \begin{itemize}
-    \item In order (static): 
+    \item In-Order (static): 
         These type of \acp{cpu} take the instructions as they come and check if they can be executed simultaneously.
         The compiler defines the instruction schedule.
-    \item Out-of-order (dynamic): 
-        Dynamic superscalar CPUs can see the following n instructions and reschedule them to achieve higher parallelism.
+    \item Out-of-Order (dynamic): 
+        Dynamic superscalar CPUs can see the following $n$ instructions and reschedule them to achieve higher parallelism.
         This means that the compiler does not fully control the executed instruction schedule, which is essential for this thesis.
     \item Very Long Instruction Word: 
         The compiler can define which instructions the CPU will execute simultaneously for this type of superscalar pipeline.
-        This assignment works by wrapping multiple instructions into a single instruction, thus the name.
+        This assignment works by wrapping multiple short instructions into a single instruction, thus the name.
+        These long instructions must be defined in the instruction set.
 \end{itemize}
 
 \subsection{Instruction Schedules}
 \label{sec:bg:cpu-schedule}
 Looking at \Cref{fig:bg:example-dag}, we see that the dependencies allow different instruction schedules.
 For example, we could use a breadth-first approach and execute all the load instructions first, then all the multiplications, et cetera.
-On the contrary, we could use a depth-first approach and execute the load and multiplication for variable a, then for b, et cetera.
+On the contrary, we could use a depth-first approach and execute the load and multiplication for variable \lstinline|a|, then for \lstinline|b|, et cetera.
 These two schedules are defined in \Cref{tbl:bg:schedules} and compared in this section.
 
-With the classical execution scheme with no pipeline, the instructions schedule is irrelevant for the runtime
-However, the runtime improvements that \acp{cpu} gain by pipelines depend heavily on the instruction schedule.
+With the classical execution scheme with no pipeline, the instructions schedule is irrelevant for the runtime.
+However, the runtime improvements that In-Order \acp{cpu} gain by pipelines depend heavily on the instruction schedule.
 We demonstrate this on two instruction schedules that we defined in \Cref{tbl:bg:schedules}.
 
 We illustrate the execution of the two schedules in \Cref{tbl:bg:schedule-comparison}.
 This example assumes that load and store instruction need three cycles to finish, multiplications need two cycles and add instruction need one cycle.
 Here, we ignore the phases of the instruction execution for simplicity.
 We demonstrate the execution of a two-way superscalar in-order processor.
-The goal here is to have an instruction schedule that allows maximum parallelism.
+The goal here is to have an instruction schedule that allows for maximum parallelism.
 \begin{table}
     \scriptsize
     \begin{subtable}{0.48\textwidth}
@@ -367,16 +370,16 @@ The goal here is to have an instruction schedule that allows maximum parallelism
             {\fontsize{11pt}{9pt}\selectfont $i_8$} & 
             {\fontsize{11pt}{9pt}\selectfont $i_9$} \\
             \midrule
-             1 & X & X &   &   &   &   &   &   &   \\ \rowcolor[gray]{.975}
-             2 & X & X & X &   &   &   &   &   &   \\
-             3 & X & X & X &   &   &   &   &   &   \\ \rowcolor[gray]{.975}
-             4 &   &   & X & X & X &   &   &   &   \\
-             5 &   &   &   & X & X & X &   &   &   \\ \rowcolor[gray]{.975}
-             6 &   &   &   &   &   & X & X &   &   \\
-             7 &   &   &   &   &   &   &   & X &   \\ \rowcolor[gray]{.975}
-             8 &   &   &   &   &   &   &   &   & X \\
-             9 &   &   &   &   &   &   &   &   & X \\ \rowcolor[gray]{.975}
-            10 &   &   &   &   &   &   &   &   & X \\
+             1 &$\boldsymbol{\times}$&$\boldsymbol{\times}$&   &   &   &   &   &   &   \\ \rowcolor[gray]{.975}
+             2 &$\boldsymbol{\times}$&$\boldsymbol{\times}$&$\boldsymbol{\times}$&   &   &   &   &   &   \\
+             3 &$\boldsymbol{\times}$&$\boldsymbol{\times}$&$\boldsymbol{\times}$&   &   &   &   &   &   \\ \rowcolor[gray]{.975}
+             4 &   &   &$\boldsymbol{\times}$&$\boldsymbol{\times}$&$\boldsymbol{\times}$&   &   &   &   \\
+             5 &   &   &   &$\boldsymbol{\times}$&$\boldsymbol{\times}$&$\boldsymbol{\times}$&   &   &   \\ \rowcolor[gray]{.975}
+             6 &   &   &   &   &   &$\boldsymbol{\times}$&$\boldsymbol{\times}$&   &   \\
+             7 &   &   &   &   &   &   &   &$\boldsymbol{\times}$&   \\ \rowcolor[gray]{.975}
+             8 &   &   &   &   &   &   &   &   &$\boldsymbol{\times}$\\
+             9 &   &   &   &   &   &   &   &   &$\boldsymbol{\times}$\\ \rowcolor[gray]{.975}
+            10 &   &   &   &   &   &   &   &   &$\boldsymbol{\times}$\\
             \bottomrule
         \end{tabular}
         \caption{Execution of instruction schedule from \Cref{tbl:bg:schedule-a}}
@@ -398,21 +401,21 @@ The goal here is to have an instruction schedule that allows maximum parallelism
             {\fontsize{11pt}{9pt}\selectfont $i_8$} & 
             {\fontsize{11pt}{9pt}\selectfont $i_9$} \\
             \midrule
-             1 & X &   &   &   &   &   &   &   &   \\ \rowcolor[gray]{.975}
-             2 & X &   &   &   &   &   &   &   &   \\
-             3 & X &   &   &   &   &   &   &   &   \\ \rowcolor[gray]{.975}
-             4 &   & X & X &   &   &   &   &   &   \\
-             5 &   & X & X &   &   &   &   &   &   \\ \rowcolor[gray]{.975}
-             6 &   &   & X &   &   &   &   &   &   \\
-             7 &   &   &   & X & X &   &   &   &   \\ \rowcolor[gray]{.975}
-             8 &   &   &   & X & X &   &   &   &   \\
-             9 &   &   &   &   & X &   &   &   &   \\ \rowcolor[gray]{.975}
-            10 &   &   &   &   &   & X & X &   &   \\
-            11 &   &   &   &   &   & X &   &   &   \\ \rowcolor[gray]{.975}
-            12 &   &   &   &   &   &   &   & X &   \\
-            13 &   &   &   &   &   &   &   &   & X \\ \rowcolor[gray]{.975}
-            14 &   &   &   &   &   &   &   &   & X \\
-            15 &   &   &   &   &   &   &   &   & X \\
+             1 &$\boldsymbol{\times}$&   &   &   &   &   &   &   &   \\ \rowcolor[gray]{.975}
+             2 &$\boldsymbol{\times}$&   &   &   &   &   &   &   &   \\
+             3 &$\boldsymbol{\times}$&   &   &   &   &   &   &   &   \\ \rowcolor[gray]{.975}
+             4 &   &$\boldsymbol{\times}$&$\boldsymbol{\times}$&   &   &   &   &   &   \\
+             5 &   &$\boldsymbol{\times}$&$\boldsymbol{\times}$&   &   &   &   &   &   \\ \rowcolor[gray]{.975}
+             6 &   &   &$\boldsymbol{\times}$&   &   &   &   &   &   \\
+             7 &   &   &   &$\boldsymbol{\times}$&$\boldsymbol{\times}$&   &   &   &   \\ \rowcolor[gray]{.975}
+             8 &   &   &   &$\boldsymbol{\times}$&$\boldsymbol{\times}$&   &   &   &   \\
+             9 &   &   &   &   &$\boldsymbol{\times}$&   &   &   &   \\ \rowcolor[gray]{.975}
+            10 &   &   &   &   &   &$\boldsymbol{\times}$&$\boldsymbol{\times}$&   &   \\
+            11 &   &   &   &   &   &$\boldsymbol{\times}$&   &   &   \\ \rowcolor[gray]{.975}
+            12 &   &   &   &   &   &   &   &$\boldsymbol{\times}$&   \\
+            13 &   &   &   &   &   &   &   &   &$\boldsymbol{\times}$\\ \rowcolor[gray]{.975}
+            14 &   &   &   &   &   &   &   &   &$\boldsymbol{\times}$\\
+            15 &   &   &   &   &   &   &   &   &$\boldsymbol{\times}$\\
             \bottomrule
         \end{tabular}
         \caption{Execution of instruction schedule from \Cref{tbl:bg:schedule-b}}
@@ -423,13 +426,13 @@ The goal here is to have an instruction schedule that allows maximum parallelism
     \label{tbl:bg:schedule-comparison}
 \end{table}
 
-We achieve parallel execution in \Cref{tbl:bg:schedule-comparison-a} for the instructions $i_1$ and $i_2$ and $i_4$ and $i_5$.
-We cannot schedule the instructions $i_3$ and $i_4$ together because $i_4$ has to wait for $i_1$ to finish.
+We achieve parallel execution in \Cref{tbl:bg:schedule-comparison-a} for the instructions $\{i_1, i_2\}$ and $\{i_4, i_5\}$.
+We cannot schedule the instructions $i_3$ and $i_4$ together because $i_4$ has to wait for $i_1$ to finish, so that it can use the result of $i_1$.
 
-In the execution in \Cref{tbl:bg:schedule-comparison-b}, we can schedule the instructions $i_4$ and $i_2$, $i_5$ and $i_3$, and $i_6$ and $i_7$ together in pairs of two.
+In the execution in \Cref{tbl:bg:schedule-comparison-b}, we can schedule the instructions $\{i_4, i_2\}$, $\{i_5, i_3\}$, and $\{i_6, i_7\}$ together in pairs of two.
 However, the overall execution is with 15 cycles slower than the 10 cycles of the execution in \Cref{tbl:bg:schedule-comparison-a}.
 
-Instruction scheduling is not a trivial task, and much research was published to optimize this problem.
+Instruction scheduling is not a trivial task, and much research has been published on this problem.
 However, the more complicated \acp{cpu} become, the harder it gets to generate fast instruction schedules.
 
 \section{Compilers}
@@ -438,18 +441,48 @@ A compiler is a tool that helps make programs, written in a high-level language,
 The compilers' goal is to translate from a high-level language to a low-level language or machine code.
 During the translation, the compiler ensures that the output program is a correct representation of the input.
 Further, compilers typically aim to optimize the source program with a defined goal, \eg runtime performance or memory usage.
+For more information on compilers, \eg see~\cite{engineeringcompiler2007}.
 
 Making a high-level language program executable includes more tasks than the translation, which is a non-trivial task.
 For example, other steps include linking the program with libraries, especially standard libraries, that implement basic functionalities.
 Next, it has to be prepared to interact with a runtime library.
 These topics are out of the scope of this thesis, and we do not discuss them further.
 
-The implementation of a compiler is typically separated into three phases which apply modifications to the given code with a defined output format.
+\begin{figure}
+    \centering
+    \tikzstyle{defaultnode} = [text centered, align=center, font=\small\accentfont, rectangle, rounded corners, draw=black, minimum height=1cm, minimum width=3cm]
+    \tikzstyle{arrow} = [thick,->,>=stealth,-{Latex[scale=1.2]}]
+    \begin{tikzpicture}[node distance=2cm]
+        \node (c_front_end) [defaultnode] {C/C++ \\ Front-End};
+        \node (rust_front_end) [defaultnode,below of=c_front_end] {Rust \\ Front-End};
+        \node (go_front_end) [defaultnode,below of=rust_front_end] {Go \\ Front-End};
+
+        \node (optimizer) [defaultnode,right=4cm of rust_front_end] {Optimizer};
+
+        \node (ve_backend) [defaultnode,right=2cm of optimizer] {\aurora \\ Back-End};
+        \node (arm_backend) [defaultnode,above of=ve_backend] {ARM AArch64 \\ Back-End};
+        \node (x86_backend) [defaultnode,below of=ve_backend] {x86 \\ Back-End};
+
+
+        \draw [arrow] (c_front_end.east) -- (optimizer.north west);
+        \draw [arrow] (rust_front_end.east) -- (optimizer.west);
+        \draw [arrow] (go_front_end.east) -- (optimizer.south west);
+
+        \draw [arrow] (optimizer.east) -- (ve_backend.west);
+        \draw [arrow] (optimizer.east) -- (arm_backend.west);
+        \draw [arrow] (optimizer.east) -- (x86_backend.west);
+    \end{tikzpicture}
+    \caption[Compiler Overview]{Compiler Implementation: Compilers typically consist of a front-end, an optimizer, and a back-end phase.
+    Exemplary, with three different source languages, and three different target architectures.}
+    \label{fig:bg:compiler-overview}
+\end{figure}
+The implementation of a compiler typically consists of three phases which apply modifications to the given code with a defined output format.
 \begin{enumerate}
-    \item The compiler transforms from the high-level language to an \ac{ir} in the front-end phase.
-    \item The compiler applies optimizations on the \ac{ir} and outputs the code in the same format.
-    \item In the back-end phase, the compiler transforms the \ac{ir} to assembly code or machine code.
+    \item The compiler transforms from the high-level language to an \ac{ir} in the \textbf{front-end phase}.
+    \item In the \textbf{optimization phase}, the compiler applies optimizations on the \ac{ir} and outputs the code in the same format.
+    \item In the \textbf{back-end phase}, the compiler transforms the \ac{ir} to assembly code or machine code.
 \end{enumerate}
+\Cref{fig:bg:compiler-overview} visualizes this setup.
 We explain these three phases in more detail, especially the back-end phase, which we are working on in this thesis.
 
 \subsubsection{Basic Block}
@@ -472,7 +505,11 @@ The parser then takes these tokens and is checked against the grammar defined by
 Even with a syntactically correct program, there can still be errors in the code, \eg assignments of incompatible types.
 These are checked during the context-sensitive analysis phase.
 Eventually, the source code is translated into a \ac{ir} which will be used as input to the optimizer and the back-end.
+
 The \ac{ir} is compiler-dependent and typically defined as a \ac{ssa} form.
+A \ac{ssa} language, is a language in which each variable is assigned exactly once.
+When the value of a variable changes, the value is not written to that variable but to a new variable.
+This form simplifies many optimizations.
 
 There might be additional steps required depending on the source language.
 C/C++ compilers, for example, use a preprocessor to replace macros like \lstinline{#include} and \lstinline{#define} with their actual values.
@@ -486,19 +523,20 @@ This step aims to optimize the code for more efficient execution in a source- an
 Efficient can mean different things here.
 The transformed code might produce, \eg a faster program, a smaller program, or a program with less power consumption.
 
-There exist a large number of optimization passes in most compilers.
+There are a large number of optimization passes in most compilers.
 They range from relatively simple optimizations, like replacing constant variables with their actual value, to more advanced ones that might, for example, simplify computations with the rules of algebra.
 
 \subsection{Back-end}
 \label{sec:bg:compilers:backend}
 The overall goal of the compiler's back-end is to transform the \ac{ir} to code for the target hardware.
-Further, it also decides where the processor saves variables (registers only or memory) and, thus, how they will be accessed.
-We explain the necessary steps in more detail.
+Further, it also decides where the processor stores variables (registers only or memory) and, thus, how they will be accessed.
+In the subsequent paragraphs, we explain the necessary steps in more detail.
 
 \subsubsection{Instruction Selection}
 First, the compiler translates the input \ac{ir} representation.
 As the \ac{ir} is already in \ac{ssa} form, the translation step mostly maps \ac{ir} instructions to instructions defined in the Instruction Set Architecture of the target hardware.
 The instruction selection is not a one-to-one mapping in all cases, but sometimes, \ac{ir} instructions are represented by multiple hardware instructions.
+\todo{Example?}
 
 Note that the compiler chooses actual processor instructions, but registers are not assigned yet.
 Variables are assigned to an unlimited number of virtual registers.
@@ -510,7 +548,8 @@ Optimal in this context usually means to optimize for short runtimes.
 
 % Mixed: why important
 We have seen how different schedules influence the runtime performance in \Cref{tbl:bg:schedule-comparison}.
-The objective of this thesis is to optimize this instruction scheduling step in the compiler back-end.
+% The objective of this thesis is to optimize this instruction scheduling step in the compiler back-end.
+The objective of this thesis is to generate instruction schedulers for novel hardware in a automized way.
 Here we explain how instruction scheduling typically works.
 
 % Why important - but rewrite this probably
@@ -521,7 +560,7 @@ However, all pipelined execution models might benefit from better instruction sc
 
 % Why hard
 Instruction scheduling is a challenging problem.
-One reason for that is that it is NP-complete to find an optimal schedule.
+One reason for that is that it is NP-complete to find an optimal schedule~\cite{hennessy1983postpass}.
 It is necessary to work with heuristics and generate approximations to optimal schedules.
 Additionally, processors get more and more optimized in special cases.
 That makes them faster, but it also becomes harder to predict what they will do in a given situation, \ie to predict how long it will take to execute a given instruction.
@@ -531,12 +570,10 @@ Therefore, the problem is not only NP-complete, but also has to be solved with u
 
 % How
 Like the transformations in the optimizer stage, the instruction scheduling is typically done on a basic block level.
-However, there exists research on extending the scope of instruction scheduling.
-\todo{Add references, see book}
+However, there exists research on extending the scope of instruction scheduling~\cite{fisher1981trace,bernstein1991global,hwu1993superblock}.
 
 Compilers typically use the list scheduling approach to find an approximately optimal solution.
 List scheduling is more of a framework than a specific algorithm.
-We will explain here how it works in general.
 
 % How
 The compiler typically transforms the sequence of instructions into a dependency graph to analyze a given basic block.
@@ -551,12 +588,9 @@ This \iloc{add} ($i_8$) instruction depends on another \iloc{add} ($i_7$) and a 
 The nodes that have no outgoing edge are leafs ($i_1$, $i_2$, and $i_3$) and can be scheduled directly in the beginning without any constraint.
 \begin{figure}
     \centering
-
-    % TODO: move these definitions somewhere else?
-    \definecolor{darkgray}{HTML}{3D4752}
-    \tikzstyle{instr} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm,text centered]%, text=white, fill=darkgray]
-    \tikzstyle{arrow} = [thick,->,>=stealth]
-    \begin{tikzpicture}[node distance=2cm]
+    \tikzstyle{instr} = [rectangle, rounded corners, draw=black, minimum width=3cm, minimum height=0.8cm, text centered]
+    \tikzstyle{arrow} = [thick,->,>=stealth,-{Latex[scale=1.2]}]
+    \begin{tikzpicture}[node distance=1.6cm]
         \node (load_a) [instr] {$i_1$: \lstinline{load @a}};
         \node (mul_a_a) [instr, below of=load_a] {$i_4$: \lstinline{mult}};
         \node (load_b) [instr, right of=load_a, xshift=3cm] {$i_2$: \lstinline{load @b}};
@@ -604,22 +638,22 @@ The described method is a top-down approach, but it is equally solvable in a bot
 
 
 \subsubsection{Register Allocation}
-In the previous instruction scheduling phase, the compiler still works with an infinite amount of virtual registers.
+In the previous instruction scheduling phase, the compiler works with an infinite amount of virtual registers.
 The processors have a defined set of different classes registers, \eg different registers often exist for integer and floating-point numbers.
 In this phase, the compiler's goal is to map $n$ virtual registers to $m$ hardware registers, where $m$ is typically a lot smaller than $n$.
 
 Registers are the fastest memory type in computers to access data.
 It is often the only way to access data directly, \ie data must be transferred from main memory to registers and vice versa by load and store instructions.
-Due to its speed, registers are also costly and thus available in a limited number.
+Due to their speed, registers are also costly and thus available in a limited number.
 
-The mapping to hardware registers is not always possible. 
+The mapping to hardware registers is not always possible, because there might not be enough registers to store all required values simultaneously.
 In that case, memory spills are introduced.
 This means that the content of some registers has to be outsourced to memory.
 So, an additional store instruction to move the data to memory and an additional load instruction must be added to the code to get the data back into a register when it is needed.
 These spills are costly for the runtime performance, and the goal is to reduce them.
 
 Like instruction scheduling, register allocation is also a challenging problem.
-It can be reduced to the graph coloring problem, which is NP-complete.
+It can be reduced to the graph coloring problem, which is NP-complete~\cite{lavrov1962store}.
 
 The runtime performance impact of the register allocation is also highly interdependent with the instruction scheduling~\cite{goodman1988code}.
 Instruction schedules can be optimized for reducing the number of live variables.
@@ -656,7 +690,7 @@ It is most known as the back-end of the C/C++ compiler \iloc{clang}, but is also
 
 The LLVM framework framework is easily extendable.
 This is especially true for new source languages and target hardwares.
-Additionally, also details can be added to the compiler easily, like optimizations passes or instruction schedulers.
+Additionally, details can be added to the compiler easily, like optimizations passes or instruction schedulers.
 
 We choose to work with the LLVM framework because it gives us full control over the compilation process.
 It is easy to add new instruction schedulers and implement transformation passes for the LLVM \ac{ir}.
@@ -703,8 +737,8 @@ There are three possible values for the output type:
     \item \lstinline|glue| also does not represent any data but is placed together with the red dependencies.
 \end{itemize}
 
-Even though the instruction scheduling has already finished, there can still be LLVM pseudo instructions.
-They get resolved in later stages.
+Even though the instruction selection has already finished, there can still be LLVM pseudo instructions.
+They are resolved in later stages.
 The LLVM \ac{dag} always contains an \lstinline|EntryToken| pseudo instruction which gets always scheduled first.
 Additionally, there is the \lstinline|GraphRoot| node at the bottom does not represent any instruction and will not get scheduled.
 The \lstinline|BasicBlock| pseudo instructions represent the \lstinline|EntryToken| of another basic block.
@@ -739,20 +773,19 @@ We use the \lstinline|default| scheduler as our baseline in all experiments.
 \section{Data-Driven Methods}
 \label{sec:bg:ml}
 Throughout this thesis, we utilize data-driven methods for different tasks.
-We use Monte Carlo Tree Search for finding good instruction schedules and build a dataset.
+We use Monte Carlo Tree Search for finding good instruction schedules and to build a dataset.
 We describe this method in \Cref{sec:bg:mcts}.
 For learning how to generate good schedules for unseen basic blocks, we use Support Vector Machines and Neural Networks, which we explain in \Cref{sec:bg:svm} and \Cref{sec:bg:nn}.
 
 \subsection{Monte Carlo Tree Search}
 \label{sec:bg:mcts}
-\ac{mcts}~\cite{abramson1990expected} is a randomized search method to search optimal decisions.
-When a computer's task is to play a board game, it has to make decisions, and from previous decisions, it has to make new decisions.
+\ac{mcts}~\cite{abramson1990expected} is a randomized search method for optimal decisions.
+When, \eg a computer's task is to play a board game, it has to make decisions, and from the outcome of previous decisions, it has to make new decisions.
 This process continues until the game is over.
 From the beginning of the game until the end, we can model the decision-making process as a decision tree.
-For small games, like Tic Tac Toe, it is possible to use the trivial Minimax algorithm, which will check all possible paths in the decision tree.
+For small games, like Tic Tac Toe, it is possible to use the trivial Minimax algorithm~\cite{neumann1928theorie}, which checks all possible paths in the decision tree.
 However, for games like Chess, there are too many possible paths for a computer to simulate.
-The same is true for our instruction scheduling problem.
-Every path in the decision tree represents an instruction schedule, which has to be compiled and executed to evaluate it.
+Another problem might be that the simulation itself is costly.
 This process is too slow for the number of possible instruction schedules that exist for a typical basic block.
 
 \ac{mcts} works by exploring one level of decisions  and finishing the path with random decisions.
@@ -777,10 +810,10 @@ These are:
         They will just be used to fill the path.
         This path through the \ac{mcts} tree gets evaluated, \eg by playing the board game with the decisions or in our case by checking the runtime of the instruction schedule.
     \item Backpropagation Phase:
-        The evaluation of that path gets applied to the statistics of all the nodes from the path present in the \ac{mcts} tree.
+        The evaluation of that path gets applied to the statistics of all the path's nodes.
 \end{enumerate}
 The node statistics are typically just two values.
-First, the count of how many times a node was included in a simulation.
+First, the count of how many times a node was included in a simulation (view count).
 The second value is the cumulated evaluation metric.
 Typically, cumulated means the average value.
 However, in our case, it is beneficial to use the maximum value instead of the average.
@@ -813,7 +846,7 @@ However, \ac{svr} tries to have as many data points as possible inside of the ma
 This means that the hyperplane is located close to the data points.
 Then, this hyperplane is used as the modeled function, not as a separation.
 
-If the data points are not easily separable, the non-linear extension to the \ac{svm} might help.
+If the data points are not easily separable, the non-linear extension to the \ac{svm}, the Kernel-\ac{svm}, might help.
 By applying the kernel-trick, the datapoints are mapped into a higher dimensional space.
 This makes them easier separable.
 The non-linearity might also help the \ac{svr} algorithm for learning non-linear functions.
@@ -823,8 +856,14 @@ The non-linearity might also help the \ac{svr} algorithm for learning non-linear
 % Importance of NN in the last decade
 Much development in the machine learning field is based on artificial neural networks since the 2010s.
 Especially, the computer vision and natural language processing fields profited from neural networks.
-\todo{Add some citations}
-However, the foundations of this field date back to the 1950s~\cite{rosenblatt1958perceptron}.
+There are special types of neural networks for working on images which are called \ac{cnn}~\cite{lecun1998gradient}.
+The weight that these networks learn are the weights of convolution operations.
+Successful implementations of \acp{cnn} are, \eg~\cite{krizhevsky2012imagenet,he2016deep} on a image classification task.
+Another important type of neural networks are Recurrent Neural Networks~\cite{rumelhart1985learning}.
+These are often used in \ac{nlp} problems, \eg~\cite{graves2013speech,socher2013recursive}.
+However, in this thesis, we use standard neural networks.
+
+The foundations of this field date back to the 1950s~\cite{rosenblatt1958perceptron}.
 With increasing computation power, more and more layers were added to the neural networks.
 Machine learning with deep neural networks are often referred to as deep learning.
 
