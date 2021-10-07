@@ -1192,7 +1192,7 @@
        style="font-size:14.00000095px;font-family:Times, serif;text-anchor:middle;stroke-width:1" />
     <path
        inkscape:connector-curvature="0"
-       style="fill:none;stroke:#b90f22;stroke-width:1.87500004;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;stroke:#b90f22;stroke-width:1.87500004;stroke-miterlimit:4;stroke-dasharray:10,10;stroke-opacity:1"
        d="m 277.5,0.19888592 c 0,0 136,0 136,0 6,0 12,-6.00000002 12,-11.99999992 0,0 0,-45.00001 0,-45.00001 0,-6 -6,-12 -12,-12 0,0 -136,0 -136,0 -6,0 -12,6 -12,12 0,0 0,45.00001 0,45.00001 0,5.9999999 6,11.99999992 12,11.99999992"
        id="path365-5" />
     <text
