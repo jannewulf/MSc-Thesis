@@ -1,0 +1,312 @@
+\chapter{Instruction Clusters}
+\section{AArch64}
+\begin{xltabular}{\textwidth}{lX}
+    \toprule
+    Cluster & Instructions \\
+    \midrule
+    \endhead
+
+    \bottomrule
+    \endfoot
+
+    ADD & ADDSWri, ADDSWrr, ADDSXri, ADDWri, ADDWrr, ADDWrs, ADDWrx, ADDXri, ADDXrr, ADDXrs, ADDXrx \\
+    ADDVv & ADDVv4i32v \\
+    ADDv & ADDv16i8, ADDv2i32, ADDv2i64, ADDv4i16, ADDv4i32 \\
+    ADJCALLSTACKDOWN & ADJCALLSTACKDOWN \\
+    ADJCALLSTACKUP & ADJCALLSTACKUP \\
+    ADRP & ADRP \\
+    AND & ANDSWri, ANDSWrr, ANDWri, ANDWrr, ANDWrs, ANDXri, ANDXrr \\
+    ANDv & ANDv16i8 \\
+    ASRV & ASRVWr, ASRVXr \\
+    BFM & BFMWri, BFMXri \\
+    BIC & BICSWrr, BICSXrr, BICWrr, BICWrs \\
+    BICv & BICv8i8 \\
+    BSPv & BSPv16i8 \\
+    CLZ & CLZWr \\
+    CMEQv & CMEQv16i8rz, CMEQv2i32rz, CMEQv4i16rz, CMEQv4i32, CMEQv4i32rz \\
+    CMGEv & CMGEv2i32rz, CMGEv2i64 \\
+    CMGTv & CMGTv2i64 \\
+    CMLTv & CMLTv2i32rz \\
+    COPY & COPY \\
+    COPY\_TO\_REGCLASS & COPY\_TO\_REGCLASS \\
+    CPYi64 & CPYi64 \\
+    CSEL & CSELWr, CSELXr \\
+    CSINC & CSINCWr, CSINCXr \\
+    CSINV & CSINVWr, CSINVXr \\
+    CSNEG & CSNEGWr \\
+    DUPv & DUPv2i32gpr, DUPv2i64gpr, DUPv2i64lane, DUPv4i32gpr, DUPv4i32lane, DUPv8i16gpr \\
+    EOR & EORWri, EORWrr, EORWrs, EORXri, EORXrr \\
+    EORv & EORv16i8, EORv8i8 \\
+    EXTR & EXTRWrri \\
+    EXTRACT\_SUBREG & EXTRACT\_SUBREG \\
+    EXTv & EXTv16i8 \\
+    FABD64 & FABD64 \\
+    FABS & FABSDr, FABSSr \\
+    FADD & FADDDrr, FADDSrr \\
+    FADDv & FADDv2f64, FADDv4f32 \\
+    FCMGTv & FCMGTv2f64, FCMGTv4i32rz \\
+    FCMP & FCMPDri, FCMPDrr, FCMPSri, FCMPSrr \\
+    FCSEL & FCSELDrrr, FCSELSrrr \\
+    FCVTD & FCVTDSr \\
+    FCVTLv & FCVTLv2i32, FCVTLv4i32 \\
+    FCVTMSUW & FCVTMSUWDr \\
+    FCVTMUUW & FCVTMUUWDr \\
+    FCVTNv & FCVTNv2i32, FCVTNv4i32 \\
+    FCVTS & FCVTSDr \\
+    FCVTZSSX & FCVTZSSXSri \\
+    FCVTZSUW & FCVTZSUWDr, FCVTZSUWSr \\
+    FCVTZSv & FCVTZSv2f64 \\
+    FDIV & FDIVDrr, FDIVSrr \\
+    FDIVv & FDIVv2f64, FDIVv4f32 \\
+    FMAX & FMAXDrr, FMAXSrr \\
+    FMAXNM & FMAXNMDrr \\
+    FMIN & FMINDrr, FMINSrr \\
+    FMINNM & FMINNMDrr \\
+    FMOV & FMOVDi, FMOVSi \\
+    FMOVD0 & FMOVD0 \\
+    FMOVS0 & FMOVS0 \\
+    FMOVv & FMOVv2f64\_ns, FMOVv4f32\_ns \\
+    FMUL & FMULDrr, FMULSrr \\
+    FMULv & FMULv1i32\_indexed, FMULv1i64\_indexed, FMULv2f32, FMULv2f64, FMULv2i32\_indexed, FMULv2i64\_indexed, FMULv4f32 \\
+    FNEG & FNEGDr, FNEGSr \\
+    FNEGv & FNEGv2f64, FNEGv4f32 \\
+    FNMUL & FNMULSrr \\
+    FRINTM & FRINTMDr \\
+    FSQRT & FSQRTDr \\
+    FSUB & FSUBDrr, FSUBSrr \\
+    FSUBv & FSUBv2f64, FSUBv4f32 \\
+    IMPLICIT\_DEF & IMPLICIT\_DEF \\
+    INSERT\_SUBREG & INSERT\_SUBREG \\
+    INSv & INSvi32lane \\
+    LD1Rv & LD1Rv2d\_POST, LD1Rv2s, LD1Rv2s\_POST, LD1Rv4s \\
+    LD2Twov & LD2Twov16b, LD2Twov16b\_POST, LD2Twov2d, LD2Twov2d\_POST, LD2Twov4h, LD2Twov4s \\
+    LDRBBpost & LDRBBpost \\
+    LDRBBpre & LDRBBpre \\
+    LDRBBroW & LDRBBroW \\
+    LDRBBroX & LDRBBroX \\
+    LDRBBui & LDRBBui \\
+    LDRBroX & LDRBroX \\
+    LDRDpost & LDRDpost \\
+    LDRDpre & LDRDpre \\
+    LDRDui & LDRDui \\
+    LDRHHpost & LDRHHpost \\
+    LDRHHpre & LDRHHpre \\
+    LDRHHroW & LDRHHroW \\
+    LDRHHroX & LDRHHroX \\
+    LDRHHui & LDRHHui \\
+    LDRHui & LDRHui \\
+    LDRQpost & LDRQpost \\
+    LDRQroX & LDRQroX \\
+    LDRQui & LDRQui \\
+    LDRSBWui & LDRSBWui \\
+    LDRSHWpost & LDRSHWpost \\
+    LDRSHWui & LDRSHWui \\
+    LDRSHXpost & LDRSHXpost \\
+    LDRSHXui & LDRSHXui \\
+    LDRSHoW & LDRSHWroW, LDRSHXroW \\
+    LDRSHoX & LDRSHWroX, LDRSHXroX \\
+    LDRSWpost & LDRSWpost \\
+    LDRSWui & LDRSWui \\
+    LDRSpost & LDRSpost \\
+    LDRSpre & LDRSpre \\
+    LDRSui & LDRSui \\
+    LDRWpost & LDRWpost \\
+    LDRWpre & LDRWpre \\
+    LDRWui & LDRWui \\
+    LDRXpost & LDRXpost \\
+    LDRXpre & LDRXpre \\
+    LDRXui & LDRXui \\
+    LDRoW & LDRDroW, LDRSWroW, LDRSroW, LDRWroW, LDRXroW \\
+    LDRoX & LDRDroX, LDRSWroX, LDRSroX, LDRWroX, LDRXroX \\
+    LDUR & LDURDi, LDURSWi, LDURSi, LDURWi, LDURXi \\
+    LDURBBi & LDURBBi \\
+    LDURHHi & LDURHHi \\
+    LDURHi & LDURHi \\
+    LDURQi & LDURQi \\
+    LDURSH & LDURSHWi, LDURSHXi \\
+    LSLV & LSLVWr, LSLVXr \\
+    LSRV & LSRVWr, LSRVXr \\
+    MADD & MADDWrrr, MADDXrrr \\
+    MOVID & MOVID \\
+    MOVIv & MOVIv16b\_ns, MOVIv2d\_ns, MOVIv2i32, MOVIv2s\_msl, MOVIv4i16, MOVIv4i32, MOVIv4s\_msl, MOVIv8b\_ns, MOVIv8i16 \\
+    MOVaddr & MOVaddr \\
+    MOVaddrCP & MOVaddrCP \\
+    MOVi32imm & MOVi32imm \\
+    MOVi64imm & MOVi64imm \\
+    MSUB & MSUBWrrr \\
+    MULv & MULv2i32, MULv4i32, MULv8i16 \\
+    MVNIv & MVNIv4i32, MVNIv4s\_msl \\
+    NEGv & NEGv2i32, NEGv4i32 \\
+    NOTv & NOTv16i8, NOTv8i8 \\
+    ORN & ORNWrr, ORNWrs, ORNXrr \\
+    ORR & ORRWri, ORRWrr, ORRWrs, ORRXri, ORRXrr, ORRXrs \\
+    ORRv & ORRv16i8, ORRv8i8 \\
+    REG\_SEQUENCE & REG\_SEQUENCE \\
+    REV & REVWr \\
+    REV64v & REV64v2i32, REV64v4i32 \\
+    SBFM & SBFMWri, SBFMXri \\
+    SCVTFUW & SCVTFUWDri, SCVTFUWSri \\
+    SCVTFUX & SCVTFUXDri, SCVTFUXSri \\
+    SCVTFv & SCVTFv1i32, SCVTFv1i64, SCVTFv2f64, SCVTFv4f32 \\
+    SDIV & SDIVWr, SDIVXr \\
+    SHLv & SHLv2i32\_shift, SHLv2i64\_shift, SHLv4i32\_shift \\
+    SMADDLrrr & SMADDLrrr \\
+    SMAXVv & SMAXVv4i32v \\
+    SMAXv & SMAXv4i32 \\
+    SMULHrr & SMULHrr \\
+    SMULLv & SMULLv4i16\_v4i32 \\
+    SSHLLv & SSHLLv2i32\_shift, SSHLLv4i16\_shift, SSHLLv4i32\_shift, SSHLLv8i16\_shift \\
+    SSHRv & SSHRv2i32\_shift \\
+    STRBBpost & STRBBpost \\
+    STRBBpre & STRBBpre \\
+    STRBBroW & STRBBroW \\
+    STRBBroX & STRBBroX \\
+    STRBBui & STRBBui \\
+    STRDpost & STRDpost \\
+    STRDpre & STRDpre \\
+    STRDui & STRDui \\
+    STRHHroW & STRHHroW \\
+    STRHHroX & STRHHroX \\
+    STRHHui & STRHHui \\
+    STRQpost & STRQpost \\
+    STRQpre & STRQpre \\
+    STRQroX & STRQroX \\
+    STRQui & STRQui \\
+    STRSpost & STRSpost \\
+    STRSui & STRSui \\
+    STRWpost & STRWpost \\
+    STRWpre & STRWpre \\
+    STRWui & STRWui \\
+    STRXpost & STRXpost \\
+    STRXpre & STRXpre \\
+    STRXui & STRXui \\
+    STRoW & STRDroW, STRWroW, STRXroW \\
+    STRoX & STRDroX, STRSroX, STRWroX, STRXroX \\
+    STUR & STURDi, STURSi, STURWi, STURXi \\
+    STURBBi & STURBBi \\
+    STURHHi & STURHHi \\
+    STURQi & STURQi \\
+    SUB & SUBSWri, SUBSWrr, SUBSWrs, SUBSWrx, SUBSXri, SUBSXrr, SUBSXrs, SUBSXrx, SUBWrr \\
+    SUBREG\_TO\_REG & SUBREG\_TO\_REG \\
+    SUBv & SUBv2i32, SUBv4i32, SUBv8i16 \\
+    UADDLv & UADDLv8i16\_v4i32, UADDLv8i8\_v8i16 \\
+    UBFM & UBFMWri, UBFMXri \\
+    UCVTFUW & UCVTFUWDri \\
+    UCVTFUX & UCVTFUXDri, UCVTFUXSri \\
+    UCVTFv & UCVTFv1i32, UCVTFv1i64 \\
+    UDIV & UDIVWr, UDIVXr \\
+    UMADDLrrr & UMADDLrrr \\
+    UMLALv & UMLALv4i16\_v4i32 \\
+    UMOVv & UMOVvi32, UMOVvi64 \\
+    UMULHrr & UMULHrr \\
+    USHLLv & USHLLv16i8\_shift, USHLLv4i16\_shift, USHLLv8i8\_shift \\
+    USHLv & USHLv2i32, USHLv4i32 \\
+    USHRv & USHRv4i32\_shift, USHRv8i16\_shift \\
+    XTNv & XTNv2i32, XTNv4i16, XTNv4i32, XTNv8i8 \\
+\end{xltabular}
+
+\newpage
+\section{\aurora}
+\begin{xltabular}{\textwidth}{lX}
+    \toprule
+    Cluster & Instructions \\
+    \midrule
+    \endhead
+
+    \bottomrule
+    \endfoot
+
+    ADDSL & ADDSLrr \\
+    ADDSWSX & ADDSWSXri, ADDSWSXrm, ADDSWSXrr \\
+    ADDSWZX & ADDSWZXrm \\
+    ADJCALLSTACKDOWN & ADJCALLSTACKDOWN \\
+    ADJCALLSTACKUP & ADJCALLSTACKUP \\
+    AND & ANDri, ANDrm, ANDrr \\
+    BCFLari\_t & BCFLari\_t \\
+    BRCFD & BRCFDir, BRCFDrr \\
+    BRCFL & BRCFLir, BRCFLrr \\
+    BRCFLa & BRCFLa \\
+    BRCFS & BRCFSir, BRCFSrr \\
+    BRCFW & BRCFWir, BRCFWrr \\
+    BSWP & BSWPri \\
+    CMOVD & CMOVDrm, CMOVDrr \\
+    CMOVL & CMOVLrm, CMOVLrr \\
+    CMOVS & CMOVSrr \\
+    CMOVW & CMOVWrm, CMOVWrr \\
+    CMPSL & CMPSLrr \\
+    CMPSWSX & CMPSWSXrr \\
+    CMPUL & CMPULir, CMPULrr \\
+    CMPUW & CMPUWir, CMPUWrr \\
+    COPY & COPY \\
+    COPY\_TO\_REGCLASS & COPY\_TO\_REGCLASS \\
+    CVTDL & CVTDLr \\
+    CVTDQ & CVTDQr \\
+    CVTDS & CVTDSr \\
+    CVTDW & CVTDWr \\
+    CVTLD & CVTLDr \\
+    CVTQD & CVTQDr \\
+    CVTSD & CVTSDr \\
+    CVTSW & CVTSWr \\
+    CVTWDSX & CVTWDSXr \\
+    CVTWSSX & CVTWSSXr \\
+    DIVSL & DIVSLrr \\
+    DIVSWSX & DIVSWSXir, DIVSWSXrm, DIVSWSXrr \\
+    DIVUL & DIVULrm, DIVULrr \\
+    DIVUW & DIVUWrm, DIVUWrr \\
+    EXTRACT\_SUBREG & EXTRACT\_SUBREG \\
+    FADDD & FADDDrm, FADDDrr \\
+    FADDQ & FADDQrr \\
+    FADDS & FADDSrm, FADDSrr \\
+    FCMPD & FCMPDrr \\
+    FCMPS & FCMPSrr \\
+    FDIVD & FDIVDrr \\
+    FDIVS & FDIVSrr \\
+    FMAXD & FMAXDrr \\
+    FMAXS & FMAXSrr \\
+    FMIND & FMINDrr \\
+    FMINS & FMINSrr \\
+    FMULD & FMULDrm, FMULDrr \\
+    FMULQ & FMULQrr \\
+    FMULS & FMULSrr \\
+    FSUBD & FSUBDrr \\
+    FSUBQ & FSUBQrr \\
+    FSUBS & FSUBSrr \\
+    GETSTACKTOP & GETSTACKTOP \\
+    IMPLICIT\_DEF & IMPLICIT\_DEF \\
+    INSERT\_SUBREG & INSERT\_SUBREG \\
+    LD & LDrii, LDrri \\
+    LD1BSX & LD1BSXrii, LD1BSXrri \\
+    LD1BZX & LD1BZXrii, LD1BZXrri \\
+    LD2BSX & LD2BSXrii, LD2BSXrri \\
+    LD2BZX & LD2BZXrii, LD2BZXrri \\
+    LDLSX & LDLSXrii, LDLSXrri \\
+    LDLZX & LDLZXrii, LDLZXrri \\
+    LDU & LDUrii, LDUrri \\
+    LDZ & LDZr \\
+    LEA & LEArii, LEArri \\
+    LEASL & LEASLrii, LEASLrri \\
+    LEASLz & LEASLzii \\
+    LEAz & LEAzii \\
+    MAXSL & MAXSLrr \\
+    MAXSWSX & MAXSWSXrr \\
+    MINSL & MINSLrr \\
+    MINSWSX & MINSWSXrr \\
+    MULSL & MULSLri, MULSLrm, MULSLrr \\
+    MULSWSX & MULSWSXri, MULSWSXrm, MULSWSXrr \\
+    NND & NNDrm, NNDrr \\
+    OR & ORim, ORri, ORrr \\
+    RET & RET \\
+    SLAWSX & SLAWSXmr, SLAWSXri, SLAWSXrr \\
+    SLL & SLLmr, SLLri, SLLrr \\
+    SRAL & SRALri, SRALrr \\
+    SRAWSX & SRAWSXri, SRAWSXrr \\
+    SRL & SRLri, SRLrr \\
+    ST & STrii, STrri \\
+    ST1B & ST1Brii, ST1Brri \\
+    ST2B & ST2Brii, ST2Brri \\
+    STL & STLrii, STLrri \\
+    STU & STUrii, STUrri \\
+    SUBSL & SUBSLir, SUBSLrr \\
+    SUBSWSX & SUBSWSXir, SUBSWSXrr \\
+    XOR & XORri, XORrm, XORrr \\    
+\end{xltabular}
