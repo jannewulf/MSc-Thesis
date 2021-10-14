@@ -85,42 +85,42 @@ The average coeffecient of variation over the basic blocks is 0.035.
 In summary, we see that different instruction schedules can generate measurable differences in the runtime.
 This means that there is potential for improvements.
 \begin{figure}
-    \begin{subfigure}{0.45\textwidth}
+    \begin{subfigure}{0.0325\textwidth}\caption{}\label{fig:eval:rndm:aarch64:a}\end{subfigure}
+    \begin{subfigure}{0.44\textwidth}
         \includegraphics[width=\textwidth]{img/random-scheduling-experiment-pi-collected/Symbolics-flt-crop.pdf}
-        \caption{}
-        \label{fig:eval:rndm:aarch64:a}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.45\textwidth}
+    \begin{subfigure}{0.0325\textwidth}\caption{}\label{fig:eval:rndm:aarch64:b}\end{subfigure}
+    \begin{subfigure}{0.44\textwidth}
         \includegraphics[width=\textwidth]{img/random-scheduling-experiment-pi-collected/trisolv-crop.pdf}
-        \caption{}
-        \label{fig:eval:rndm:aarch64:b}
     \end{subfigure}
-    \begin{subfigure}{0.45\textwidth}
+
+    \vspace{0.5cm}
+    \begin{subfigure}{0.0325\textwidth}\caption{}\label{fig:eval:rndm:aarch64:c}\end{subfigure}
+    \begin{subfigure}{0.44\textwidth}
         \includegraphics[width=\textwidth]{img/random-scheduling-experiment-pi-collected/smg2000-crop.pdf}
-        \caption{}
-        \label{fig:eval:rndm:aarch64:c}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.45\textwidth}
+    \begin{subfigure}{0.0325\textwidth}\caption{}\label{fig:eval:rndm:aarch64:d}\end{subfigure}
+    \begin{subfigure}{0.44\textwidth}
         \includegraphics[width=\textwidth]{img/random-scheduling-experiment-pi-collected/LoopRerolling-dbl-crop.pdf}
-        \caption{}
-        \label{fig:eval:rndm:aarch64:d}
     \end{subfigure}
-    \begin{subfigure}{0.45\textwidth}
+
+    \vspace{0.5cm}
+    \begin{subfigure}{0.0325\textwidth}\caption{}\label{fig:eval:rndm:aarch64:e}\end{subfigure}
+    \begin{subfigure}{0.44\textwidth}
         \includegraphics[width=\textwidth]{img/random-scheduling-experiment-pi-collected/Shootout-matrix-crop.pdf}
-        \caption{}
-        \label{fig:eval:rndm:aarch64:e}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.45\textwidth}
+    \begin{subfigure}{0.0325\textwidth}\caption{}\label{fig:eval:rndm:aarch64:f}\end{subfigure}
+    \begin{subfigure}{0.44\textwidth}
         \includegraphics[width=\textwidth]{img/random-scheduling-experiment-pi-collected/fourinarow-crop.pdf}
-        \caption{}
-        \label{fig:eval:rndm:aarch64:f}
     \end{subfigure}
+
     \caption[Random Scheduling Experiment on AArch64]{Random Scheduling Experiment on AArch64:
     The bars show the runtime of a function with a random instruction schedule.
     The two runs of the instruction schedule are grouped together.
+    The distance measure represents the longest execution time relative to the shortest execution time.
     Two runs that differ more than 5\% are marked as outliers and plotted in gray.}
     \label{fig:eval:rndm:aarch64}
 \end{figure}
@@ -132,42 +132,42 @@ No measurements in the whole example where marked as outliers.
 The average coeffecient of variation over the basic blocks is 0.046.
 In summary, we observe potential for optimizations on this processor.
 \begin{figure}
-    \begin{subfigure}{0.45\textwidth}
+    \begin{subfigure}{0.0325\textwidth}\caption{}\label{fig:eval:rndm:aurora:a}\end{subfigure}
+    \begin{subfigure}{0.44\textwidth}
         \includegraphics[width=\textwidth]{img/random-scheduling-experiment-aurora-collected/Equivalencing-dbl-crop.pdf}
-        \caption{}
-        \label{fig:eval:rndm:aurora:a}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.45\textwidth}
+    \begin{subfigure}{0.0325\textwidth}\caption{}\label{fig:eval:rndm:aurora:b}\end{subfigure}
+    \begin{subfigure}{0.44\textwidth}
         \includegraphics[width=\textwidth]{img/random-scheduling-experiment-aurora-collected/uudecode-crop.pdf}
-        \caption{}
-        \label{fig:eval:rndm:aurora:b}
     \end{subfigure}
-    \begin{subfigure}{0.45\textwidth}
+
+    \vspace{0.5cm}
+    \begin{subfigure}{0.0325\textwidth}\caption{}\label{fig:eval:rndm:aurora:c}\end{subfigure}
+    \begin{subfigure}{0.44\textwidth}
         \includegraphics[width=\textwidth]{img/random-scheduling-experiment-aurora-collected/automotive-susan-crop.pdf}
-        \caption{}
-        \label{fig:eval:rndm:aurora:c}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.45\textwidth}
+    \begin{subfigure}{0.0325\textwidth}\caption{}\label{fig:eval:rndm:aurora:d}\end{subfigure}
+    \begin{subfigure}{0.44\textwidth}
         \includegraphics[width=\textwidth]{img/random-scheduling-experiment-aurora-collected/bicg-crop.pdf}
-        \caption{}
-        \label{fig:eval:rndm:aurora:d}
     \end{subfigure}
-    \begin{subfigure}{0.45\textwidth}
+
+    \vspace{0.5cm}
+    \begin{subfigure}{0.0325\textwidth}\caption{}\label{fig:eval:rndm:aurora:e}\end{subfigure}
+    \begin{subfigure}{0.44\textwidth}
         \includegraphics[width=\textwidth]{img/random-scheduling-experiment-aurora-collected/beamformer-crop.pdf}
-        \caption{}
-        \label{fig:eval:rndm:aurora:e}
     \end{subfigure}
     \hfill
-    \begin{subfigure}{0.45\textwidth}
+    \begin{subfigure}{0.0325\textwidth}\caption{}\label{fig:eval:rndm:aurora:f}\end{subfigure}
+    \begin{subfigure}{0.44\textwidth}
         \includegraphics[width=\textwidth]{img/random-scheduling-experiment-aurora-collected/uuencode-crop.pdf}
-        \caption{}
-        \label{fig:eval:rndm:aurora:f}
     \end{subfigure}
+
     \caption[Random Scheduling Experiment on \aurora]{Random Scheduling Experiment on \aurora:
     The bars show the runtime of a function with a random instruction schedule.
     The two runs of the instruction schedule are grouped together.
+    The distance measure represents the longest execution time relative to the shortest execution time.
     Two runs that differ more than 5\% are marked as outliers.
     However, this processor did not produce any outliers in our experiment.}
     \label{fig:eval:rndm:aurora}
