@@ -5,27 +5,31 @@ Followingly, we evaluate if we can use the results of the \ac{mcts} approach to 
 
 \section{Hardware selection}
 \label{sec:eval:hw}
-The moste relevant hardware feature of processors when working on instruction scheduling is the instruction pipeline.
-We are specifically interested in the fact if a instruction pipeline is a in-order or out-of-order pipeline (\Cref{sec:bg:superscalar-cpu}).
-In-order processors execute the instructions in the schedule that is written in the executable file.
-A out-of-order processor might reschedule the instructions in hardware.
+There are different aspects in choosing the hardware for our experiments.
+Two aspects must be given that a processor makes sense.
+The first is, that it is supported in LLVM because our whole approach is based on LLVM and we use the LLVM instruction scheduler as a baseline.
+Secondly, we limit the hardware choice to processors that implement superscalar pipelines (see \Cref{sec:bg:superscalar-cpu}) because these are used in most modern processors.
 
-For our experiments we have selected two different types of processors, one of each type:
+However, we consider more aspects regarding the hardware to be important.
+The most interesting one is if the superscalar pipeline is implemented as in-order or out-of-order.
+While the former comes with no restrictions for our experiments, the latter is able to reschedule instructions during execution in hardware.
+Followingly, it is interesting to see how the out-of-order model influences the performance of our approach.
+
+Additionally, to show the versatility of our approach, it is interesting to choose different types of processors.
+There exist classical \acp{cpu}, Edge \acp{cpu}, accelerator cards (\eg Graphical Processing Units (GPU), Vector Processing Units, and Intelligence Processing Units (IPU)), and others.
+
+With these aspects in mind we choose to use:
 \begin{itemize}
-    \item 
-    % \subsubsection{AArch64}
-    The AArch64 hardware architecture is a 64-bit ARM architecture with a in-order superscalar pipeline.
-    A \ac{cpu} that implements this hardware, and that we use for our experiment is the Arm Cortex-A53.
-    We use this \ac{cpu} in the RaspberryPi 3 Model B with a Ubuntu 20.04.
-    \todo{Correct Ubuntu version?}
-    
-    \item
-    % \subsubsection{\aurora}
-    The second processor is the \aurora vector processor that implements a out-of-order superscalar pipeline.
-    This processor is installed via a PCI-Express slot.
+    \item \textbf{Arm Cortex-A53:} This processor is a edge \ac{cpu} and implements an in-order superscalar pipeline based on the AArch64 architecture.
+    An edge device that uses it is the Raspberry Pi 3 Model B.
+    We use this device for our experiments with a Ubuntu 20.04.
+    \item \textbf{\aurora:} This processor is interesting because it implements an out-of-order superscalar pipeline. 
+    Additionally, it is an vector processing accelerator card, and thus a different type of processor that is installed via a PCI-Express connection.
 \end{itemize}
-    
+
+
 \section{Approach Validation}
+\label{sec:eval:validation}
 Before starting to optimize a process, it is useful to validate that there is potential for any optimizations.
 Therefore, we show, that different instruction schedules can indeed have different runtimes on our target hardware.
 The approach of this experiment is differs from the other experiments because it is an early experiment that took place before our pipeline was developed.
