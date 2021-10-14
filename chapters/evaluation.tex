@@ -1,5 +1,8 @@
 \chapter{Evaluation}
-\label{eval:svm}
+In this chapter we explain how we used the system described in \Cref{sec:approach} to evaluate its performance.
+First, we review the results of the \ac{mcts} approach in \Cref{sec:eval:mcts}.
+Followingly, we evaluate if we can use the results of the \ac{mcts} approach to learn to generate good schedules with supervised learning methods in \Cref{sec:eval:supervised}.
+
 \section{Hardware selection}
 \label{sec:eval:hw}
 The moste relevant hardware feature of processors when working on instruction scheduling is the instruction pipeline.
@@ -299,10 +302,159 @@ Thus, it does not depend on good instruction schedules as the AArch64 processor.
 We showed with this experiment, that we are able to find better instruction schedules for both our selected processors.
 However, our search for instruction schedules was more successful for the AArch64 processor, as does no rescheduling in hardware.
 
-\section{Machine Learning Schedule Generation}
-\subsection{Look-Up Model}
-\subsection{Support Vector Regression}
-\subsection{Neural Network}
+\section{Supervised Schedule Generation}
+\label{sec:eval:supervised}
+As discussed, the \ac{mcts} approach is not usable for production systems because of its long runtime.
+We use another approach for inference here, by using the generated dataset.
+First we evaluate the nearest neighbor model, and then the parametric models.
+
+The dataset that we use for our supervised models is based on the results of the \ac{mcts} approach (\Cref{sec:eval:mcts}).
+We split this dataset into a training set with 80\% randomly selected data points and a test set with the remaining 20\%.
+\Cref{fig:eval:datasets} illustrates the usage of the created datasets.
+\begin{figure}
+    \centering
+    \tikzstyle{defaultnode} = [text centered, align=center, font=\footnotesize\accentfont, rectangle, rounded corners, draw=black, minimum height=1cm, minimum width=2.5cm]
+    \tikzstyle{arrow} = [thick,->,>=stealth,-{Latex[scale=1.2]}, font=\footnotesize\accentfont]
+    \begin{tikzpicture}
+        \node (bb)              [defaultnode] at ( 0,1) {Basic Blocks};
+        \node (bbe)             [defaultnode] at ( 4.5,1) {Basic Blocks \\ + \\ Evaluated \\ Instruction Schedules};
+        \node (training-set)    [defaultnode] at ( 8.5,2) {Training Set};
+        \node (test-set)        [defaultnode] at ( 8.5,0) {Test Set};
+        \node (model)           [defaultnode] at (13,2) {Supervised \\ Model};
+        \node (eval)            [defaultnode] at (15.5,0) {Supervised \\ Evaluation};
+
+        \draw [arrow] (bb) -- node [midway,above] {MCTS} (bbe);
+        \draw [arrow] (bbe) |- node [midway,above] {80\%} (training-set);
+        \draw [arrow] (bbe) |- node [midway,below] {20\%} (test-set);
+        \draw (training-set) -- node [midway,above=0.4cm] {\footnotesize\accentfont Supervised} (model);
+        \draw [arrow] (training-set) -- node [midway,above] {Training} (model);
+        \draw [arrow] (test-set) -- node [midway,below] {Model Inference} (eval);
+        \draw [arrow] (model) |- (eval);
+    \end{tikzpicture}
+    \caption[Overview over the used Dataset]{Overview over used datasets. The supervised model is one from \Cref{sec:eval:supervised}.}
+    \label{fig:eval:datasets}
+\end{figure}
+
+The goal of this experiment is to see if we can generate well performing instruction schedules without auto-tuning methods.
+
+\subsection{Nearest Neighbor Model}
+\begin{table}
+    \centering
+    \begin{tabular}{@{}lrr@{}}
+        \toprule
+        & \multicolumn{2}{c}{Processor}\\
+        \cmidrule{2-3}
+        Supervised Model & AArch64 & \aurora \\
+        \midrule
+        Nearest Neighbor & \textbf{1.38\%} & -3.03\% \\
+        \tblsection{Support Vector Regression} && \\
+        \tblitem{Balanced + Clustered} & -1.14\% & -3.53\% \\
+        \tblitem{Balanced} & -1.18\% & -3.20\% \\
+        \tblitem{Clustered} & -1.45\% & \textbf{-2.90\%} \\
+        \tblsection{Neural Network} && \\
+        \tblitem{Balanced + Clustered} & -0.48\% & -4.19\% \\
+        \tblitem{Balanced} & -0.19\% & -3.19\% \\
+        \tblitem{Clustered} & -0.47\% & -3.31\% \\
+        \bottomrule
+    \end{tabular}
+    \caption[Performance of our Supervised Models]{Performance of our supervised models relative to the baseline:
+    This table shows the mean speedup on the test set with our applied supervised learning models.
+    Our nearest neighbor model performed best on the AArch64. 
+    It is the only model that generated a positive mean speedup.
+    On the \aurora, the SVR model with clustered instructions performed best.
+    However, it is still worse than the baseline.}
+    \label{tbl:eval:supervised-perf}
+\end{table}
+
+We use a big map structure to quickly search our dataset for similar scheduling situations.
+The details of this approach are explained in \Cref{sec:app:nearest-neighbor}.
+This model is then integrated into the LLVM compiler framework, and we use it to compile our basic blocks in the test set.
+
+The instruction schedules that we compiled with this nearest neighbor model for the AArch64 processor performed better than the baseline instruction scheduler from LLVM.
+The measured runtimes for the basic block are 1.38\% shorter.
+On the \aurora processor however, the measured runtimes are 3.03\% slower than the basic blocks compiled with the baseline instruction scheduler (see \Cref{tbl:eval:supervised-perf}).
+
+\subsection{Parametric Machine Learning Models}
+The parametric models need, an additional data transformation bring it into the form \Cref{eqn:approach:regression-mapping}.
+This results in a dataset of 4.9 million data points for the AArch64 architecture, and 1.3 million data points for the \aurora architecture.
+We have to added two variations to the parametric approaches which we describe in the next paragraphs.
+All approaches are run once with both variations and additionally with only one of the approaches, to see their effect.
+
+% \subsubsection{Instruction Clustering}
+There are many similar instructions in the instruction sets of the two processors.
+To reduce the dimensionality and simplify the dataset, we cluster some instructions into an alias instruction.
+For example, the addition instructions \lstinline|ADDWri| and \lstinline|ADDXri| of the AArch64 architecture are clustered into the same cluster.
+These two instructions only differ in that one takes 32-bit values and the other 64-bit values.
+See \Cref{app:instr-clusters} for exact clusterings.
+
+% \subsubsection{Dataset Balancing}
+Further, we balance our dataset in the target dimension.
+The distribution of target values in our dataset follows a normal distribution.
+However, this can be problematic because, the model might only learn to predict the mean in any situation.
+Therefore, we duplicate samples whose target value is further away from the mean and delete samples whose target value is very close to the mean.
+% We sort the dataset into 40 histogram bins.
+% In order to not distort the dataset too much, we delete at most 50\% of the samples in a histogram bin and do not increase the number of occurances of a sample to more than 30 times.
+\todo{How exactly}
+This way we were able to generate a dataset that has a distribution that is closer to an equal distribution.
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\textwidth]{img/balanced-supervised-dataset-rpi.pdf}
+    \caption[Balancing for the AArch64 Dataset]{Balancing for the AArch64 dataset. 
+    We duplicate samples with a reward further away from the distribution mean, and delete some samples that are close to the mean.}
+    \label{fig:eval:balanced-dataset}
+\end{figure}
+\Cref{fig:eval:balanced-dataset} illustrates the effect on the distribution of the AArch64-dataset.
+The effect for the \aurora dataset is similar.
+
+\subsubsection{Support Vector Regression}
+\label{sec:eval:svm}
+\acp{svm} have long runtimes when trained with many data points.
+We reduced this by randomly selecting 200,000 data points for our model training.
+
+For the AArch64 processor, the average runtime of the instruction schedules generated by this model is between 1.14\% and 1.45\% worse than the runtime of the baseline.
+This is the worst result of the parametric models on this processor.
+
+On the \aurora however, we found the best working parametric model to be the \ac{svr} approach combined with clustered instructions.
+But it performs still worse than on the AArch64 processor.
+
+Regarding the effects of the dataset balancing and instruction clustering, we see no clear effect.
+For the AArch64 processor, the experiments with the balanced datasets perform better.
+However, the effect is reversed for the \aurora.
+Here, the dataset balancing negatively influenced the performance.
+
+\subsubsection{Neural Network}
+\label{sec:eval:nn}
+For training the neural network, we use the early stopping scheme.
+Once the loss does not improve once for at least $10^{-6}$ in the last 10 epochs, we abort the training.
+Therefore, the dataset is split into another training and validation set with a 85/15 split.
+
+The results on the AArch64 processor performs better than the \ac{svr} approach.
+With the balanced dataset, we get close to the baseline performance.
+However, this approach performs still worse than the baseline.
+
+On the \aurora, the neural network approach performed the worst.
+We can also see, that the approach performed the worst with the dataset balancing and the instruction clustering together.
+
+
+\section{Summary}
+The best supervised learning model that we have found is the nearest neighbor approach on the AArch64 processor.
+In fact, it is the only one that performed better than the baseline instruction scheduler.
+Close to the baseline performance gets the neural network that was trained with the balanced dataset.
+
+For the two dataset variations where we balanced the dataset and clustered similar instructions, we can see that the balancing was helping.
+Compare \Cref{tbl:eval:mcts} to see that the models trained with the balanced dataset performed better than with the clustered dataset in three out of four cases.
+It even performed better in three out of four cases than the approach with balanced and clustered dataset, and in the one other case it is very close.
+So the balancing helped performance wise, and the clustering had a negative influence on the performance.
+It seems, that it indeed is important to differenctiate between instructions that only differ in small aspects like the bit width. 
+
+We have seen that our supervised approaches have all worked better on the AArch64 processor.
+This was expected due to the smaller dataset and thus the worse average speedup in the \ac{mcts} approach for the \aurora processor.
+\Cref{tbl:eval:mcts} shows that the \aurora processor only achieved a 0.30\% speedup in the \ac{mcts} approach.
+This value can be seen, as a upper limit for the supervised learning approaches because they are based on the results of the \ac{mcts} approach.
+
+Another important effect, why the approach was not that successful on the \aurora is that it has a out-of-order pipeline.
+This means it reschedules the instructions during execution in hardware, so we do not know what is actually executed.
+We expected that we would see worse performance on out-of-order hardware.  
 
 Compare speedup with complexity of the problem (number of possible schedulings) vs speedup
 
