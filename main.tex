@@ -30,7 +30,6 @@
 %% <path to your LaTeX distribution>/doc/latex/tuda-ci
 %% ============================================================================
 %%
-% !TeX program = lualatex
 %%
 
 \documentclass[
@@ -38,7 +37,7 @@
 	ruledheaders=section,%Ebene bis zu der die Überschriften mit Linien abgetrennt werden, vgl. DEMO-TUDaPub
 	class=report,% Basisdokumentenklasse. Wählt die Korrespondierende KOMA-Script Klasse
 	thesis={type=master},% Dokumententyp Thesis, für Dissertationen siehe die Demo-Datei DEMO-TUDaPhd
-	accentcolor=9c,% Auswahl der Akzentfarbe
+	accentcolor=3d,% Auswahl der Akzentfarbe
 	% custommargins=true,% Ränder werden mithilfe von typearea automatisch berechnet
 	marginpar=false,% Kopfzeile und Fußzeile erstrecken sich nicht über die Randnotizspalte
 	%BCOR=5mm,%Bindekorrektur, falls notwendig
@@ -60,6 +59,7 @@
     chapters/related_work,
 	chapters/approach,
     chapters/evaluation,
+	chapters/conclusion_and_future_work,
 	appendices/instruction_clusters
 }
 
@@ -121,6 +121,7 @@
 \printbibliography
 
 \appendix
+\crefalias{section}{appendix}
 \include{appendices/instruction_clusters}
 
 \end{document}
