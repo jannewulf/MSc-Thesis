@@ -6,56 +6,56 @@ Further, we present possible research directions that this thesis opens.
 % Answer the research questions
 % how good the instruction schedules are that state-of-the-art compilers generate and if we can find better ones
 We showed that state-of-the-art compilers do not generate optimal instruction schedules.
-With a search approach we are able to find better performing instruction schedules in many cases.
+With a search approach, we can find better-performing instruction schedules in many cases.
 % if it is possible to train a model that can generate better instruction schedules than modern compilers
-Further, we showed that it is possible to train a supervised model that is able to generate better instruction schedules than modern compilers.
+Further, we showed that it is possible to train a supervised model that can generate better instruction schedules than modern compilers.
 % investigate the varying influence of the instruction schedules on the performance of in-order and out-of-order processors
-In our experiments we have seen that compile-time instruction scheduling has a lower influence on the benchmark runtime on out-of-order processors than on in-order processors.
+Our experiments showed that compile-time instruction scheduling has a lower influence on the benchmark runtime on out-of-order processors than in-order processors.
 
 % Show how you have addressed your aims and objectives
 In order to build a methodology that generates optimized instruction schedulers for any novel hardware, we have built our approach on top of the LLVM compiler framework.
-We propose an approach that first searches for well performing instruction schedules for a set of of basic block benchmarks.
+We propose an approach that first searches for well-performing instruction schedules for a set of basic block benchmarks.
 However, the search takes too much time to do it at compile-time.
 Therefore, we build a dataset with the evaluated basic blocks.
-To have a fast instruction scheduler, we use this dataset to train a supervised model.
+To speed up the instruction scheduler, we use this dataset to train a supervised model that the instruction scheduler then uses.
 
 % Explain the significance and implications of your findings
-With our approach it is possible to reduce the runtime of compiled computer programs on any hardware.
-The influence is especially high for in-order architectures.
-Cheaper processors, that are widely used in mobile and edge devices, and also accelerators like \acp{gpu} usually implement in-order architectures.
-Shorter runtimes are a good achievement, but with shorter runtimes also comes a reduced energy consumption which is especially important for devices that are powered by batteries.
+With our approach, it is possible to reduce the runtime of compiled computer programs on any hardware.
+The influence is especially big for in-order architectures.
+Mobile and edge devices widely use cheaper processors, and also accelerators like \acp{gpu} usually implement in-order architectures.
+Shorter runtimes are an important achievement, but shorter runtimes also come with reduced energy consumption, which is especially important for devices powered by batteries.
 
 % Explain the contribution the study makes
 Our contribution is a pipeline that automatically optimizes instruction schedulers for any hardware.
-Therefore, we developed metrics to select basic blocks with a high influence on the overall runtime of the program.
+Therefore, we developed metrics to select basic blocks with a strong influence on the overall runtime of the program.
 We extract these basic blocks to execute them in our runtime measurement framework.
-The selected and extracted basic blocks are used in an \ac{mcts} approach to find well performing instruction schedules for each basic block.
+The selected and extracted basic blocks are used in an \ac{mcts} approach to find well-performing instruction schedules for each basic block.
 As a consequence, we get many evaluated scheduling decisions.
-We use them to build a datset for training supervised models that can generate well performing instruction schedules for unknwon basic blocks.
-Additionally, we made a feasibility study, that showed the potential of optimizing instruction schedulers.
+We use them to train supervised models to generate well-performing instruction schedules for unknown basic blocks.
+Additionally, we made a feasibility study that showed the potential of optimizing instruction schedulers.
 
 % Explain the limitations of the study
-While our work performs well on the in-order architecture, the results are not that good on out-of-order processors.
-The search for well performing instruction schedules achieves an average runtime speed up of 0.3\%.
-This is an improvement, but it is also an upper limit for the supervised learning models which all perform worse than modern compilers.
+While our work performs well on the in-order architecture, the results are not good on out-of-order processors.
+The search for well-performing instruction schedules achieves an average runtime speed up of 0.3\%.
+This is an improvement, but it is also an upper limit for the supervised learning models, which all perform worse than modern compilers.
 Further, we can say that our supervised learning models are still a weakness of our pipeline.
-There is definitely potential for improvements and could be a direction for more research.
+There is potential for improvements and could be a direction for more research.
  
 % Lay out questions for further research
-Our research layed out multiple directions in which future work could aim.
-We used in our search and supervised learning models only basic information, which was mostly just the information about previously schedules instruction and ready-to-schedule instructions.
-One type of information that could be useful are heuristics that are already included in the LLVM framework.
-This additional information might especially help the supervised learning models.
-Common heuristics are for example, if an instruction is part of the critical path of the \ac{dag}, the register pressure, or the distance in the schedule of a candidate instruction to its predecessors.
+Our research laid out multiple directions in which future work could aim.
+We used only basic information in our search and supervised learning models, mostly just about previously scheduled instruction and ready-to-schedule instructions.
+The LLVM framework includes many heuristics used in instruction scheduling, which could provide additional information
+This additional information might help the supervised learning models.
+Common heuristics are, for example, if an instruction is part of the critical path of the \ac{dag}, the register pressure, or the distance in the schedule of a candidate instruction to its predecessors.
 
-Further, it would be interesting to extend the supervised learning models with an initialization phase in which the whole \ac{dag} is presented to the instruction scheduler.
+Further, extending the supervised learning models with an initialization phase that examines the whole DAG would be interesting.
 It could then extract relevant information from the graph structure of the \ac{dag}.
-This would allow the instruction scheduler to plan multiple steps ahead, instead of being limited to the information about previously scheduled instructions and the candidate instructions.
-A tool that could help with this are graph neural networks.
+This would allow the instruction scheduler to plan multiple steps ahead instead of being limited to the information about previously scheduled instructions and the candidate instructions.
+A tool that could help with this is graph neural networks.
 
 Imaginable is also to apply an instruction embedding method to transfer the instructions into a multi-dimensional vector space.
 We have discussed some of these approaches in the literature review in \Cref{sec:rw}.
-Word embeddings are very succesful in \ac{nlp} tasks and might also help in this task.
+Word embeddings are very successful in \ac{nlp} tasks and might also help in this task.
 
 
 

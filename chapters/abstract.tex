@@ -6,14 +6,14 @@
 % What are the results?
 Compilers have hardware-dependent parts that need to be manually adjusted and optimized by experts for every target hardware.
 Many new compute devices came to the market in the last decade.
-One hardware-dependent step of the compilation process is the instruction scheduling.
-Processors can be grouped into in-order processors and out-of-order processors, which can itself re-schedule the instructions in hardware.
-The goal of this thesis is to evaluate if this step can be automatically optimized, especially for novel hardware.
-We contribute a methodology to automatically optimize the instruction scheduling task in compilers by making use of data-driven methods.
-Therefore, we run we search well performing instruction schedules on a set of micro-benchmarks.
+One hardware-dependent step of the compilation process is instruction scheduling.
+Processors can be grouped into in-order and out-of-order processors, where the latter can re-schedule itself during execution.
+This thesis aims to evaluate if this step can be automatically optimized, especially for novel hardware.
+We contribute a methodology to automatically optimize the instruction scheduling task in compilers by using data-driven methods.
+Therefore, we run we search well-performing instruction schedules on a set of micro-benchmarks.
 With these results, we train different supervised learning models to generate instruction schedules of high quality.
-We find instruction schedules for our dataset which, on average, perform 8.35\% (in-order) and 0.30\% better (out-of-order) than the LLVM compiler framework.
+We find instruction schedules for our dataset, which, on average, perform 8.35\% (in-order) and 0.30\% better (out-of-order) than the LLVM compiler framework.
 Our supervised learning models generate instruction schedules that perform, on average, 1.38\% (in-order) better.
-On out-of-order processors we are not able to achieve a speed up with the supervised learning models.
+On out-of-order processors, we are not able to achieve a speedup with the supervised learning models.
 
 \chapter*{Zusammenfassung}
