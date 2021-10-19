@@ -67,9 +67,6 @@ However, the performance of the GCC instruction scheduler limits this approachâ€
 We conclude that machine learning-based approaches mostly performed well in theory but only against weak random baselines.
 The only work that we found that was actually evaluated on hardware was~\cite{beaty1996using}.
 
-% \citeauthor{cavazos2004inducing} showed that instruction scheduling only makes a difference on some basic blocks.
-% They used decision trees for selecting basic blocks for instruction scheduling~\cite{cavazos2004inducing}.
-
 \section{Register Allocation}
 \label{sec:rw:register-allocation}
 We have discussed the implications of the instruction scheduling phase on register allocation in \Cref{sec:bg:compilers:backend}.
@@ -84,7 +81,6 @@ The newer and naturally better fitting approach with graph neural networks was u
 \section{Related Areas}
 \label{sec:rw:other}
 \subsection{Compiler Optimizations with Machine Learning}
-% \cite{mammadli2020static,haj2020neurovectorizer,huang2019autophase,qiao2019loop}
 Machine learning approaches are also applied to optimize other parts of the compilation process.
 \citeauthor{mammadli2020static}~\cite{mammadli2020static} and \citeauthor{huang2019autophase}~\cite{huang2019autophase} successfully apply deep reinforcement learning to the phase-ordering problem.
 Phase-ordering means to select the compiler's optimization passes and define its execution order (see \Cref{sec:bg:compilers:optimizer} for information on the optimization phase).
@@ -99,11 +95,8 @@ However, the listed tools only work with the x86 architecture, which we do not u
 The research projects and open-source estimators might be extended to other hardware architectures.
 Especially the Ithemal~\cite{mendis2019ithemal} project is interesting as they use a neural network to predict the runtime from the basic block.
 That means they learned to extract features from the basic block to predict its runtime.
-% This could also be interesting in the instruction scheduling task.
 
-% Code representation learning
 \subsection{Feature Extraction from Code}
-% \cite{ben2018neural,cummins2021programl,brauckmann2020compiler}
 The previously cited works on data-driven machine learning optimizations have or might benefit from research whose goal is to extract features from code automatically.
 A similar approach to the word2vec~\cite{mikolov2013efficient} approach in the \ac{nlp} area was proposed by~\cite{ben2018neural,alon2019code2vec}.
 \citeauthor{cummins2021programl} developed a method to extract features from code based on graph structures~\cite{cummins2021programl}.
@@ -112,102 +105,3 @@ The work proposed by \citeauthor{brauckmann2020compiler}~\cite{brauckmann2020com
 \subsection{Other Scheduling Tasks with Machine Learning}
 \citeauthor{mao2019learning}~\cite{mao2019learning} have used a deep reinforcement learning approach to schedule data-processing jobs onto computing clusters.
 This work is interesting because the jobs have dependencies on each other, represented in a \ac{dag}, just like the instructions in the instruction scheduling problem.
-
-% \subsection*{Register Allocation for Intel Processor Graphics}\cite{chen2018register}
-
-% \section{Compiler Optimization Phase Ordering}
-% %Static neural compiler optimization via deep reinforcement learning~\cite{mammadli2020static}\\
-% % - Uses only static information extracted from IR 
-% % - IR embedded by using ben2018neural
-% % - Use deep q learning
-% % - training is executed by running the modified IR and measure the speedup 
-% % - reward is defined as ln(T(s_t)/T(s_t+1)) with T being the runtime
-
-
-% \subsection*{Autophase: Compiler phase-ordering for hls with deep reinforcement learning}\cite{huang2019autophase}
-
-% \section{Code Representation}
-% \label{sec:rw:code-representation}
-% For making use of data driven techniques in the area of compiler optimization, it is required to somehow extract features from the code to make it accessible for data driven algorithms.
-% Older works usually made use of approaches that used hand-tuned features.
-% \todo{Maybe add references used in https://chriscummins.cc/u/ed/phd-thesis.pdf (3.3.2.1)}
-
-% Recent works are inspired by the advances in the the field of \ac{nlp}, which are caused by neural networks and continuous distributed vectors (referred to as embeddings) \eg, word2vec~\cite{mikolov2013efficient}. 
-% Although, human language is different from codes of programming languages in many aspects, embeddings prove to be useful in code related tasks, too.
-
-% Code inputs may be used directly in a high-level programming language or in an \ac{ir} (\eg, LLVM-IR~\cite{LLVM:CGO04}).
-% The advantage of using an \ac{ir} is that it is independent of the source programming language and the target architecture.
-
-%Overviews:
-%\begin{itemize}
-%    \item ProGraML Paper under Motivation
-%    \item https://chriscummins.cc/u/ed/phd-thesis.pdf (3.3.2.1)
-%    \item https://arxiv.org/pdf/1904.03061.pdf
-%\end{itemize}
-
-% Most approaches for representing high-level language code use some sort of the \ac{ast} in combination with various learning mechanisms.
-% %code2vec: Learning distributed representations of code \cite{alon2019code2vec}
-% % - works on source code
-% % - sensitive to identifier names
-% \citeauthor{alon2019code2vec}~\cite{alon2019code2vec} used paths of the \ac{ast} in combination with a Attention Neural Network model.
-% Others have used the \ac{ast} in combination with Gated Graph Neural Networks~\cite{ye2020deep, allamanis2017learning}, with Support Vector Machines~\cite{park2012using} or with \ac{lstm} Networks for tree structures~\cite{dam2018deep}.
-%\cite{ye2020deep} % Deep Program Structure Modeling Through Multi-RelationalGraph-based Learning, graph-based deep learning (Gated Graph Neural Networks), AST
-%\cite{allamanis2017learning} % LEARNING  TO REPRESENT PROGRAMS WITH GRAPHS, graph-based deep learning (Gated Graph Neural Networks), AST
-%\cite{dam2018deep} % A deep tree-based model for software defect prediction, AST, tree-LSTM
-%\cite{park2012using} % Using Graph-Based ProgramCharacterization for Predictive Modeling, SVM
-
-% \subsubsection{Neural code comprehension: A learnable representation of code semantics~\cite{ben2018neural}}
-% - Defines embedding space inst2vec
-% - Encodes LLVM-IR, independent of source programming language
-% - Leveraging data- and control flow (Contextual Flow Graphs)
-% - Use RNN
-% - Analyze the embeddings qualitatively using analogies and clustering, and evaluate the learned representation on three different high-level tasks
-% - See description in ProGraML Paper under Motivation
-% With Neural Code Comprehension (inst2vec)~\cite{ben2018neural}, Ben-Nun et al. defined an embedding space for the LLVM-IR.
-% Relevant information to discover code semantics are data and control flow. 
-% To emphasize the semantics, the data and control flow are represented in a novel graph structure, called \acp{xfg}.
-% %Before building the \ac{xfg}, the LLVM-IR code is split into basic blocks, so diverging control flow is eliminated.
-% The context of an individual statement, with size $N$, is defined as the statement and its graph neighbors that are connected by a path of length $N$.
-% This statement is then mapped to its embedding by using the skip-gram model~\cite{mikolov2013distributed}, which are known to work good in \ac{nlp} tasks.
-% The \ac{xfg} captures features like data and control dependence's, instructions and data types, which are important for our task.
-
-% \subsection*{ProGraML: Graph-based Deep Learning for Program Optimization and Analysis}\cite{cummins2021programl}
-%\begin{itemize}
-%    \item approach is insensitive to identifier names and preserves operand order and type information
-%    \item compared to inst2vec, it can do the same plus preserve operand order, important to distinguish non-commutative ops
-%    \item represent programs as directed multigraphs where statements, identifiers, and immediate values are vertices, and relations between vertices are edge
-%    \item encode IR into a graph which will be consumed by a Message Passing Neural Network to execute some task
-%\end{itemize}
-
-% \subsection*{Compiler-based graph representations for deep learning models of code}\cite{brauckmann2020compiler}
-% \todo{Find Paper PDF and write text}
-
-%IR2Vec: A Flow Analysis based Scalable Infrastructure for Program Encodings \cite{keerthy2019ir2vec}
-%\begin{itemize}
-%    \item Abstracts away the width of the datatype
-%\end{itemize}
-% IR2Vec~\cite{keerthy2019ir2vec} is another approach that maps an \ac{ir} to a embedding space.
-% However, the datatype size, which is important for code optimizations, is abstracted away during the embedding process.
-
-% \section{Applied Machine Learning on Code}
-% \label{sec:rw:applied-code-ml}
-% Machine learning approaches are used in newer research for code analysis and for compiler optimizations.
-% Before machine learning algorithms can be applied, the code must be transformed into some format that the algorithm can consume.
-
-% Various approaches exist that are inspired by the advances in the \ac{nlp} field.
-% Much success in the \ac{nlp} field is based on word embeddings~\cite{mikolov2013efficient}.
-% Embeddings map words into a high-dimensional continous vector space, such that words with a similar meaning are close to each other.
-% \citeauthor{alon2019code2vec}~\cite{alon2019code2vec} used paths of the \ac{ast} in combination with a Attention Neural Network model to map Java code snippets into an embedding space.
-% A more broadly applicable approach is to map from instructions of the LLVM \ac{ir} into an embedding space, because it is independent of the source programming language and the target hardware architecture.
-% A recent work, that implements this mapping is from \citeauthor{venkatakeerthy2020ir2vec}~\cite{venkatakeerthy2020ir2vec}.
-% This mapping from LLVM \ac{ir} was also proposed by \citeauthor{ben2018neural}~\cite{ben2018neural}. 
-% Their work led to the improved work of \citeauthor{cummins2021programl}~\cite{cummins2021programl}.
-
-
-% \subsection*{Ithemal Accurate, portable and fast basic block throughput estimation using deep neural networks}\cite{mendis2019ithemal}
-% \subsection*{NeuroVectorizer: End-to-End Vectorization with DeepReinforcement Learning}\cite{haj2020neurovectorizer}
-% \subsection*{From Loop Fusion to Kernel Fusion: A Domain-Specific Approach to Locality Optimization}\cite{qiao2019loop}
-% \subsection*{A Machine Learning Approach for Performance Prediction and Scheduling on Heterogeneous CPUs}\cite{nemirovsky2017machine}
-
-
-
