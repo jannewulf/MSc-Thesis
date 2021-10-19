@@ -1,96 +1,102 @@
 \chapter{Related Work}
 \label{sec:rw}
-In this chapter, we survey the existing relevant research in the topic area of this thesis. 
-We present the fundamental research and newer data-driven developments in the related fields of instruction scheduling (\Cref{sec:rw:instruction-scheduling}) and register allocation (\Cref{sec:rw:register-allocation}).
-Further, we discuss some other relevant works in the fields of machine learning based compiler optimizations, runtime estimation, code feature extraction and machine learning approaches on other scheduling tasks (\Cref{sec:rw:other}).
+In this chapter, we survey the existing relevant literature covering this thesis' topics. 
+For instruction scheduling (\Cref{sec:rw:instruction-scheduling}) and register allocation (\Cref{sec:rw:register-allocation}), we first discuss classical approaches and continue with newer data-driven advancements.
+Further, we discuss some other relevant works in the fields of machine learning-based compiler optimizations, runtime estimation, code feature extraction, and machine learning approaches on other scheduling tasks (\Cref{sec:rw:other}).
+These are interesting because we use methods like this in our or they are closely related.
 
 \section{Instruction Scheduling}
 \label{sec:rw:instruction-scheduling}
 \subsection{Classical Approaches}
-Scheduling problems appear in many fields.
-This is why general scheduling is a topic with much existing research.
-Also the research on instruction scheduling has a long history.
+Scheduling problems appear in many fields where tasks with dependencies and a cost need to be ordered for execution.
+Therefore, general scheduling is a topic with much existing research.
+Also, the research on instruction scheduling has a long history.
 
-Algorithms exist that can generate perfect instruction schedules for simple situations with perfect information.
-The requirements are met for architectures with only one functional unit and uniform instruction latencies.
-The best-known algorithms in this field is the Sethi-Ullman labelling algorithm~\cite{sethi1970generation} and the work by \citeauthor{proebsting1991linear}~\cite{proebsting1991linear}.
+Some algorithms can generate perfect instruction schedules for simple situations with perfect information.
+Architectures with only one functional unit and uniform instruction latencies fulfill the requirements.
+The best-known algorithms in this field are the Sethi-Ullman labeling algorithm~\cite{sethi1970generation} and the work by \citeauthor{proebsting1991linear}~\cite{proebsting1991linear}.
 
-However, these conditions are not present in modern processors.
-In more complex situations, the instruction scheduling problem is NP-complex~\cite{hennessy1983postpass}.
-Modern processors use pipelines to achieve instruction parallelism, see \Cref{sec:bg:cpu}.
-Consequently, most instruction schedulers that are used nowadays are based on the list scheduling framework, which was proposed by \citeauthor{landskov1980local}~\cite{landskov1980local}.
-The algorithms, that follow this approach, are better able to generate instruction schedules for pipelined processors.
-\citeauthor{heller1961sequencing}~\cite{heller1961sequencing} published an early work on how to approach instruction scheduling for these processors.
-Much research on further developments of the list scheduling was published~\cite{bernstein1991global,gibbons1986efficient,hennessy1983postpass}.
+However, these conditions are not present in modern processors, as discussed in \Cref{sec:bg:cpu}.
+In more complex situations, the instruction scheduling problem is NP-complete~\cite{hennessy1983postpass}.
+Modern processors use multiple pipelines to achieve instruction parallelism, see \Cref{sec:bg:cpu}.
+Consequently, most instruction schedulers used nowadays are based on the list scheduling framework, which \citeauthor{landskov1980local}~\cite{landskov1980local} proposed.
+The algorithms that follow this approach are better able to generate instruction schedules for pipelined processors.
+\citeauthor{heller1961sequencing}~\cite{heller1961sequencing} published early work on how to approach instruction scheduling for these processors.
+Further research on developments of list scheduling was published in~\cite{bernstein1991global,gibbons1986efficient,hennessy1983postpass}.
 
-As elaborated in \Cref{sec:bg:cpu}, the available information on instruction latencies is mostly uncertain.
-The reasons are instruction-level parallelism and uncertain memory latencies.
-One way to approach this problem, is balanced scheduling~\cite{kerns1993balanced,lo1995improving}.
-Another proposed idea, was to use stochastic instruction scheduling~\cite{schielke2000stochastic}.
+As elaborated in \Cref{sec:bg:cpu}, the available information on instruction latencies is often unreliable due to instruction-level parallelism and unpredictable memory latencies caused by cache hierarchies.
+One way to approach this problem is balanced scheduling~\cite{kerns1993balanced,lo1995improving}.
+Another proposed idea was to use stochastic instruction scheduling~\cite{schielke2000stochastic}.
 
 Instruction scheduling typically works on a basic block level.
-This also means that transitions between basic blocks are not scheduled to work well together.
-However, research exists on extending the scope to greater regions~\cite{fisher1981trace,bernstein1991global,hwu1993superblock}.
+This means that instruction schedulers cannot schedule transitions between basic blocks.
+However, research exists on extending the scope to larger regions.
+\citeauthor{fisher1981trace}~\cite{fisher1981trace} selected code paths in functions for instruction scheduling.
+\citeauthor{bernstein1991global}~\cite{bernstein1991global} define regions of strongly connected code (\eg loops) and execute scheduling on this unit.
+A superblock consists of multiple consecutive basic blocks and thus can start execution from other instructions than the first one.
+Superblock scheduling was proposed by \citeauthor{hwu1993superblock}~\cite{hwu1993superblock}.
 
-\subsection{Machine Learning Approaches}
-The first work that combined data-driven methods with instruction scheduling was a patent by \citeauthor{tarsy1994method}~\cite{tarsy1994method}, filed in \citeyear{tarsy1994method}.
-They optimize weights that are used in cost-based heuristics.
+\subsection{Data-Driven Approaches}
+List schedulers usually have multiple heuristics used to choose instructions from the list of available instructions.
+The selection is based on a weighted sum of the heuristics.
+The first work that combined data-driven methods with instruction scheduling is a patent by \citeauthor{tarsy1994method}~\cite{tarsy1994method}, filed in \citeyear{tarsy1994method}.
+They optimize weights used in cost-based heuristics.
 These heuristics are used in list scheduling for pipelined processors.
 
-List schedulers usually have multiple heuristics that are used for choosing an instruction from the list of available instructions.
-The selection is based on a weighted sum of the heuristics.
-\citeauthor{beaty1996using}~\cite{beaty1996using} published a work in \citeyear{beaty1996using}, in which they have used a genetic algorithm to learn weights for different heuristics.
+Similarly, \citeauthor{beaty1996using}~\cite{beaty1996using} published a work in \citeyear{beaty1996using} in which they used a genetic algorithm to learn weights for different heuristics.
 They achieved a 5\% performance increase compared to a random scheduler on three architectures.
 
-\citeauthor{moss1997learning}~\cite{moss1997learning} trained a function that would prefer one instruction over another when presented the previosuly scheduled instructions.
-They used decision trees, look-up tables, ELF function approximations, and feed-forward neural networks.
-The decision tree performed best and found often the optimal schedule.
-However, they only used simulations and limited the basic block length to 10 instructions.
+\citeauthor{moss1997learning}~\cite{moss1997learning} trained a function that picks one instruction over another when presented the previously scheduled instructions.
+They use decision trees, look-up tables, ELF function approximations, and feed-forward neural networks.
+The decision tree performs best and often finds the optimal schedule.
+However, they only use simulations and limit the basic block length to 10 instructions.
 
-A reinforcement learning and a search heuristic were proposed by \citeauthor{mcgovern1999scheduling}~\cite{mcgovern1999scheduling,mcgovern2002building}.
+\citeauthor{mcgovern1999scheduling}~\cite{mcgovern1999scheduling,mcgovern2002building} propose a reinforcement learning and a search heuristic.
 Their reinforcement learning heuristic sometimes found a better instruction schedule than their baseline.
 The long-running search approach found a better instruction schedule every time.
-However, their baseline was only a random instruction scheduler and they have only used simulation results.
+However, their baseline was only a random instruction scheduler, and they have only used simulation results instead of using a state-of-the-art compiler and executing their benchmarks on hardware.
 
-\citeauthor{russell2006learning}~\cite{russell2006learning} used decision trees to create heuristics to improve instruction scheduling decisions.
-They showed, that they generated better instruction schedules 7.8 times more often than the compared heuristics.
-Their results are also based on simulations only.
+\citeauthor{russell2006learning}~\cite{russell2006learning} uses decision trees to create heuristics for improving instruction scheduling decisions.
+They show that they generate better instruction schedules 7.8 times more often than the compared heuristics.
+They also evaluate their work only on a simulator.
 
 A newer work in this field was published by \citeauthor{jain2019learning}~\cite{jain2019learning}.
-They trained a neural network to imitate the instruction schedules by the GCC compiler.
-However, this approach is limited by the performance of the GCC instruction scheduler and cannot exceed it.
+They train a neural network to imitate the instruction schedules by the GCC compiler.
+However, the performance of the GCC instruction scheduler limits this approach’s performance.
 
-We conclude, that the machine learning based approaches mostly performed well in theory, but only against weak random baselines.
-The only work, that we found that was evaluated on hardware was~\cite{beaty1996using}.
+We conclude that machine learning-based approaches mostly performed well in theory but only against weak random baselines.
+The only work that we found that was actually evaluated on hardware was~\cite{beaty1996using}.
 
 % \citeauthor{cavazos2004inducing} showed that instruction scheduling only makes a difference on some basic blocks.
 % They used decision trees for selecting basic blocks for instruction scheduling~\cite{cavazos2004inducing}.
 
 \section{Register Allocation}
 \label{sec:rw:register-allocation}
-We have disussed the implications of the instruction scheduling phase on the register allocation \Cref{sec:bg:compilers:backend}.
-This interdependence was also shown by \citeauthor{goodman1988code}~\cite{goodman1988code}.
-\citeauthor{lavrov1962store} showed the connection between the graph-coloring problem and register allocation and thus, the NP-completeness~\cite{lavrov1962store}.
-The first graph-coloring based algorithm implemented in a compiler by \citeauthor{chaitin1982register}~\cite{chaitin1982register}.
+We have discussed the implications of the instruction scheduling phase on register allocation in \Cref{sec:bg:compilers:backend}.
+Their interdependence was also shown by \citeauthor{goodman1988code}~\cite{goodman1988code}.
+\citeauthor{lavrov1962store}~\cite{lavrov1962store} showed the connection between the graph-coloring problem and register allocation and thus, the NP-completeness.
+The first graph-coloring-based algorithm was implemented in a compiler by \citeauthor{chaitin1982register}~\cite{chaitin1982register}.
 
-In the field of register allocation also appeared research that builds the connection to data-driven methods.
-\citeauthor{das2019deep} used a deep learning approach to solve the graph coloring problem~\cite{das2019deep}.
+In the field of register allocation, also appeared research that builds the connection to data-driven methods.
+\citeauthor{das2019deep}~\cite{das2019deep} use a deep learning approach to solve the graph coloring problem.
 The newer and naturally better fitting approach with graph neural networks was used by \citeauthor{lemos2019graph}~\cite{lemos2019graph} to solve the graph coloring problem. 
 
-\section{Other}
+\section{Related Areas}
 \label{sec:rw:other}
 \subsection{Compiler Optimizations with Machine Learning}
 % \cite{mammadli2020static,haj2020neurovectorizer,huang2019autophase,qiao2019loop}
 Machine learning approaches are also applied to optimize other parts of the compilation process.
-Deep reinforcement learning was successfully applied to the phase-ordering problem by \citeauthor{mammadli2020static}~\cite{mammadli2020static} and \citeauthor{huang2019autophase}~\cite{huang2019autophase}.
-Phase-ordering means to select the compilers optimization passes and define its execution order (see \Cref{sec:bg:compilers:optimizer} for information on the optimization phase).
+\citeauthor{mammadli2020static}~\cite{mammadli2020static} and \citeauthor{huang2019autophase}~\cite{huang2019autophase} successfully apply deep reinforcement learning to the phase-ordering problem.
+Phase-ordering means to select the compiler's optimization passes and define its execution order (see \Cref{sec:bg:compilers:optimizer} for information on the optimization phase).
 Deep reinforcement learning was also used by \citeauthor{haj2020neurovectorizer}~\cite{haj2020neurovectorizer} to translate loops into vector processing instructions (SIMD).
 \citeauthor{wang2009mapping}~\cite{wang2009mapping} used machine learning to predict the optimal number of threads and the optimal scheduling policy for OpenMP parallelized loops.
-For more works, see the surveys~\cite{wang2018machine,ashouri2018survey}.
+We refer to the surveys~\cite{wang2018machine,ashouri2018survey}.
 
 \subsection{Runtime Estimation}
-Various tools for throughput and runtime estimation exist, like Ithemal~\cite{mendis2019ithemal}, llvm-mca\footnote{https://llvm.org/docs/CommandGuide/llvm-mca.html}, and Intel Architecture Code Analyzer (IACA)\footnote{https://software.intel.com/content/www/us/en/develop/articles/intel-architecture-code-analyzer.html}.
+\label{sec:rw:other:runtime}
+There are various tools for throughput and runtime estimation, like Ithemal~\cite{mendis2019ithemal}, llvm-mca\footnote{https://llvm.org/docs/CommandGuide/llvm-mca.html}, and Intel Architecture Code Analyzer (IACA)\footnote{https://software.intel.com/content/www/us/en/develop/articles/intel-architecture-code-analyzer.html}.
 However, the listed tools only work with the x86 architecture, which we do not use.
+The research projects and open-source estimators might be extended to other hardware architectures.
 Especially the Ithemal~\cite{mendis2019ithemal} project is interesting as they use a neural network to predict the runtime from the basic block.
 That means they learned to extract features from the basic block to predict its runtime.
 % This could also be interesting in the instruction scheduling task.
@@ -98,14 +104,14 @@ That means they learned to extract features from the basic block to predict its 
 % Code representation learning
 \subsection{Feature Extraction from Code}
 % \cite{ben2018neural,cummins2021programl,brauckmann2020compiler}
-The previously cited works on data-driven machine learning optimizations have or might benefit from research whose goal it is to automatically extract features from code.
+The previously cited works on data-driven machine learning optimizations have or might benefit from research whose goal is to extract features from code automatically.
 A similar approach to the word2vec~\cite{mikolov2013efficient} approach in the \ac{nlp} area was proposed by~\cite{ben2018neural,alon2019code2vec}.
-\citeauthor{cummins2021programl} developed a method to extract features from code, that is based on graph structures~\cite{cummins2021programl}.
-The work proposed by \citeauthor{brauckmann2020compiler}~\cite{brauckmann2020compiler} works similarly, they also work on graph structures and use graph neural networks to extract features.
+\citeauthor{cummins2021programl} developed a method to extract features from code based on graph structures~\cite{cummins2021programl}.
+The work proposed by \citeauthor{brauckmann2020compiler}~\cite{brauckmann2020compiler} works similarly -- they also work on graph structures and use graph neural networks to extract features.
 
 \subsection{Other Scheduling Tasks with Machine Learning}
-\citeauthor{mao2019learning}~\cite{mao2019learning} have used a deep reinforcement learning approach to schedule data-processing jobs onto compute clusters.
-This work is interesting because the jobs have dependencies on each other which are represented in a \ac{dag}, just like the instructions in the instruction scheduling problem.
+\citeauthor{mao2019learning}~\cite{mao2019learning} have used a deep reinforcement learning approach to schedule data-processing jobs onto computing clusters.
+This work is interesting because the jobs have dependencies on each other, represented in a \ac{dag}, just like the instructions in the instruction scheduling problem.
 
 % \subsection*{Register Allocation for Intel Processor Graphics}\cite{chen2018register}
 
