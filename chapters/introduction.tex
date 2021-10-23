@@ -1,56 +1,56 @@
 \chapter{Introduction}
-% State the overarching topic and aims of the thesis in more detail. Very short literature review
-Compilers are programs that translate code from a programming language into a machine-executable format.
-There are parts in compilers that generate output specific to a given processor.
-These parts have to be manually adjusted and optimized to every target hardware.
-Experts do this process in the field, which is time-consuming and expensive.
-
 In the early days of computers, the \ac{cpu} did all processing.
 Supercomputers already utilized Vector Processing Units (VPU) in the 1970s.
 These accelerators can execute an instruction on many data points in parallel, known as SIMD (Single Instruction Multiple Data).
-The \ac{gpu}, a new type of computing device, came to the consumer market with applications that used complex graphics in the 1990s.
-It is a specialized device for parallel computations in graphics applications.
-\acp{gpu} are also used for the highly parallelizable deep learning methods, even though that was not a design goal initially.
-The wide application of deep learning methods in the 2010s led to the development of specialized hardware for these tasks, like Tensor Processing Units (TPU) and Intelligence Processing Units (IPU).
+The \ac{gpu}, a new type of computing device, entered the consumer market with applications that used complex graphics in the 1990s.
+It was originally designed as a specialized device for parallel computations in graphics applications, but nowadays \acp{gpu} are also used for the highly parallelizable deep learning methods, even though that was not a design goal initially.
+The emergence of deep learning methods in the 2010s led to the development of specialized hardware for these tasks, like Tensor Processing Units (TPU) and Intelligence Processing Units (IPU).
 
-Besides accelerators, also cheap processors created a high demand.
-A wide range of devices use these processors.
-These can be hand-held devices like smartphones or tablets, or they can be devices for edge computing like single-board computers.
+Besides accelerators, less powerful processors created a high demand.
+A wide range of devices use these processors that mainly implement ARM architectures and are optimized for low power consumption.
+These can be hand-held devices (\eg smartphones or tablets) or edge computing devices like single-board computers.
+
+% State the overarching topic and aims of the thesis in more detail. Very short literature review
+Compilers are programs that translate code from a programming language into a machine-executable format.
+There are passes of compilers that generate output specific to a given processor.
+These parts have to be manually adjusted and optimized to every target hardware.
+Experts in the field perform this task manually, which is time-consuming and expensive.
 
 % Define the terms (instruction scheduling, basic block, io vs ooo, machine-learning/data-driven) and scope of the topic
-We focus our work on one specific part of the hardware-dependent compiler phase, the instruction scheduling.
+We focus our work on one specific part of the hardware-dependent compiler phase: the instruction scheduling.
 Once the compiler has translated the source code into atomic instructions that the processor understands, the instruction scheduler can schedule these instructions in different orders without changing the outcome of the translated program.
 For example, if we want to compute $a+b+c$, it does not matter if we first compute $a+b$ and then add $c$ or if we start with $b+c$ and then add $a$.
 % \todo{Example ok? That reordering would not change anything probably, but I wanted a simple to understand example here.}
-However, one schedule might execute faster than the other because of the implementation details of the processor architecture.
+However, one schedule might execute faster than the other because of the implementation details of the processor microarchitecture.
 
 The instruction scheduling is usually not performed on the whole program at once.
 The instruction scheduler's unit is called a basic block, a sequence of processor instructions that always execute as a whole.
 Consequently, the execution of a basic block must start with its first instruction and terminate with the last instruction in the sequence.
 
-Processors can be grouped into two categories regarding this scope.
+Processors can be grouped into two categories regarding their instruction scheduling capabilities.
 There are in-order and out-of-order processors.
-While the former executes the instructions as given, the latter can re-schedule the instructions during execution.
+While the former executes the instructions as given, the latter can re-schedule the instructions during execution in hardware.
 Followingly, an out-of-order processor might not execute the schedule in the defined order.
 
-To optimize this complicated task in an automized process, we use data-driven and machine learning algorithms.
+To optimize this complicated task in an automated process in order to remove the need for expensive human experts, we use data-driven and machine learning algorithms.
 % Our objective is to establish a methodology to generate an automatically optimized instruction scheduler for any novel processor.
 
 % Critically evaluate the current state of the literature on that topic and identify your gap
 Research on the instruction scheduling problem already started in the 1960s, and many papers were published.
-Also, some research was published since the 1990s that made use of machine learning approaches.
-However, most of the data-driven work in the literature has substantial limitations.
+Also, some research was published since the 1990s that made use of machine-learning-based approaches.
 
 % Outline why the research is important and the contribution that it makes
 Tuning instruction schedulers to specific hardware manually is a time-consuming and challenging task.
 Modern processors are intricate and complex machines, which makes the instruction scheduling problem NP-complete.
-As processors are that complex, the effects of re-ordering instructions are often not apparent before execution.
+Since processors are that complex, the effects of re-ordering instructions are often not apparent before execution.
 
 Computer programs can execute code significantly faster with tuned instruction schedules. 
-However, good instruction schedules benefit the runtime, but lower runtimes also result in lower energy consumption, which is especially interesting for mobile and edge computing devices.
+While good instruction schedules benefit the runtime, lower runtimes also lead to lower energy consumption, which is especially interesting for mobile and edge computing devices.
 
-Our contribution is a pipeline of tasks that generates automatically optimized instruction schedulers for a given processor.
-The pipeline can replace the problematic manual instruction scheduler optimization.
+We contribute a methodology for automatically creating optimized instruction scheduling policies for any hardware using data-driven approaches.
+Next, we build a pipeline for automatic basic block micro-benchmark creation.
+A large part of that pipeline is concerned with automatically standardizing the code coming from various C/C++ projects.
+Lastly, we contribute a training and test set extracted from the LLVM test suite.
 
 % Our contribution is a multistep pipeline to automatically generate optimized instruction schedulers for any target hardware.
 % First we select relevant basic blocks that have a high influence on the overall runtime of the benchmarks.
@@ -62,25 +62,25 @@ The pipeline can replace the problematic manual instruction scheduler optimizati
 % Clearly outline the research questions and problem(s) you seek to address
 This thesis seeks to find answers to multiple questions.
 First, how good the instruction schedules are that state-of-the-art compilers generate and if we can find better ones.
-Followingly, we research if it is possible to train a model that can generate better instruction schedules than modern compilers.
+Subsequently, we investigate whether it is possible to train a model that can generate better instruction schedules than modern compilers.
 Lastly, we use the dataset to train various data-driven and machine learning approaches to generate well-performing instruction schedules for unknown basic blocks.
 
 % State the hypotheses (if you are using any)
 
 % Detail the most important concepts and variables
 % Briefly describe your methodology
-We execute all our experiments on one in-order and one out-of-order processor to compare the effects.
+We execute all our experiments on an AArch64 in-order processor (ARM Cortex-A53) and the \aurora out-of-order processor to compare the effects of the different pipeline models.
 Our data-driven approach requires many basic blocks for its learnings.
-Therefore, we select basic blocks from the LLVM Test Suite that greatly influence the overall runtime of the benchmarks.
-Followingly, we extract the selected basic blocks and integrate them into our runtime measurement framework.
+Therefore, we present two heuristics to select basic blocks from the LLVM Test Suite that greatly influence the overall runtime of the benchmarks.
+Next, we extract the selected basic blocks and integrate them into our runtime measurement framework.
 Our proposed pipeline starts with a Monte Carlo Tree Search to find well-performing instruction schedules for the selected basic blocks.
 We do this by intelligently generating different instruction schedules, executing them on the target hardware, and measuring its runtime.
 With the findings of this search approach, we build a dataset with evaluated instruction schedules.
-Lastly, this dataset is then used to train various data-driven and machine learning approaches with the goal to generate good performing instruction schedules also for unknown basic blocks.
+Lastly, this dataset is then used to train various data-driven and machine learning approaches with the goal of generating good performing instruction schedules also for unknown basic blocks.
 
 % Discuss the main findings
 We have found better instruction schedules for the in-order processor for 55\% and are on par for 37\% of the basic blocks.
-The found instruction schedules have on average 8.4\% shorter runtimes than those generated by a state-of-the-art compiler.
+The resulting instruction schedules have on average 8.4\% shorter runtimes than those generated by a state-of-the-art compiler.
 We have found better instruction schedules for the out-of-order processor for 32\% and are on par for 53\% of the basic blocks with an average speedup of 0.3\%.
 Additionally, we create a nearest-neighbor model for the in-order processor that can generate instruction schedules that, on average, perform 1.4\% better than the ones of the state-of-the-art compiler.
 
