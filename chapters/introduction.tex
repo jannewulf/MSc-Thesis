@@ -53,12 +53,6 @@ Next, we build a pipeline for automatic basic block micro-benchmark creation.
 A large part of that pipeline is concerned with automatically standardizing the code coming from various C/C++ projects.
 Lastly, we contribute a training and test set extracted from the LLVM test suite.
 
-% Our contribution is a multistep pipeline to automatically generate optimized instruction schedulers for any target hardware.
-% First we select relevant basic blocks that have a high influence on the overall runtime of the benchmarks.
-% We extract these basic blocks and integrate them into our runtime measurement framework.
-% Next, we execute a \ac{mcts} search approach on these basic blocks to find well performing instruction schedules.
-% Finally, we train supervised models that generates instruction schedules faster than the search approach.
-
 % Outline your epistemological and ontological position - ???
 % Clearly outline the research questions and problem(s) you seek to address
 This thesis seeks to find answers to multiple questions.
@@ -90,18 +84,3 @@ The thesis starts with background information in \Cref{sec:bg}, which explains i
 Next, we review existing relevant research in this field in \Cref{sec:rw}.
 Then in detail, we explain the approach that we have used in \Cref{sec:approach}.
 Finally, we discuss the results and findings in \Cref{sec:eval} and finish the thesis with an outlook in \Cref{sec:conclusion}.
-
-
-
-
-
-% ACHIEVEMENTS
-% Pipeline
-% Upper limit for improving the instr scheduling for AARCH64 (~8%) and Aurora
-% Scheduling performance improvement for AARCH64 (~1.8%?) and Aurora
-
-
-% Compare approach with auto-tuning approach.
-% Why not use auto-tuning? Search space size, and lack of generalization could be a reason
-
-% Why not optimize for ooo cpus? Cost, Energy (Edge devices)
