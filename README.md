@@ -1,0 +1,43 @@
+# MSc-Thesis: Automatic Compiler Customization for Novel Hardware
+
+## Abstract
+With the growing number of processor architectures and specialized accelerators, compilers have become once again a critical tool for effective use of new capabilities.
+Compilers have hardware-dependent parts that need to be manually adjusted and optimized by experts for every target hardware.
+One major step of the hardware-dependent compilation process is instruction scheduling.
+Regarding their scheduling mechanisms, there are two groups of processors, in-order and out-of-order processors, where the latter can re-schedule instructions during execution in hardware.
+
+This thesis aims to evaluate whether this step can be automatically optimized, especially for novel hardware.
+We have multiple contributions through our work:
+First, we develop a methodology for automatically creating optimized instruction scheduling policies for any hardware using data-driven approaches.
+Next, we build a pipeline for automatic basic block micro-benchmark creation.
+A large part of that pipeline is concerned with automatically standardizing basic blocks coming from various C/C++ projects.
+Lastly, we collect a dataset of basic blocks extracted from the [LLVM Test Suite](https://llvm.org/docs/TestSuiteGuide.html).
+
+Our experiments aim to compare the effectiveness of our approach on different processors.
+We use an in-order AArch64 CPU (ARM Cortex-A53) and the NEC SX-Aurora TSUBASA-VE, an out-of-order vector accelerator.
+To summarize, we search for well-performing instruction schedules on a set of micro-benchmarks.
+In an effort to reduce inference times, we train different supervised learning models with the results of the search approach.
+We generate instruction schedules for the basic blocks in our test dataset, which, on average, perform 8.35% (in-order) and 0.30% (out-of-order) better than the LLVM compiler framework.
+Our supervised learning models generate instruction schedules that perform, on average, 1.38% (in-order) better.
+On the out-of-order processor, we do not achieve a speedup with the supervised learning models.
+
+## Zusammenfassung
+Mit einer steigenden Anzahl an Prozessorarchitekturen und spezialisierten Beschleunigerkarten sind Compiler erneut zu einem entscheidenden Werkzeug für die effektive Nutzung von neuen Fähigkeiten geworden.
+Compiler haben hardwarespezifische Teile die für jeden neuen Prozessor von Experten manuell angepasst und optimiert werden müssen.
+Ein Hauptschritt des hardwarespezifischen Kompilierens ist das Instruction Scheduling.
+Bezüglich ihrer Mechanismen zum Instruction Scheduling können Prozessoren in zwei Gruppen eingeteilt werden: in-order und out-of-order Prozessoren, wobei letztere während der Ausführung Instruktionen in der Hardware noch umsortieren können.
+
+Das Ziel dieser Thesis ist zu untersuchen ob das Instruction Scheduling durch einen automatisierten Vorgang optimiert werden kann, insbesondere für neuartige Hardware.
+Wir leisten mehrere Beiträge mit dieser Arbeit:
+Wir entwickeln mithilfe von datengetriebenen Ansätzen eine Methodik für die automatisierte Erstellung von optimierten Instruction Scheduling Strategien für jegliche Hardware.
+Außerdem erstellen wir eine Folge von Arbeitsschritten für die automatisierte Generierung von Mikrobenchmarks in der Größe von einzelnen Basic Blocks.
+Ein großer Teil dieser Arbeitsschritte befasst sich mit der automatischen Vereinheitlichung von Basic Blocks aus verschiedenen C/C++ Projekten.
+Zusätzlich erstellen wir einen Datensatz an Basic Blocks aus der [LLVM Test Suite](https://llvm.org/docs/TestSuiteGuide.html).
+
+Das Ziel unserer Experimente ist es die Wirksamkeit unserer Methoden auf verschiedenen Prozessoren zu untersuchen.
+Dafür, benutzen wir einen in-order AArch64 Prozessor (ARM Cortex-A53) und die out-of-order Beschleunigerkarte NEC SX-Aurora TSUBASA-VE.
+Wir suchen für die Basic Blocks in unserem Datensatz Instruction Schedules, die zu einer kürzeren Laufzeit führen.
+Um die langen Laufzeiten des Suchansatzes zu umgehen trainieren wir mit dessen Ergebnissen mehrere Supervised Learning Modelle.
+Für die Basic Blocks in unserem Testdatensatz generieren wir so Instruction Schedules die, im Vergleich zu jenen des LLVM Compiler Frameworks, durschnittlich zu einer um 8.35% (in-order) bzw. 0.30% (out-of-order) kürzeren Laufzeit führen.
+Die Supervised Learning Modelle generieren Instruction Schedules die im Schnitt 1.38% (in-order) schneller sind.
+Für den out-of-order Prozessor erreichen wir keine Beschleunigung mit den Supervised Learning Modellen.
