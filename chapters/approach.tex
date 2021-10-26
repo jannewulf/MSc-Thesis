@@ -3,18 +3,6 @@
 \IMRADlabel{methods}
 \todo{State that generated schedules are checked by LLVM for correctness}
 
-% Many novel hardware architectures, iot, accelerators, coprocessors
-% Back-end part of compilers must be adjusted for each new hardware
-% basic schedulers exist, but not optimized for hardware
-Many new hardware architectures come to the market.
-These include simple processors, used for \ac{iot} devices and single-board computers (\eg Raspberry Pi).
-Other examples are accelerators like graphics cards, and vector processing cards (\eg \aurora).
-The back-end part of compilers need to be adjusted for every new hardware architecture.
-This includes the instruction scheduling task.
-% instruction scheduling is hard
-The compiler framework LLVM comes with general instruction schedulers that can work with a formal description of the given hardware architecture.
-However, these instruction schedulers are not optimized for the given hardware.
-
 % in order vs out of order
 The optimization of instruction schedulers is a challenging, but important task.
 Expensive chips often implement out-of-order pipelines, which means that they can reschedule instructions in hardware during execution.
@@ -42,7 +30,7 @@ Then we discuss the importance of basic blocks for instruction scheduling in gen
 That is followed by explaining the \ac{mcts} approach~(\Cref{subsec:approach:ml:mcts}), which is used to find well performing instruction schedules.
 Finally, we introduce our approach to train global models~(\Cref{subsec:approach:ml:global}) from the many \ac{mcts} models.
 
-\section{Dataset}
+\section{Data Source}
 \label{sec:approach:dataset}
 For our experiments, we use benchmarks from the LLVM project~\cite{LLVM:CGO04} called LLVM Test Suite~\footnote{\url{https://llvm.org/docs/TestSuiteGuide.html}}.
 The test suite contains benchmarks from the following categories
@@ -58,8 +46,15 @@ We select the 273 benchmarks from the Single-Source and Multi-Source categories 
 The selected categories contain benchmarks that are compiled from a single source file or multiple source files, respectively.
 The benchmarks are all written in C or C++.
 
-\subsection{Modified Build Process}
+\section{Build Process}
 \label{sec:approach:build_process}
+This section describes the process that we use for building the programs in the LLVM Test Suite.
+First, we divide the compilation into separate steps to gain full controll over the settings.
+We explain this in \Cref{sec:approach:divided-build}.
+Next, \Cref{sec:approach:llvm-passes} explains the LLVM passes that we implement to add functionality to the LLVM compiler.
+
+\subsection{Divided Process}
+\label{sec:approach:divided-build}
 The test suite comes with Makefiles and CMake configurations to automatically build all benchmarks.
 However, these are not sufficient for our approach.
 We need a modified build process for all the benchmarks because we are manipulating it in several cases.
@@ -116,7 +111,40 @@ We also analyze the test suite for execution arguments.
 For example, some benchmarks read data from files or require arguments when calling them.
 To execute them, we generate a shell script that calls the compiled benchmark with the required arguments.
 
-\section{Basic Block --- Scheduling Unit}
+\subsection{LLVM Compiler Passes}
+\label{sec:approach:llvm-passes}
+The LLVM compiler framework makes it easy to implement compiler passes, which are functions that are executed during compilation and can modify the \ac{ir} code.
+We implemented three of these functions: to count the number of executions of basic blocks, to count the basic block lengths, and to measure the runtime of a given function.
+
+\subsubsection{Basic Block Execution Counting Pass}
+\label{sec:approach:pass-count}
+We implement an LLVM optimizer pass for injecting counters into a program.
+Optimizer passes take LLVM \ac{ir} files as input and output the code in the same file format.
+Our pass injects one global 64 bit counter variable for each basic block into the code.
+Next, the pass adds instructions into the beginning of each basic block, which increases the corresponding counter by one.
+At the end of the main function, the pass adds a format string and injects a call to the \lstinline{printf} function to print all the counter values and corresponding basic block names.
+
+The optimizer pass must be compiled with the LLVM framework.
+We include the optimizer pass into our build process (see \Cref{sec:approach:build_process}).
+There, we add a call to the LLVM optimizer \lstinline{opt} with the argument \mbox{\lstinline{-passes=dyn-bb-count}}.
+To actually get the counts, we build a benchmark with this optimizer pass and execute it.
+The benchmark will then print the counter values.
+
+\subsubsection{Basic Block Instruction Count Pass}
+\label{sec:approach:instr-count}
+In order to get the number of instructions for all the basic blocks in a program we implement another pass.
+This pass just prints the name of the basic block and its number of instructions to the command line during compile time.
+It does not modify the code.
+
+\subsubsection{Function Runtime Measure Pass}
+Lastly, we implement a pass, to measure the runtime of a single function.
+The pass searches for the function that contains the selected basic block.
+Then, it injects calls to the timer functions of the C++ standard library (\lstinline|std::high_resolution_clock::now|).
+The calls are injected at the beginning of the given function and right before the return statement.
+Additionally, it injects a compilation-unit-wide global variable and stores the measurements into this variable.
+In the destructor of
+
+\section{Basic Block Selection Heuristics}
 \label{sec:approach:basicblock}
 Even though there is research on instruction scheduling on more extensive units (see \Cref{sec:rw:instruction-scheduling}), most compilers schedule instructions on a per basic block level.
 This is also true for the LLVM compiler framework.
@@ -128,7 +156,7 @@ That means that we execute our experiments on individual basic blocks and learn 
 Later, we combine the models to generalize the knowledge to be applied to unseen basic blocks.
 We describe this process in detail in \Cref{sec:approach:ml}.
 
-\subsection{Selection Process}
+\subsection{Selection Process ?? UNIFY THIS}
 \label{sec:approach:basicblock:selection}
 Not all basic blocks provide an equal value to our experiments.
 It also consumes too much time to work on all the basic blocks within the scope of this thesis (\eg compilation time, execution time, machine learning time).
@@ -161,7 +189,7 @@ See \Cref{tab:approach:bb_heuristics} for an example.
     \label{tab:approach:bb_heuristics}
 \end{table}
 
-\subsubsection{Longest Basic Blocks}
+\subsection{Longest Basic Blocks}
 % \todo{Add note about influence of pipeline length}
 % \todo{More different instructions use more functional units of the processor}
 % The number of instructions in a basic block correlates with the number of possible schedules.
@@ -179,7 +207,7 @@ This was also shown by \citeauthor{stefanovic1997character}~\cite{stefanovic1997
 We use the optimizer pass described in \Cref{sec:approach:instr-count} to count the number of instructions per basic block.
 From the output of that pass, we put together a list with all basic blocks and their lengths (see \Cref{tab:approach:bb_heuristics}).
 
-\subsubsection{Most Executed Basic Blocks}
+\subsection{Most Executed Basic Blocks}
 Some basic blocks are significantly more often executed than others.
 For example, basic blocks in the bodies of loops run often.
 A basic block in the error checking code in the beginning of a program might only execute once.
@@ -189,44 +217,12 @@ We count the number of executions with the LLVM optimizer pass described in \Cre
 See \Cref{tab:approach:bb_heuristics} for an example.
 
 
-\subsubsection{Most Executed and Longest Basic Blocks}
+\subsection{Most Executed and Longest Basic Blocks}
 % \todo{Include discussion about variance in resulting basic blocks}
 % \todo{most influence on overall runtime}
 The previous two heuristics are helpful on their own, but we are most interested in basic blocks that combine the two aspects.
 For example, the most executed basic block can still come from a very simple loop with few instructions in the loop body.
-We compute the product of the two heuristics to get a combined heuristic.
-
-\section{LLVM Compiler Passes}
-The LLVM compiler framework makes it easy to implement compiler passes, which are functions that are executed during compilation and can modify the \ac{ir} code.
-We implemented two of these functions, one to count the number of executions of basic blocks and one to measure the runtime of a given function.
-
-\subsection{Basic Block Execution Counting Pass}
-\label{sec:approach:pass-count}
-We implement an LLVM optimizer pass for injecting counters into a program.
-Optimizer passes take LLVM \ac{ir} files as input and output the code in the same file format.
-Our pass injects one global 64 bit counter variable for each basic block into the code.
-Next, the pass adds instructions into the beginning of each basic block, which increases the corresponding counter by one.
-At the end of the main function, the pass adds a format string and injects a call to the \lstinline{printf} function to print all the counter values and corresponding basic block names.
-
-The optimizer pass must be compiled with the LLVM framework.
-We include the optimizer pass into our build process (see \Cref{sec:approach:build_process}).
-There, we add a call to the LLVM optimizer \lstinline{opt} with the argument \mbox{\lstinline{-passes=dyn-bb-count}}.
-To actually get the counts, we build a benchmark with this optimizer pass and execute it.
-The benchmark will then print the counter values.
-
-\subsection{Basic Block Instruction Count Pass}
-\label{sec:approach:instr-count}
-In order to get the number of instructions for all the basic blocks in a program we implement another pass.
-This pass just prints the name of the basic block and its number of instructions to the command line during compile time.
-It does not modify the code.
-
-\subsection{Function Runtime Measure Pass}
-Lastly, we implement a pass, to measure the runtime of a single function.
-The pass searches for the function that contains the selected basic block.
-Then, it injects calls to the timer functions of the C++ standard library (\lstinline|std::high_resolution_clock::now|).
-The calls are injected at the beginning of the given function and right before the return statement.
-Additionally, it injects a compilation-unit-wide global variable and stores the measurements into this variable.
-In the destructor of that compilation-unit, the pass injects code to print all the measurements.
+We compute the product of the two heuristics to get a combined heuristic. that compilation-unit, the pass injects code to print all the measurements.
 
 \section{Feasibility Study}
 \label{sec:eval:validation}
@@ -263,7 +259,7 @@ We choose the shortest measured runtime per benchmark run to ensure that we use 
 To check that the runtime measurements are reproducible, we run each generated instruction schedule two times.
 
 % evaluate
-We choose to carry out this experiment on a processor with the architecture AArch64 and on the \aurora.
+We choose to carry out this experiment on a processor with the architecture AArch64 and on the \aurora{}.
 The choice is explained in \Cref{sec:eval:hw}.
 \Cref{fig:eval:rndm:aarch64} shows a representative selection of experimental results for the AArch64 processor.
 The plots show the runtimes grouped by the different seeds for the random instruction scheduler.
@@ -315,7 +311,7 @@ This means that there is potential for improvements.
     \label{fig:eval:rndm:aarch64}
 \end{figure}
 
-\Cref{fig:eval:rndm:aurora} shows a similar selection for the same experiment on the \aurora processor.
+\Cref{fig:eval:rndm:aurora} shows a similar selection for the same experiment on the \aurora{} processor.
 We can observe a similar outcome of the experiment.
 However, as this processor cannot be interrupted by the \ac{os}, the runtimes are more stable between two runs.
 No measurements in the whole example where marked as outliers.
@@ -354,7 +350,7 @@ In summary, we observe potential for optimizations on this processor, as well.
         \includegraphics[width=\textwidth]{img/random-scheduling-experiment-aurora-collected/uuencode-crop.pdf}
     \end{subfigure}
 
-    \caption[Random Scheduling Experiment on \aurora]{Random Scheduling Experiment on \aurora:
+    \caption[Random Scheduling Experiment on \aurora{}]{Random Scheduling Experiment on \aurora{}:
     The bars show the runtime of a function with a random instruction schedule.
     The two runs of the instruction schedule are grouped together.
     The distance measure represents the longest execution time relative to the shortest execution time.
@@ -419,7 +415,7 @@ To generate a model that works globally, \ie also for unseen basic blocks, we ha
 Therefore, we extract data samples matching the input format of \Cref{eqn:mlmapping1}, or respectively \Cref{eqn:mlmapping2}.
 We have trained different models that are explained in detail in \Cref{subsec:approach:ml:global}.
 
-\subsection{Local MCTS Model}
+\subsection{Monte Carlo Tree Search for Instruction Schedules}
 \label{subsec:approach:ml:mcts}
 We choose \ac{mcts} to find examples of schedules that perform best.
 The reason is that this approach fits naturally for sequential problems and allows us to balance between the exploration and exploitation of instruction schedules. 
@@ -436,31 +432,20 @@ The LLVM instruction \ac{dag} still contains many instructions that exist just f
 We remove these pseudo-instructions from the instruction \ac{dag} and adjust the dependencies between the nodes.
 
 The nodes in an \ac{mcts} tree represent a state in the underlying model, and the edges correspond to transitions between these states.
-Compare \Cref{fig:approach:max-vs-avg:a} to see that our \ac{mcts} nodes represent a (partial) instruction schedule.
+Compare \Cref{fig:approach:max-vs-avg} to see that our \ac{mcts} nodes represent a (partial) instruction schedule.
 The edges in our \ac{mcts} tree represent a legal scheduling of a new instruction to the previous schedule.
 When you iterate back from any node to the root node, you get the (partial) instruction schedule in reverse ordering.
 \begin{figure}[p]
     \centering
-    \begin{subfigure}[b]{0.3\textwidth}
-        \centering
-        \includegraphics[width=17.5cm,angle=90]{data/mcts-max-vs-avg/svg/selected/8752639012199.pdf}
-        \caption{\ac{mcts} tree}
-        \label{fig:approach:max-vs-avg:a}
-    \end{subfigure}
-    \hspace{0.2\textwidth}
-    \begin{subfigure}[b]{0.3\textwidth}
-        \centering
-        \includegraphics[width=17.5cm,angle=90]{data/mcts-max-vs-avg/svg/selected/8752639012199-next.pdf}
-        \caption{\ac{mcts} tree after next iteration}
-        \label{fig:approach:max-vs-avg:b}
-    \end{subfigure}
+    \includegraphics[width=18cm,angle=90]{data/mcts-max-vs-avg/svg/selected/8752639012199.inkscape-crop.pdf}
     \caption[\ac{mcts} tree with the consequences of maximum and average metric]{
-        \Cref{fig:approach:max-vs-avg:a} shows a given \ac{mcts} tree and \Cref{fig:approach:max-vs-avg:b} shows two different choices on different \ac{mcts} metrics.
+        \ac{mcts} tree with the consequences of maximum and average metric:
         The boxes represent a \ac{mcts} node, at the top is the name of the instruction, on the left are the cumuluated metric and the number of visits, on the right is the metric.
+        The colored nodes have two metric values: The upper one is the average metric value and the lower italic one shows the maximum metric value.
         In this example, we use the negative runtime for the metric.
-        The dashed box is the new instruction.
-        The green values show the alternative maximum metric values.
-        The red path was chosen if we used the average metric (-122.0), but if we use the maximum metric (green path) we find a better runtime (-102.0).
+        The blue nodes show the path that was selected when we used the \ac{mcts} approach with the average metric.
+        There is a path of green nodes which shows the path that would have been selected if we used the maximum metric.
+        The green path results in a better metric value.
         % \\ (Benchmark: LoopRestructuring-dbl, Function: s2233, Basic Block: for.body20)
     }
     \label{fig:approach:max-vs-avg}
@@ -474,8 +459,9 @@ When you train \ac{mcts} for games, that makes sense because you do not want to 
 But we are only interested in a single best schedule, therefore we do not care about similar but bad schedules.
 The consequence is that we do not take the average but the maximum.
 This means that in the exploitation phase, we always follow the path to the best-found schedule.
-You can observe the consequences in \Cref{fig:approach:max-vs-avg:b}, where the green numbers represent the maximum metric and the black numbers represent the average metric.
-Our approach is similar to the one in~\cite{bjornsson2009cadiaplayer}, however, they still use the average for the search part.
+You can observe the consequences in \Cref{fig:approach:max-vs-avg}, where the green path represents the maximum metric and the blue path represents the average metric.
+Our approach is similar to the one in~\cite{bjornsson2009cadiaplayer}.
+However, they still use the average for the search part, which we do not.
 
 % Explain process: Generate schedule -> compile -> measure runtime -> train mcts -> go to 1
 The \ac{mcts} learning process is separated into four phases:
@@ -508,7 +494,7 @@ The further we grow the \ac{mcts} tree, the higher is the probability that we fi
 This is at the same time an upper limit for the global models in our second step.
 Therefore, we can see how much of our potential improvements we are able to reach with our global models.
 
-\subsection{Global Model}
+\subsection{Inference Models}
 \label{subsec:approach:ml:global}
 Once we have found good schedules by generating \ac{mcts} trees for many basic blocks, we want to generalize this knowledge.
 This is necessary to transfer the knowledge to unseen basic blocks and make the model usable in practice by generating good schedules directly, in contrast to searching them with \ac{mcts}.
@@ -775,7 +761,7 @@ We do some error checking after the execution has stopped (see \Cref{sec:approac
         x86 & \lstinline|rdtsc| \\
         ARM32 & \lstinline|mrc p15m, 0, r0, c15, c12, 1| \\
         AArch64 & \lstinline|mrs x0, PMCCNTR_EL0| \\
-        \aurora & \lstinline|smir %s60, %usrcc| \\
+        \aurora{} & \lstinline|smir %s60, %usrcc| \\
         \bottomrule
     \end{tabular}
     \caption{Assembly instructions for getting the cycle counter value of a given hardware.}
