@@ -6,7 +6,7 @@ First, we review the results of the \ac{mcts} approach in \Cref{sec:eval:mcts}.
 Next, we evaluate if we can use the results of the \ac{mcts} approach for learning to generate good schedules with supervised learning methods in \Cref{sec:eval:supervised}.
 Lastly, we analyze and discuss the outcomes of the experiments in \Cref{sec:eval:discussion}.
 
-\section{Hardware selection}
+\section{Hardware Selection}
 \label{sec:eval:hw}
 There are different aspects in choosing the hardware for our experiments.
 A processor must fulfill two aspects to be relevant for us.
@@ -26,7 +26,7 @@ With these aspects in mind, we select:
     \item \textbf{AArch64 (Arm Cortex-A53):} This processor is an edge \ac{cpu} and implements an in-order superscalar pipeline based on the AArch64 architecture.
     An edge device that uses it is the Raspberry Pi 3 Model B.
     We use this device for our experiments with Ubuntu 20.04.
-    \item \textbf{\aurora:} This processor is interesting because it implements an out-of-order superscalar pipeline. 
+    \item \textbf{\aurora{}:} This processor is interesting because it implements an out-of-order superscalar pipeline. 
     Additionally, it is a vector processing accelerator card installed via a PCI-Express connection and thus a different type of processor.
 \end{itemize}
 
@@ -38,7 +38,7 @@ With these aspects in mind, we select:
         \toprule
         & \multicolumn{2}{c}{Processor} \\
         \cmidrule{2-3}
-        MCTS Performance & AArch64 & \aurora \\
+        MCTS Performance & AArch64 & \aurora{} \\
         \midrule
         \tblsection{Absolute} && \\
         \tblitem{Better than baseline}    & 54.79\% (7759) & 31.73\% (1349) \\
@@ -49,7 +49,7 @@ With these aspects in mind, we select:
         \bottomrule
     \end{tabular}
     \caption[Results of the \ac{mcts} Approach]{Results of the \ac{mcts} approach. The \ac{mcts} approach was very successful on the AArch64 processor. We found better instruction schedules for more than the half of the basic blocks.
-    On the \aurora, we are on par with the baseline for half of the basic blocks and fou nd better instruction schedules for a third of the basic blocks.}
+    On the \aurora{}, we are on par with the baseline for half of the basic blocks and fou nd better instruction schedules for a third of the basic blocks.}
     \label{tbl:eval:mcts}
 \end{table}
 % Goal of the experiment
@@ -80,7 +80,7 @@ The experiment is time-consuming because of the many basic blocks and the expens
 We have to terminate the experiment at some point.
 After 200 iterations, we have seen that we get a speedup for many basic blocks.
 Therefore, we run the \ac{mcts} model for each basic block for 200 iterations.
-The experiment execution took five weeks for the AArch64 processor, and three weeks for the \aurora.
+The experiment execution took five weeks for the AArch64 processor, and three weeks for the \aurora{}.
 
 % Exploration vs Exploitation balance weight
 % WE DID NOT DESCRIBE THE FORMULAR NOWHERE
@@ -102,7 +102,7 @@ That leaves us with 14,162 valid instruction schedules for the AArch64 processor
 In only 8.24\% of the basic blocks, we did not find an instruction schedule that performed at least as well as the LLVM generated one.
 On average, we increase the runtime performance of the basic blocks by 8.35\%.
 
-We also executed this experiment for 4,253 basic blocks on the \aurora processor.
+We also executed this experiment for 4,253 basic blocks on the \aurora{} processor.
 The lower number of basic blocks is caused by hardware and time limitations.
 Only two outliers are generated during this experiment.%, which results in 4,251 valid basic blocks.
 See \Cref{tbl:eval:mcts} for the summarized results.
@@ -111,10 +111,10 @@ In 15.27\% of the basic blocks, our model finds only worse instruction schedules
 The average speedup of the basic blocks is 0.30\%.
 
 % In-order vs OoO discussion (Speed Up vs BB length)
-If we run this experiment on more basic blocks, the results could still change in favor of the \aurora processor.
+If we run this experiment on more basic blocks, the results could still change in favor of the \aurora{} processor.
 However, the observation that the performance on this processor is worse than on the AArch64 processor was expected.
-The reason is that the \aurora is an out-of-order processor, and the AArch64 processor is an in-order processor.
-That means, the \aurora might reschedule the instruction in hardware when it detects problems with the instruction schedule.
+The reason is that the \aurora{} is an out-of-order processor, and the AArch64 processor is an in-order processor.
+That means, the \aurora{} might reschedule the instruction in hardware when it detects problems with the instruction schedule.
 Thus, it does not depend on good instruction schedules as the AArch64 processor.
 
 We showed with this experiment that we can find better instruction schedules for both our selected processors.
@@ -149,7 +149,7 @@ We split this dataset into a training set with 85\% randomly selected data point
         \draw [arrow] (test-set) -- node [midway,below] {Model Inference} (eval);
         \draw [arrow] (model) |- (eval);
     \end{tikzpicture}
-    \caption[Overview over the used Dataset]{Overview over used datasets. The supervised model is one from \Cref{sec:eval:supervised}.}
+    \caption[Overview Over the Used Dataset]{Overview over used datasets. The supervised model is one from \Cref{sec:eval:supervised}.}
     \label{fig:eval:datasets}
 \end{figure}
 
@@ -162,7 +162,7 @@ These experiments aim to see if we can generate well-performing instruction sche
         \toprule
         & \multicolumn{2}{c}{Processor}\\
         \cmidrule{2-3}
-        Supervised Model & AArch64 & \aurora \\
+        Supervised Model & AArch64 & \aurora{} \\
         \midrule
         Nearest Neighbor & \textbf{1.38\%} & -3.03\% \\
         \tblsection{Support Vector Regression} && \\
@@ -179,23 +179,23 @@ These experiments aim to see if we can generate well-performing instruction sche
     This table shows the mean speedup on the test set with our applied supervised learning models.
     Our nearest neighbor model performed best on the AArch64. 
     It is the only model that generated a positive mean speedup.
-    On the \aurora, the SVR model with clustered instructions performed best.
+    On the \aurora{}, the SVR model with clustered instructions performed best.
     However, it is still worse than the baseline.}
     \label{tbl:eval:supervised-perf}
 \end{table}
 
-We use a large map structure to search our dataset for similar scheduling situations quickly.
-\Cref{sec:app:nearest-neighbor} explains the details of this approach.
+We use a large map structure to search our dataset for similar scheduling situations quickly and set the threshold value $t_c=0.8$.
+\Cref{sec:app:nearest-neighbor} explains $t_c$ and more details of this approach.
 Then, we integrate this model into the LLVM compiler framework, and we use it to compile our basic blocks in the test set.
 
 The instruction schedules that we compiled with this nearest-neighbor model for the AArch64 processor performed better than the baseline instruction scheduler from LLVM.
 The measured runtimes for the basic block are 1.38\% shorter.
 In fact, this is the only experiment where we exceeded the baseline performance with a supervised learning approach.
-However, the measured runtimes on the \aurora processor are 3.03\% higher than the basic blocks compiled with the baseline instruction scheduler (see \Cref{tbl:eval:supervised-perf}).
+However, the measured runtimes on the \aurora{} processor are 3.03\% higher than the basic blocks compiled with the baseline instruction scheduler (see \Cref{tbl:eval:supervised-perf}).
 
 \subsection{Parametric Machine Learning Models}
 The parametric models require an additional data transformation to bring it into the form defined in \Cref{eqn:approach:regression-mapping}.
-This results in a dataset of 4.9 million data points for the AArch64 architecture and 1.3 million data points for the \aurora architecture.
+This results in a dataset of 4.9 million data points for the AArch64 architecture and 1.3 million data points for the \aurora{} architecture.
 We add two variations to the parametric approaches, which we describe in the following paragraphs.
 To see the effects of these variations, we run all approaches once with both and once with only one of the variations.
 
@@ -223,7 +223,7 @@ This results in a dataset with a distribution closer to an equal distribution th
     \label{fig:eval:balanced-dataset}
 \end{figure}
 \Cref{fig:eval:balanced-dataset} illustrates the effect on the distribution of the AArch64-dataset.
-The effect for the \aurora dataset is similar.
+The effect for the \aurora{} dataset is similar.
 
 \subsubsection{Support Vector Regression}
 \label{sec:eval:svm}
@@ -233,12 +233,12 @@ We reduced this by randomly selecting 200,000 data points for the model training
 For the AArch64 processor, this model is the worst-performing one of the supervised learning models.
 The measured runtimes of the scheduled basic blocks are 1.14\% to 1.45\% higher than the baseline's runtimes.
 
-However, on the \aurora, we found this SVR approach combined with clustered instructions to be the best working parametric model.
+However, on the \aurora{}, we found this SVR approach combined with clustered instructions to be the best working parametric model.
 Nevertheless, with a slowdown of 2.90\%, it still performs worse than on the AArch64 processor.
 
 Regarding the effects of the dataset balancing and instruction clustering, we see no apparent effect.
 For the AArch64 processor, the experiments with the balanced datasets perform better.
-However, we observe the opposite effect for the \aurora.
+However, we observe the opposite effect for the \aurora{}.
 Here, the dataset balancing negatively influenced the performance.
 
 \subsubsection{Neural Network}
@@ -251,7 +251,7 @@ We choose an 85/15 split again.
 On the AArch64 processor, the scheduled basic blocks perform better than with the \ac{svr} approach.
 With the balanced dataset, we get close to the baseline performance but we still perform worse than the baseline.
 
-On the \aurora, the three neural network approaches performed the worst of all supervised learning approaches.
+On the \aurora{}, the three neural network approaches performed the worst of all supervised learning approaches.
 Here, the neural network approach with both, the balancing and clustering activated, is the worst of all approaches.
 
 
@@ -271,7 +271,7 @@ Here, the neural network approach with both, the balancing and clustering activa
     \begin{subfigure}{\textwidth}
         \centering
         \includegraphics[width=0.75\textwidth]{img/nearest-neighbor/aurora_nn_scatter_no_outliers.png}
-        \caption{\aurora}
+        \caption{\aurora{}}
         \label{fig:eval:nn-hist:aurora}
     \end{subfigure}
     \caption{Influence of the Applied History Length on Nearest Neighbor Speedup}
@@ -293,7 +293,7 @@ Therefore, we expect that the runtime speedup is higher for basic blocks with a 
 \Cref{fig:eval:nn-hist} illustrates each basic block in the test set with its runtime speedup and average applied history length.
 However, we do not observe the expected correlation.
 For the AArch64 processor, \Cref{fig:eval:nn-hist:pi} shows a big point cloud with no visible correlation.
-\Cref{fig:eval:nn-hist:aurora} shows more worse-performing instruction schedules around an applied history length of 2 for the \aurora.
+\Cref{fig:eval:nn-hist:aurora} shows more worse-performing instruction schedules around an applied history length of 2 for the \aurora{}.
 Still, there is no clear correlation observable.
 
 
@@ -331,7 +331,7 @@ In tasks where nodes with similar rewards are grouped close together and nodes w
 Contrarily, in our case, there seem to be single scheduling decisions that can significantly change the whole schedule's performance.
 \Cref{fig:eval:changing-performance} illustrates an example of such a decision.
 \begin{figure}
-    \includegraphics[width=\textwidth]{img/mcts-scores/2-crop.pdf}
+    \includegraphics[width=\textwidth]{img/mcts-scores/2.inkscape-crop.pdf}
     \caption[Importance of Single Scheduling Decisions]{Importance of Single Scheduling Decisions: All the blue partial paths have been evaluated with the score 1.429. 
     But after seven scheduling decisions, the deicision for the green instruction decreased the schedule performance to 0.834.
     This is an example from the \ac{mcts} approach for the AArch64 processor.}
@@ -386,8 +386,8 @@ To summarise, the balancing helped overall, and the clustering had a negative in
 It seems, that it indeed is important to differentiate between instructions that only differ in small aspects like the bit width. 
 
 We have seen that our supervised approaches have all worked better on the AArch64 processor.
-This was expected due to the smaller dataset and the low average speedup in the \ac{mcts} approach for the \aurora processor.
-\Cref{tbl:eval:mcts} shows that the \aurora processor only achieved a 0.30\% speedup in the \ac{mcts} approach.
+This was expected due to the smaller dataset and the low average speedup in the \ac{mcts} approach for the \aurora{} processor.
+\Cref{tbl:eval:mcts} shows that the \aurora{} processor only achieved a 0.30\% speedup in the \ac{mcts} approach.
 This value can be seen, as an upper limit for the supervised learning approaches because they are based on the results of the \ac{mcts} approach.
 
 We observed that the applied history length does not have a clear influence on the performance of the nearest neighbor approach.

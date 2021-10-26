@@ -1,54 +1,30 @@
 \chapter{Approach}
 \label{sec:approach}
 \IMRADlabel{methods}
-\todo{State that generated schedules are checked by LLVM for correctness}
+% \todo{State that generated schedules are checked by LLVM for correctness}
 
-% in order vs out of order
-The optimization of instruction schedulers is a challenging, but important task.
-Expensive chips often implement out-of-order pipelines, which means that they can reschedule instructions in hardware during execution.
-Cheaper chips however, often do not have this functionality and benefit more from optimized instruction schedulers.
-See \Cref{sec:bg:cpu} for details.
-However, the optimization can increase the runtime of the compiled code.
-Shorter runtimes also save energy, which is an important aspect for \ac{iot} devices.
-
-% use data-driven methods to create schedulers automatically
-% auto-tuning vs our approach
-The optimization of instruction schedulers is a costly task.
-Followingly, the objective of this thesis is to automize this task.
-We use data-driven methods to optimize the decision making involved in the instruction scheduling task.
-
+In the remainder of this chapter, we present the approach used for this thesis (compare~\Cref{fig:approach:overview}).
+We start with explaining the necessary modifications to the build steps in \Cref{sec:approach:build_process}.
+Then we discuss the importance of basic blocks for instruction scheduling in general and our approach specifically~(\Cref{sec:approach:basicblock}).
+In \Cref{sec:approach:feasibility-study}, we present a feasability study to validate the potential of our approach.
+That is followed by explaining the \ac{mcts} approach~(\Cref{subsec:approach:ml:mcts}), which is used to find well performing instruction schedules.
+We introduce our approach to train inference models~(\Cref{subsec:approach:ml:global}) from the many \ac{mcts} models.
+Finally, we discuss how we transform source code into data in a format that we can use for our data-driven approaches in \Cref{sec:approach:data-generation}.
 \begin{figure}
     \centering
     \includegraphics[width=\textwidth]{img/ppt/approach_overview-crop.pdf}
-    \caption[Overview of the approach]{Overview of the complete approach. 
-    The process covers the selection of basic blocks, the instruction schedule generation, the execution model, the learning process and the derivation of the final scheduler.}
+    \caption[Overview Over the Approach]{Overview over the complete approach:
+    First, we evaluate the basic blocks in the programs of the LLVM Test Suite (\Cref{sec:bg:test-suite}) with our heuristics, described in \Cref{sec:approach:basicblock}.
+    Then, we extract the selected basic blocks and normalize them for isolated execution (\Cref{sec:approach:bbisolation}).
+    We train a \ac{mcts} model for each basic block (\Cref{subsec:approach:ml:mcts}), which includes measuring the runtime (\Cref{sec:approach:datageneration:runtime_methods}).
+    Finally, we use the \ac{mcts} models to train various inference models (\Cref{subsec:approach:ml:global}).
+    }
     \label{fig:approach:overview}
 \end{figure}
-In the remainder of this chapter, we present the approach used for this thesis (compare~\Cref{fig:approach:overview}).
-We start with an overview of the benchmark programs we used~(\Cref{sec:approach:dataset}).
-Then we discuss the importance of basic blocks for instruction scheduling in general and our approach specifically~(\Cref{sec:approach:basicblock}).
-That is followed by explaining the \ac{mcts} approach~(\Cref{subsec:approach:ml:mcts}), which is used to find well performing instruction schedules.
-Finally, we introduce our approach to train global models~(\Cref{subsec:approach:ml:global}) from the many \ac{mcts} models.
-
-\section{Data Source}
-\label{sec:approach:dataset}
-For our experiments, we use benchmarks from the LLVM project~\cite{LLVM:CGO04} called LLVM Test Suite~\footnote{\url{https://llvm.org/docs/TestSuiteGuide.html}}.
-The test suite contains benchmarks from the following categories
-\begin{itemize}
-    \item Single-Source --- built from a single C/C++ source file
-    \item Multi-Source --- built from multiple C/C++ source files
-    \item Micro-Benchmarks --- separate functions that are executed by google-benchmark
-    \item Bitcode --- tests that are written in LLVM bitcode
-    \item CTMark --- symbolic links to the other benchmarks to measure compilation performance
-\end{itemize}
-We select the 273 benchmarks from the Single-Source and Multi-Source categories for our experiments.
-% \todo{Add table?}
-The selected categories contain benchmarks that are compiled from a single source file or multiple source files, respectively.
-The benchmarks are all written in C or C++.
 
 \section{Build Process}
 \label{sec:approach:build_process}
-This section describes the process that we use for building the programs in the LLVM Test Suite.
+This section describes the process that we use for building the programs in the LLVM Test Suite (see \Cref{sec:bg:test-suite}).
 First, we divide the compilation into separate steps to gain full controll over the settings.
 We explain this in \Cref{sec:approach:divided-build}.
 Next, \Cref{sec:approach:llvm-passes} explains the LLVM passes that we implement to add functionality to the LLVM compiler.
@@ -58,83 +34,77 @@ Next, \Cref{sec:approach:llvm-passes} explains the LLVM passes that we implement
 The test suite comes with Makefiles and CMake configurations to automatically build all benchmarks.
 However, these are not sufficient for our approach.
 We need a modified build process for all the benchmarks because we are manipulating it in several cases.
-Furthermore, the compilation cannot be done by a single command because not all arguments of the separate compilation steps are available in the main compiler.
+Furthermore, the compilation cannot be done by a single command because not all arguments of the separate compilation steps are available in the compilers front-end.
 We execute the front-end, optimization, and back-end compiler phases separately to have complete control over the build process.
+
+We, further, analyze the CMake configurations of the programs in the LLVM test suite and extract required compiler arguments on a per benchmark level.
+We categorize the extracted arguments into front-end, optimizer, and back-end phases.
+Finally, we append them to the previously described arguments in the respective compilation phase.
+
+Some programs read data from files or require arguments when calling them.
+We analyze the test suite for these execution arguments.
+To execute the test suite programs, we generate a shell script that calls the compiled benchmark with the required arguments.
 
 \subsubsection{Front-End}
 We have to set some compiler arguments to make the LLVM compiler front-end output LLVM \ac{ir} instead of compiling the program to an executable format.
-We use the compiler front-ends \lstinline{clang}~\footnote{\url{https://clang.llvm.org/}} for C programs and \lstinline{clang++} for C++ programs, both in version 12.0.0.
-However, the compiler arguments are the same for both front-ends.
+We use the compiler front-ends \lstinline{clang}~\footnote{\url{https://clang.llvm.org/}} for C programs and \lstinline{clang++}\footnotemark[1] for C++ programs, both in version 12.0.0.
+The compiler arguments are the same for both front-ends.
 We pass the following arguments to the front-ends:
 \begin{itemize}
-    \item \lstinline{-O0}: to prevent optimization in this first step
-    \item \lstinline{-Xclang -disable-O0-optnone}: the \lstinline{-O0} flag alone also prevents optimization in later compilation stages
-    \item \lstinline{-S -emit-llvm}: to emit LLVM \ac{ir} for further processing --- instead of creating the program's binary
+    \item \lstinline{-O0}: To prevent optimization in this first step.
+    \item \lstinline{-Xclang -disable-O0-optnone}: The \lstinline{-O0} flag alone also prevents optimization in later compilation stages. These flags still allow later optimizations.
+    \item \lstinline{-S -emit-llvm}: To emit LLVM \ac{ir} for further processing --- instead of creating the program's binary.
 \end{itemize}
 
 \subsubsection{Optimizer}
 The LLVM optimizer \lstinline{opt}~\footnote{\url{https://llvm.org/docs/CommandGuide/opt.html}} gives a choice to select one of the predefined optimization levels or select specific optimizer runs.
 When we compile a benchmark for measuring the runtime, we only use the flag \lstinline{-O3} for optimizing the LLVM \ac{ir}.
 This optimizes the code only on the \ac{ir} level, and does not interfere with the instruction scheduling.
-We choose to use optimization in this step because it would probably be used in a production setting, too.
+We choose to use optimization in this step because it would usually be used in a production setting, too.
 This makes the input code to our instruction scheduler more realistic to real-world situations.
 
-The LLVM framework makes it easy to implement new optimizer passes.
-We have implemented two passes.
-The first pass counts how often basic blocks are executed during the execution of the benchmark.
-This information is used in \Cref{sec:approach:basicblock:selection}.
-The second pass measures the execution time of a specific function.
-This pass is used for the experiment in \Cref{sec:eval:validation} and is described in \Cref{sec:approach:datageneration:runtime:function}.
-These passes are not executed in the data-driven approaches described in section \Cref{sec:approach:ml}.
+We implement various LLVM passes that we explain in detail in \Cref{sec:approach:llvm-passes}.
+The optimizer argument \mbox{\iloc{-passes=\emph{<pass-names>}}} activates these passes.
 
 \subsubsection{Back-End}
-The LLVM back-end compiler implements a instruction scheduling phase before the register allocation and one after the register allocation.
+The LLVM back-end compiler implements one instruction scheduling phase before the register allocation and one after the register allocation.
 The first instruction scheduling phase is the one that we are interested in.
 This first instruction scheduling phase was re-implemented in the LLVM project in the last years.
 Both versions do currently work.
-We decide to base our work on the old implementation because, the most target architectures still use this one.
+We decide to base our work on the old implementation because, the most target architectures still use it.
 
 We manipulate the back-end by passing arguments to the LLVM static compiler \lstinline{llc}~\footnote{\url{https://llvm.org/docs/CommandGuide/llc.html}}.
 This program represents the back-end phase and executes the instruction scheduling.
 We use the following arguments for the back-end:
 \begin{itemize}
     \item \lstinline{--pre-RA-sched=}: To select our new instruction schedulers for the pre-register-allocation phase.
-    \item \lstinline{--misched-cutoff=0}: To disable the new pre-register-allocation implementation.
+    \item \lstinline{--misched-cutoff=0}: To disable the new pre-register-allocation scheduler implementation.
     \item \lstinline{--disable-post-ra}: To disable the post-register-allocation scheduler, because we focus on optimizing the pre-register-allocation phase and do not want the post-register-allocation scheduler to manipulate our schedules. Thereby, we create a controlled environment.
 \end{itemize}
-
-We, further, analyze the CMake configurations and extract required compiler arguments on a per benchmark level.
-We categorize the extracted arguments into front-end, optimizer, and back-end phases.
-Finally, we append them to the previously described arguments in the respective compilation phase.
-
-We also analyze the test suite for execution arguments.
-For example, some benchmarks read data from files or require arguments when calling them.
-To execute them, we generate a shell script that calls the compiled benchmark with the required arguments.
 
 \subsection{LLVM Compiler Passes}
 \label{sec:approach:llvm-passes}
 The LLVM compiler framework makes it easy to implement compiler passes, which are functions that are executed during compilation and can modify the \ac{ir} code.
 We implemented three of these functions: to count the number of executions of basic blocks, to count the basic block lengths, and to measure the runtime of a given function.
+To make these passes usable, we compile them together with the source code of the LLVM compiler framework.
 
 \subsubsection{Basic Block Execution Counting Pass}
 \label{sec:approach:pass-count}
-We implement an LLVM optimizer pass for injecting counters into a program.
+We implement an LLVM optimizer pass for injecting counters into a program that count the number of executions for each basic block.
 Optimizer passes take LLVM \ac{ir} files as input and output the code in the same file format.
-Our pass injects one global 64 bit counter variable for each basic block into the code.
+Our pass injects one global 64-bit counter variable for each basic block into the code.
 Next, the pass adds instructions into the beginning of each basic block, which increases the corresponding counter by one.
 At the end of the main function, the pass adds a format string and injects a call to the \lstinline{printf} function to print all the counter values and corresponding basic block names.
 
-The optimizer pass must be compiled with the LLVM framework.
 We include the optimizer pass into our build process (see \Cref{sec:approach:build_process}).
-There, we add a call to the LLVM optimizer \lstinline{opt} with the argument \mbox{\lstinline{-passes=dyn-bb-count}}.
-To actually get the counts, we build a benchmark with this optimizer pass and execute it.
+To actually get the execution counts, we build a program with this optimizer pass and execute it.
 The benchmark will then print the counter values.
 
 \subsubsection{Basic Block Instruction Count Pass}
 \label{sec:approach:instr-count}
 In order to get the number of instructions for all the basic blocks in a program we implement another pass.
 This pass just prints the name of the basic block and its number of instructions to the command line during compile time.
-It does not modify the code.
+It is a pure analysis pass and does not modify the \ac{ir} code.
 
 \subsubsection{Function Runtime Measure Pass}
 Lastly, we implement a pass, to measure the runtime of a single function.
@@ -142,28 +112,39 @@ The pass searches for the function that contains the selected basic block.
 Then, it injects calls to the timer functions of the C++ standard library (\lstinline|std::high_resolution_clock::now|).
 The calls are injected at the beginning of the given function and right before the return statement.
 Additionally, it injects a compilation-unit-wide global variable and stores the measurements into this variable.
-In the destructor of
+In the destructor of that compilation-unit, the pass injects code to print all the measurements.
+
+\subsection{Instruction Scheduler Integration}
+Since the LLVM compiler framework is designed to be easily extendable, it is not complicated to implement new instruction schedulers in C++.
+However, these instruction schedulers must be compiled with the whole framework.
+Additionally, due to C++'s complexity, it is not the best language for making quick experiments.
+
+Therefore, we implement an LLVM instruction scheduler in C++ that calls an external command for scheduling selected basic blocks and and fallsback to another instruction scheduler for other basic blocks.
+We define an interface to exchange scheduling information and write the information about the \ac{dag}'s structure and instructions to a text file.
+Then our C++ scheduler calls an external shell command.
+The executed command is responsible to generate another text file with the scheduled basic block.
+Our C++ scheduler then parses the schedule and and schedules it.
+We rely on LLVM's internal methods to ensure that the generated schedules are legal.
+Our actual instruction schedulers that, \eg interact with the \ac{mcts} model are implemented in Python.
 
 \section{Basic Block Selection Heuristics}
 \label{sec:approach:basicblock}
 Even though there is research on instruction scheduling on more extensive units (see \Cref{sec:rw:instruction-scheduling}), most compilers schedule instructions on a per basic block level.
 This is also true for the LLVM compiler framework.
 The advantage of this is that the limited scope avoids complicated situations and thus simplifies the scheduling problem.
-For example, we do not have to deal with jump instructions.
+For example, we do not have to deal with unclear execution paths due to conditional jump instructions.
 
 Consequently, we also choose the basic block as the unit for instruction scheduling.
-That means that we execute our experiments on individual basic blocks and learn to schedule individual basic blocks.
-Later, we combine the models to generalize the knowledge to be applied to unseen basic blocks.
+That means that we execute our experiments on individual basic blocks and thus, learn to schedule individual basic blocks.
+Later, we combine the \ac{mcts} models to generalize the knowledge with our inference models to apply them to unseen basic blocks.
 We describe this process in detail in \Cref{sec:approach:ml}.
 
-\subsection{Selection Process ?? UNIFY THIS}
-\label{sec:approach:basicblock:selection}
 Not all basic blocks provide an equal value to our experiments.
-It also consumes too much time to work on all the basic blocks within the scope of this thesis (\eg compilation time, execution time, machine learning time).
+It also consumes too much time to work on all the basic blocks within the scope of this thesis (\eg compilation time, execution time, machine learning training time).
 Therefore, we sort our basic blocks by heuristics. 
 From this list, we select as many as we need and can handle in our experiments.
-We designed three heuristics which we will explain in the following paragraphs.
-See \Cref{tab:approach:bb_heuristics} for an example.
+We design three heuristics which we will explain in the following paragraphs.
+See \Cref{tab:approach:bb_heuristics} for an example basic block with these heuristics.
 
 \begin{table}
     \centering
@@ -180,9 +161,9 @@ See \Cref{tab:approach:bb_heuristics} for an example.
         main & entry & 11 & 1 & 11 \\
         \bottomrule
     \end{tabular}
-    \caption[Basic block heuristics for the floyd-warshall benchmark]
+    \caption[Basic Block Heuristics for the Floyd-Warshall Benchmark]
     {
-        The tables shows an excerpt of the basic block heuristics (see \Cref{sec:approach:basicblock:selection}) for the floyd-warshall benchmark. 
+        The tables shows an excerpt of the basic block heuristics (see \Cref{sec:approach:basicblock}) for the floyd-warshall benchmark. 
         The basic blocks are sorted by the last heuristic, which is the product of the length and execution count. 
         From this list the table shows the top four and last two basic blocks in the benchmark.
     }
@@ -190,12 +171,6 @@ See \Cref{tab:approach:bb_heuristics} for an example.
 \end{table}
 
 \subsection{Longest Basic Blocks}
-% \todo{Add note about influence of pipeline length}
-% \todo{More different instructions use more functional units of the processor}
-% The number of instructions in a basic block correlates with the number of possible schedules.
-% Consequently, we can learn more from a basic block when there are more different scheduling situations available.
-% For example, we will see more scheduling situations in a basic block containing 20 instructions than in a basic block containing only three instructions.
-
 There are multiple reasons why we are more interested in longer basic blocks than in shorter basic blocks.
 All these reasons summarize to the fact that there are more optimization possibilities with longer basic blocks.
 We better exploit pipeline effects with longer basic blocks, because more instructions can potentially be executed interleaved (see \Cref{sec:bg:cpu}). 
@@ -214,62 +189,50 @@ A basic block in the error checking code in the beginning of a program might onl
 Often executed basic blocks influence the overall runtime a lot.
 Hence, we are more interested in optimizing these.
 We count the number of executions with the LLVM optimizer pass described in \Cref{sec:approach:pass-count}.
-See \Cref{tab:approach:bb_heuristics} for an example.
 
 
 \subsection{Most Executed and Longest Basic Blocks}
-% \todo{Include discussion about variance in resulting basic blocks}
-% \todo{most influence on overall runtime}
+\label{sec:approach:basicblock:exec-long}
 The previous two heuristics are helpful on their own, but we are most interested in basic blocks that combine the two aspects.
 For example, the most executed basic block can still come from a very simple loop with few instructions in the loop body.
-We compute the product of the two heuristics to get a combined heuristic. that compilation-unit, the pass injects code to print all the measurements.
+We compute the product of the two heuristics to get a combined heuristic.
 
 \section{Feasibility Study}
-\label{sec:eval:validation}
+\label{sec:approach:feasibility-study}
 Before starting to optimize a process, it is useful to determine whether there is potential for any optimizations.
-Therefore, we show, that different instruction schedules can indeed lead to different runtimes on our target hardware.
-This early experiment is also helpful to get a overview of how much the runtime can vary between different instruction schedules.
+Therefore, we show, that different instruction schedules can indeed lead to different runtimes on our target hardware (see \Cref{sec:eval:hw}).
+This early experiment is also helpful to get an overview of how much the runtime can vary between different instruction schedules.
 
 % select longest bb per benchmark
 % longest might have the most possible schedule, so more variation in the random schedules
-\Cref{sec:approach:dataset} describes the selection of benchmarks from the LLVM Test Suite.
+\Cref{sec:bg:test-suite} describes the selection of benchmarks from the LLVM Test Suite.
 For this experiment, we select one basic block per benchmark, whose instruction schedule we modify.
-For the selection of basic blocks we use the heuristic that balances between the most executions and the longest basic blocks, which is discussed in \Cref{sec:approach:basicblock:selection}.
+For the selection of basic blocks we use the heuristic that balances between the most executions and the longest basic blocks, which is discussed in \Cref{sec:approach:basicblock:exec-long}.
 
 % measure the function runtime
 % we measure the runtime of the function (implemented llvm passes)
 % talk about impact on measurements.
-We executed this experiment in a early stage and did not have a basic block extraction pipeline nor means to measure the execution time of a single basic block.
-Therefore, we must execute the whole benchmark with the modified instruction schedule of a single basic block.
+We execute this experiment in an early stage and did not have a basic block extraction pipeline nor means to measure the execution time of a single basic block.
+Therefore, we execute the whole benchmark with the modified instruction schedule of a single basic block.
 However, measuring the runtime of the whole benchmark includes the execution of much overhead code that we are not interested in.
-Thus, we measure the runtime of the function that contains the basic block of interest instead.
+Thus, we instead measure the runtime of the function that contains the basic block of interest.
 This corresponds to the third method in \Cref{fig:approach:runtime_scopes}.
 
 % generate 10 different random schedules 
 % do that twice
-We choose the simple approach of generating random schedules.
+The simplest approach to achieve this experiments goal is to use random instruction schedules.
 Our random instruction scheduler works on top of a basic list scheduler.
 This means, out of the issue-ready instructions provided by the list scheduler, our scheduler chooses one at random.
 This is repeated until no more instructions are left.
-We fix the seed of the random number generator for reproducibility.
-
-We generate instruction schedules with the seeds 0-10 for each selected basic block.
+We fix the seed of the random number generator for reproducibility and generate instruction schedules with the seeds 0-10 for each selected basic block.
 The basic block of interest might execute multiple times in the measured function for reasons discussed in \Cref{sec:approach:runtime-measurement-unit}.
 We choose the shortest measured runtime per benchmark run to ensure that we use the same execution path in our measurements.
 To check that the runtime measurements are reproducible, we run each generated instruction schedule two times.
 
 % evaluate
-We choose to carry out this experiment on a processor with the architecture AArch64 and on the \aurora{}.
+To carry out this experiment, we choose a processor with the architecture AArch64 and the \aurora{}.
 The choice is explained in \Cref{sec:eval:hw}.
 \Cref{fig:eval:rndm:aarch64} shows a representative selection of experimental results for the AArch64 processor.
-The plots show the runtimes grouped by the different seeds for the random instruction scheduler.
-Runtimes that differ between two runs more than 5\% are marked as outliers and plotted in gray.
-\Crefrange*{fig:eval:rndm:aarch64:a}{fig:eval:rndm:aarch64:d} show examples where different runtimes are clearly observable for different instruction schedules.
-However, this was not always observable.
-\Cref{fig:eval:rndm:aarch64:e} and \Cref{fig:eval:rndm:aarch64:f} show examples where no difference in the runtime was observable.
-% The average coeffecient of variation over the basic blocks is 0.035.
-In summary, we see that different instruction schedules can generate measurable differences in the runtime.
-This means that there is potential for improvements.
 \begin{figure}
     \begin{subfigure}{0.0325\textwidth}\caption{}\label{fig:eval:rndm:aarch64:a}\end{subfigure}
     \begin{subfigure}{0.44\textwidth}
@@ -310,13 +273,16 @@ This means that there is potential for improvements.
     Two runs that differ more than 5\% are marked as outliers and plotted in gray.}
     \label{fig:eval:rndm:aarch64}
 \end{figure}
+The plots show the runtimes grouped by the different seeds for the random instruction scheduler.
+Runtimes that differ between two runs more than 5\% are marked as outliers and plotted in gray.
+\Crefrange*{fig:eval:rndm:aarch64:a}{fig:eval:rndm:aarch64:d} show examples where different runtimes are clearly observable for different instruction schedules.
+However, this is not always observable.
+\Cref{fig:eval:rndm:aarch64:e} and \Cref{fig:eval:rndm:aarch64:f} show examples where no difference in the runtime was observable.
+% The average coeffecient of variation over the basic blocks is 0.035.
+In summary, we see that different instruction schedules can generate measurable differences in the runtime.
+This means that there is potential for improvements.
 
 \Cref{fig:eval:rndm:aurora} shows a similar selection for the same experiment on the \aurora{} processor.
-We can observe a similar outcome of the experiment.
-However, as this processor cannot be interrupted by the \ac{os}, the runtimes are more stable between two runs.
-No measurements in the whole example where marked as outliers.
-% The average coeffecient of variation over the basic blocks is 0.046.
-In summary, we observe potential for optimizations on this processor, as well.
 \begin{figure}
     \begin{subfigure}{0.0325\textwidth}\caption{}\label{fig:eval:rndm:aurora:a}\end{subfigure}
     \begin{subfigure}{0.44\textwidth}
@@ -358,19 +324,24 @@ In summary, we observe potential for optimizations on this processor, as well.
     However, this processor did not produce any outliers in our experiment.}
     \label{fig:eval:rndm:aurora}
 \end{figure}
+We can observe a similar outcome of the experiment.
+However, as this processor cannot be interrupted by the \ac{os}, the runtimes are more stable between two runs.
+In fact, no measurements in the whole example where marked as outliers.
+% The average coeffecient of variation over the basic blocks is 0.046.
+In summary, we observe potential for optimizations on this processor, as well.
 
 Multiple reasons could lead to the small or missing variations that we observe in \Crefrange{fig:eval:rndm:aarch64:e}{fig:eval:rndm:aarch64:f} and \Crefrange{fig:eval:rndm:aurora:e}{fig:eval:rndm:aurora:f}:
 One possibility is that different instruction schedules have no effect on the runtime of the basic block.
-The motivation for this experiment was to verify, that these cases do not dominate all the instruction schedules.
-Another possibilities have their origin in the experimental setup, these could be:
+The motivation for this experiment was to verify, that these cases do not dominate the instruction schedules.
+Other possibilities have their origin in the experimental setup, these could be:
 \begin{itemize}
     \item The basic block for which we manipulate the instruction schedule might have a low influence on the runtime of the function.
         We tried to minimize this effect by choosing basic blocks that are often executed.
     \item Our random instruction scheduler works on top of LLVM.
-        LLVM makes, in this stage of the back-end, still use of pseudo-instructions that are not represented in the binary.
+        In this stage of the back-end, LLVM makes still use of pseudo-instructions that are not represented in the binary.
         This means that schedules that we see as different schedules might actually end up being equal in the binary.
     \item There are short functions with a short execution time.
-        We observed few changes in the runtime when the measured execution time is below 10,000 processor cycles.
+        We observed few changes in the runtime when the measured execution time is below 1,000 processor cycles.
         The underlying timer of the C++ standard library might not be able to measure such short time periods.  
 \end{itemize}
 However, the experiment is still valid, because we show that we are able to influence the runtime by manipulating the instruction schedules beyond noise in the measurements.
@@ -394,14 +365,14 @@ We define this mapping as
     (h_n, \ldots, h_1) \times \{i_1, \ldots, i_m\} \mapsto i_k
     \label{eqn:mlmapping1}
 \end{equation}
-where $h$ defines the instructions in the history of scheduled instructions, $i$ are instructions that can be scheduled and $k \in \{1, \ldots, m\}$.
+where $h$ defines the instructions in the history of scheduled instructions, $i$ are candidate instructions that are ready to be scheduled and $k \in \{1, \ldots, m\}$.
 However, we define a second, easier to implement, mapping
 \begin{equation}
     (h_n, \ldots, h_1) \times i \mapsto r
     \label{eqn:mlmapping2}
 \end{equation}
 where we map from the history and a single instruction to a reward value $r$.
-We lose some input information in this model about the other available instructions.
+We lose some input information in this model about the other candidate instructions.
 But we can now simply run the model for all the available instructions and select the one with the best reward.
 
 We need lots of data samples to utilize data-driven, or machine learning approaches.
@@ -411,13 +382,16 @@ A better way is to use \ac{mcts} to iteratively find better schedules (see \Cref
 The \ac{mcts} approach searches for good schedules locally, \ie for a single basic block.
 So, the search is not generalized for other basic blocks.
 
-To generate a model that works globally, \ie also for unseen basic blocks, we have to add a second step and learn from the locally good schedules.
+There are two reasons why we add a second step to our approach:
+First, the \ac{mcts} approach takes a lot of time to complete and is not usable for production environments.
+Second, this approach only works locally on single basic blocks.
+To generate a model that works globally, \ie also for unseen basic blocks, we add a second step and learn from the locally good schedules.
 Therefore, we extract data samples matching the input format of \Cref{eqn:mlmapping1}, or respectively \Cref{eqn:mlmapping2}.
 We have trained different models that are explained in detail in \Cref{subsec:approach:ml:global}.
 
 \subsection{Monte Carlo Tree Search for Instruction Schedules}
 \label{subsec:approach:ml:mcts}
-We choose \ac{mcts} to find examples of schedules that perform best.
+We choose \ac{mcts} to find instruction schedules that perform best for a given basic block.
 The reason is that this approach fits naturally for sequential problems and allows us to balance between the exploration and exploitation of instruction schedules. 
 \ac{mcts} tries all possible next steps in a given situation and chooses the further steps randomly because there is no information available.
 When all possibilities in a situation are already examined, the algorithm takes the best option (based on a defined metric) and tries to improve from thereon.
@@ -432,13 +406,13 @@ The LLVM instruction \ac{dag} still contains many instructions that exist just f
 We remove these pseudo-instructions from the instruction \ac{dag} and adjust the dependencies between the nodes.
 
 The nodes in an \ac{mcts} tree represent a state in the underlying model, and the edges correspond to transitions between these states.
-Compare \Cref{fig:approach:max-vs-avg} to see that our \ac{mcts} nodes represent a (partial) instruction schedule.
+Compare \Cref{fig:approach:max-vs-avg} to see that our \ac{mcts} nodes represent a partial instruction schedule.
 The edges in our \ac{mcts} tree represent a legal scheduling of a new instruction to the previous schedule.
-When you iterate back from any node to the root node, you get the (partial) instruction schedule in reverse ordering.
+When we iterate back from any node to the root node, we get the partial instruction schedule in reverse ordering.
 \begin{figure}[p]
     \centering
     \includegraphics[width=18cm,angle=90]{data/mcts-max-vs-avg/svg/selected/8752639012199.inkscape-crop.pdf}
-    \caption[\ac{mcts} tree with the consequences of maximum and average metric]{
+    \caption[\ac{mcts} Tree with the Consequences of Maximum and Average Metric]{
         \ac{mcts} tree with the consequences of maximum and average metric:
         The boxes represent a \ac{mcts} node, at the top is the name of the instruction, on the left are the cumuluated metric and the number of visits, on the right is the metric.
         The colored nodes have two metric values: The upper one is the average metric value and the lower italic one shows the maximum metric value.
@@ -452,14 +426,14 @@ When you iterate back from any node to the root node, you get the (partial) inst
 \end{figure}
 
 We do not use the default choice of node evaluation metric.
-Typically, to evaluate the reward of a node in the \ac{mcts} tree, you compute the average of the children nodes.
+Typically, to evaluate the reward of a node in the \ac{mcts} tree, the algorithm compute the average of the child nodes.
 In our approach, this leads to situations where we have already found a good schedule but keep searching for schedules in another area of the tree.
 The reason for that is that the good schedule might be surrounded by relatively bad schedules, which have a negative effect on the average evaluation.
-When you train \ac{mcts} for games, that makes sense because you do not want to get into situations where only one good state exists, and the surrounding ones would let you lose the game.
+When we train \ac{mcts} for games, that makes sense because we do not want to get into situations where only one good state exists, and the surrounding ones would let us lose the game.
 But we are only interested in a single best schedule, therefore we do not care about similar but bad schedules.
-The consequence is that we do not take the average but the maximum.
+Thus, we do not take the average but the maximum.
 This means that in the exploitation phase, we always follow the path to the best-found schedule.
-You can observe the consequences in \Cref{fig:approach:max-vs-avg}, where the green path represents the maximum metric and the blue path represents the average metric.
+\Cref{fig:approach:max-vs-avg} illustrates the effects of both metrics, where the green path represents the maximum metric and the blue path represents the average metric.
 Our approach is similar to the one in~\cite{bjornsson2009cadiaplayer}.
 However, they still use the average for the search part, which we do not.
 
@@ -467,7 +441,7 @@ However, they still use the average for the search part, which we do not.
 The \ac{mcts} learning process is separated into four phases:
 \begin{enumerate}
     \item Generate schedule: \\
-    Apply the exploration or exploitation phase and generate a new schedule based on our previous experience.
+    Apply the exploration or exploitation selection phase and generate a new schedule based on the previous experience.
     This results in most situations in a partial instruction schedule because the \ac{mcts} tree usually not grows until it knows all states.
     The partial instruction schedules are completed by using random scheduling decisions. 
     \item Compile the generated schedule: \\
@@ -476,7 +450,7 @@ The \ac{mcts} learning process is separated into four phases:
     \item Execute and measure the runtime: \\
     The compiled executable is transferred to our target machine and executed there to measure the runtime of the basic block (see \Cref{sec:approach:isol_bb_exec}).
     \item Progress the \ac{mcts} tree with the measured runtime: \\
-    Then, the measurement data is copied back to the machine where we run the experiment.
+    Then, the measurement data is copied back to the machine where we run the \ac{mcts} training.
     The measurement data is preprocessed and used to train the \ac{mcts} tree.
 \end{enumerate}
 This process is repeated many times, depending on the experiment.
@@ -485,27 +459,27 @@ See \Cref{sec:bg:mcts} for more information.
 % Technically possible to use for production, but slow
 Note that this \ac{mcts} approach is not only able to generate data for our global model.
 It can theoretically also be used in a normal compilation process.
-It is not practical to use it for a whole program because of the many compilation steps and the bad compilation-time performance.
+It is not practical to use it for a whole program because of the extra compilation steps, caused by the many experiments.
 However, critical parts of a program could be optimized with this approach.
 
 % Positive sideeffect: Also there to define a possible range of improvement
 A positive side effect of this \ac{mcts} approach is that we generate an upper limit for the improvements of the instruction scheduling phase.
 The further we grow the \ac{mcts} tree, the higher is the probability that we find the actual upper limit of improvements.
-This is at the same time an upper limit for the global models in our second step.
-Therefore, we can see how much of our potential improvements we are able to reach with our global models.
+This is at the same time an upper limit for the global inference models in our second step.
+Therefore, we can see how much of our potential improvements we are able to reach with our inference models.
 
 \subsection{Inference Models}
 \label{subsec:approach:ml:global}
-Once we have found good schedules by generating \ac{mcts} trees for many basic blocks, we want to generalize this knowledge.
+Once we have found good schedules by generating \ac{mcts} trees for many basic blocks, we want to generalize this knowledge for unknown basic blocks.
 This is necessary to transfer the knowledge to unseen basic blocks and make the model usable in practice by generating good schedules directly, in contrast to searching them with \ac{mcts}.
 Therefore, we have developed three different models that we discuss here.
 
-Another way to see this two-step approach is to see the \ac{mcts} step as a training phase and this global model step as inference phase.
+Another way to see this two-step approach is to see the \ac{mcts} step as a training phase and this global model step as inference phase, thus the name.
 
 \subsubsection{Nearest Neighbor Model}
 \label{sec:app:nearest-neighbor}
 Our first model is a nearest neighbor approach.
-That means we iterate our \ac{mcts} trees and build up a big model in which we can search for situations and see what decision performed best.
+That means we iterate our \ac{mcts} trees and build up a big look-up model in which we can search for situations and see what decision performed best.
 
 % Dataformat: (h_n, ..., h_1) x (i_1, i_2) -> (w_1, d, w_2)
 In order to build the model, we first define the input and output formats.
@@ -514,9 +488,9 @@ A scheduling situation has the format
     (h_n, \ldots, h_1) \times {i_1, \ldots, i_m}
     \label{eqn:approach:example-scheduling-situation}
 \end{equation}
-where instructions $h$ build a sequence of last scheduled instructions and instructions $i$ build the set of available instructions for scheduling.
-To simplify our model and have more data per scheduling situation, we limited the size of the set of available instructions to two.
-The disadvantage is that we lose some context information on which other instructions are available.
+where instructions $h$ build a sequence of last scheduled instructions and instructions $i$ build the set of candidate instructions.
+To simplify our model and have more data per scheduling situation, we limited the size of the set of candidate instructions to two.
+The disadvantage is that we lose context information on other candidates.
 The data we are interested in per scheduling situation is the number of times instruction $x$ was better than instruction $y$ or vice versa and the number of times they were on par.
 This results in the data format
 \begin{equation}
@@ -538,10 +512,11 @@ To build the model, we iterate the \ac{mcts} trees and extract the contained dat
             ]
         ]
     \end{forest}
-    \caption[Example scheduling situation]{Example scheduling situation with the previously scheduled instructions $h$ and the instructions $i$ to choose from.}
+    \caption[Example Scheduling Situation]{Example scheduling situation with the previously scheduled instructions $h$ and the candidate instructions $i$ to choose from.}
     \label{fig:approach:example-scheduling-situation}
 \end{figure}
-For every scheduling situation (compare \Cref{eqn:approach:example-scheduling-situation} and \Cref{fig:approach:example-scheduling-situation}), we take every combination of instructions $i$.
+For every scheduling situation (compare \Cref{eqn:approach:example-scheduling-situation}), we take every combination of instructions $i$.
+In the example in \Cref{fig:approach:example-scheduling-situation}, that would be $(i_1, i_2)$, $(i_1, i_3)$, and $(i_2, i_3)$.
 For each combination, we check which instruction choice resulted in a better reward.
 We add this situation to our model if it was not already present.
 Otherwise, we increase the corresponding counter variable in this situation.
@@ -561,7 +536,7 @@ If we found fewer than $t_c$ instructions, we remove the oldest instruction $h_n
 \subsubsection{Support Vector Machine Model}
 % What mapping are we trying to learn?
 Further, we want to learn parametric regression models.
-Therefore, we need a different mapping that we learn because our output will be a scalar value.
+Therefore, we use a different mapping that we learn because the inputs and outputs are scalar values.
 \begin{equation}
     (h_n, \ldots, h_1) \times i \times (d_{min}, d_{max}) \mapsto r
     \label{eqn:approach:regression-mapping}
@@ -574,7 +549,7 @@ We do this because, instructions have to wait for the result of the direct prede
 And the bigger the distance between them is, the higher is the probability, that the predecessors already terminated. 
 For example, instruction $a$ depends on instruction $b$, and we are in the situation in which we want to schedule $a$.
 That means we have already scheduled $b$.
-There usually also exist other instructions that we scheduled after $b$.
+There are usually also other instructions that we scheduled after $b$.
 We count the number of instructions that we scheduled between $a$ and $b$.
 There is typically more than one instruction that $a$ depends on, so we decided to take the maximum and the minimum number of instructions between $a$ and its predecessors for the dataset.
 We refer to these values as $d_{max}$ and $d_{min}$ in \Cref{eqn:approach:regression-mapping}.
@@ -587,30 +562,29 @@ For every instruction node, we collect its previously scheduled instructions and
 However, we cannot insert these data points into the \ac{svm} model because it requires numerical values only.
 We transform the instructions from their textual representation into an ordinal encoding, \ie every instruction gets a unique numerical representation.
 Further, we scale all numerical values into the range $[0,1]$ because \acp{svm} typically learn better when inputs are in this range.
-\todo{Add table?}
 
 With this data, we train an \ac{svm} regression model.
 The details and results of the experiments can be found in \Cref{sec:eval:svm}.
 
 \subsubsection{Neural Network Model}
-We choose to use a neural network as a second regression model, because they have a shorter inference runtime when trained on big datasets than \acp{svm}.
+We choose to use a neural network as a second regression model, because they have a shorter inference runtime than \acp{svm} when trained on big datasets.
 With this model, we try to learn the same mapping as we did with our \ac{svr} model, which is defined in \Cref{eqn:approach:regression-mapping}.
 Consequently, we use the same dataset that we have already built for the \ac{svr} model.
 
 In contrast to our \ac{svr} model, we chose not to encode the instructions into ordinary values.
 The instructions are encoded into one-hot vectors because neural networks can handle high-dimensional inputs better.
-Further, the we also scale numerical values into the range $[0,1]$, like we did for the \ac{svr} model.
+Further, we also scale numerical values into the range $[0,1]$, like we did for the \ac{svr} model.
 
 We use a standard neural network with three hidden layers with dimensions 512, 128, and 64.
 The output layer is a singular value which represents the scaled score of the given scheduling situation.
 All hidden layers are followed by a ReLU activation function~\cite{nair2010rectified}.
 We use the Adam optimizer~\cite{kingma2014adam} with a learning rate of $10^{-3}$.
 For the loss function, we use the squared error.
-
 We discuss the details and results in \Cref{sec:eval:nn}.
 
 \section{Data Generation}
-We cannot build our data-driven models (see \Cref{sec:approach:ml}) directly from our dataset, described in \Cref{sec:approach:dataset}, as it requires some transformation from the code to a metric we are interested in.
+\label{sec:approach:data-generation}
+We cannot build our data-driven models (see \Cref{sec:approach:ml}) directly from the programs in the LLVM Test Suite (\Cref{sec:bg:test-suite}), as it requires some transformation from the code to a metric.
 Many metrics can be chosen for optimization, \eg runtime, energy consumption, cache misses, processor stalls.
 We focus on optimizing the instruction scheduling for short runtimes.
 To generate data for our MCTS approach, we need a mapping from instruction schedules to runtimes.
@@ -624,7 +598,7 @@ We discuss various aspects of this in the remainder of this section.
 \begin{figure}
     \centering
     \includegraphics[scale=0.8]{img/ppt/runtime_measurement_scopes-crop.pdf}
-    \caption[Possibile scopes for measuring runtimes]{The outer box represents a function. 
+    \caption[Possibile Scopes for Measuring Runtimes]{The outer box represents a function. 
     The function consists of multiple basic blocks (BB) where different possible branches are caused by if/else statements and loops. 
     The diagram shows three possible runtime measuring scopes to measure the runtime of the filled basic block.
     Method 1 shows a measuring inside of a basic block. 
@@ -636,8 +610,8 @@ We discuss various aspects of this in the remainder of this section.
 \subsection{Runtime Measurement Unit}
 \label{sec:approach:runtime-measurement-unit}
 The metric we are interested in specifically is the relative runtime compared to a baseline runtime.
-Runtime overheads can be ignored in our approach, as long as they are constant over multiple runs and the baseline has the same overheads.
-Thus, various possibilities for placing the start and stop events of the timer exist to accomplish runtime measurements of fractions of the application's code.
+Runtime overheads can be ignored, as long as they are constant over multiple runs and the baseline has the same overheads.
+Thus, there are various possibilities for placing the start and stop events of the timer to accomplish runtime measurements of fractions of the application's code.
 The objective is to minimize noise and get reliable, reproducible measurements.
 We discuss the possibilities of making measurements on a basic block, function, and application scope and relevant aspects to these possibilities.
 
@@ -655,11 +629,11 @@ These disadvantages make this approach unreliable and not usable for us because 
 A finer-grained approach is to start the timer at the beginning of the function or method that contains the basic block of interest and stop the timer at the end of the function (see Method 3 in \Cref{fig:approach:runtime_scopes}).
 This approach creates several problems.
 
-Compared to measuring the runtime of the whole application (see \Cref{sec:approach:datageneration:runtime:app}), this approach executes only a small fraction of the code.
+Compared to measuring the runtime of the whole application, this approach executes only a small fraction of the code.
 This results in a lower degree of variance in the measured runtimes due to fewer \ac{os} interruptions, and fewer memory and \ac{io} accesses.
 Thus, the precision of these measurements is higher.
 
-Notice in \Cref{fig:approach:runtime_scopes} that different control paths are possible in a function, based on if/else statements or loops.
+Note in \Cref{fig:approach:runtime_scopes}, that different control paths are possible in a function, based on if/else statements or loops.
 This can be problematic in a general setup.
 However, the benchmarks we use and the data we insert to them are deterministic, \ie the same paths are taken in each benchmark execution.
 Theoretically, if there was no variance in the measurements, the shortest measured execution time will always correspond to the same execution path.
@@ -668,7 +642,7 @@ That makes it difficult to differentiate between execution paths and variance in
 
 \subsubsection{Basic Block}
 The most intuitive approach when scheduling basic blocks is to measure only the runtime of the basic block we are interested in.
-We eliminate all extra processor instructions that we are not interested in.
+We eliminate all extra instructions that we are not interested in.
 However, we can still get runtime variations for different reasons:
 \begin{itemize}
     \item The basic block could call other functions which could, in turn, execute varying branches. 
@@ -691,26 +665,22 @@ These can typically be classified into the categories of profiling, \ac{os} util
 We discuss these three in more detail.
 
 \subsubsection{Profiling}
-Profilers are programs that observe the execution of other processes running on the system (\eg gperf \cite{graham1982gprof}).
-They are designed to observe the execution from start to end and to return various metrics. Some examples are:
-\begin{itemize}
-    \item execution times per function
-    \item memory consumption
-    \item cache misses
-\end{itemize}
-The observation is done by doing snapshots of the process of interest.
+Profilers (\eg gperf \cite{graham1982gprof}) are programs that observe the execution of other processes running on the system.
+They are designed to observe the execution from start to end and to return various metrics. 
+Some examples are execution times per function, memory consumption, and cache misses.
+The observation is done by taking snapshots of the process of interest.
 Thus, profilers are good for finding, \eg performance problems and memory leaks in software.
 
 However, we need cycle-accurate measurements from instruction A to instruction B for our experiments.
 Profilers are not able to make such precise measurements, \ie they are not helpful to us because they are designed for other purposes.
 
 \subsubsection{Operating System Methods}
-\acp{os} typically need to work with times and also provide a user interface to use its timing functions.
+\acp{os} typically need to work with time values and also provide a programming interface to use its timing functions.
 There is the wall clock time and timers that are based on \ac{cpu} functionality to get times.
 We are interested in the latter.
 Often there are various possibilities to retrieve timing values from the hardware with varying precision.
 The most precise timers are usually good for measuring intervals in the microseconds range or longer.
-\ac{os} functions have some overhead because they also handle errors.
+\ac{os} functions have some overhead because they also handle various errors.
 \begin{table}
     \centering
     \begin{tabular}{@{}ll@{}}
@@ -721,7 +691,7 @@ The most precise timers are usually good for measuring intervals in the microsec
         Windows & \lstinline|QueryPerformanceCounter()| \\
         \bottomrule
     \end{tabular}
-    \caption[Operating System interfaces to their timing functions]
+    \caption[Operating System Interfaces to Their Timing Functions]
     {
         The table shows examples for interfaces in \acp{os} to their timing functions in the C programming language.
     }
@@ -730,11 +700,11 @@ The most precise timers are usually good for measuring intervals in the microsec
 See \Cref{tab:approach:timing_functions} for selected \acp{os}.
 The C++ function \lstinline|std::high_resolution_clock()| from the standard library falls back to one of these \ac{os} functions.
 
-\acp{os} sometimes not only provide timing methods but also allows us to manage how a process will be executed.
+Some \acp{os} not only provide timing methods, but also allow to manage how a process will be executed.
 Linux provides different methods to avoid or reduce the probability of \ac{os} interrupts during the execution of a process.
 \begin{itemize}
     \item Isolating \ac{cpu} cores: 
-    The Linux kernel command line option \lstinline|isolcpus=[cpu_number]| in the boot loader instructs Linux to not schedule tasks to the given \ac{cpu} cores automatically.
+    The Linux kernel command line option \mbox{\iloc{isolcpus=\emph{<cpu-number>}}} in the boot loader instructs Linux to not schedule tasks to the given \ac{cpu} cores automatically.
     \item Pinning a process to a \ac{cpu} core: 
     The Linux program \lstinline|taskset| can specify on which \ac{cpu} core a process will be scheduled.
     This can also be used to schedule processes on isolated \ac{cpu} cores.
@@ -746,9 +716,9 @@ This makes the measuring of runtimes more reliable.
 \label{sec:approach:hwpercounter}
 The most code blocks we want to measure are only 5-50 instructions long, \ie we need very precise measurements.
 We use the assembly instructions of the given hardware directly to get the most precise timing values with the lowest overhead.
-These instructions typically return the value of a processor cycle counter register.
+These instructions typically return the value of a processor cycle-counter.
 
-Using assembly instructions can be complicated (depending on the used high-level language and hardware).
+Depending on the used high-level language and hardware, using assembly instructions can be complicated.
 But it is not a problem in our experiments because the code blocks we want to measure are already written in the assembly language of the given hardware.
 That means we only add a timer instruction at the beginning and one at the end.
 We do some error checking after the execution has stopped (see \Cref{sec:approach:isol_bb_exec} for details).
@@ -758,25 +728,23 @@ We do some error checking after the execution has stopped (see \Cref{sec:approac
         \toprule
         Hardware & Assembly instruction \\
         \midrule
-        x86 & \lstinline|rdtsc| \\
-        ARM32 & \lstinline|mrc p15m, 0, r0, c15, c12, 1| \\
-        AArch64 & \lstinline|mrs x0, PMCCNTR_EL0| \\
         \aurora{} & \lstinline|smir %s60, %usrcc| \\
+        AArch64 & \lstinline|mrs x0, PMCCNTR_EL0| \\
+        ARM32 & \lstinline|mrc p15m, 0, r0, c15, c12, 1| \\
+        x86 & \lstinline|rdtsc| \\
         \bottomrule
     \end{tabular}
-    \caption{Assembly instructions for getting the cycle counter value of a given hardware.}
+    \caption[Assembly Instructions for Getting the Cycle Counter Value of a Given Hardware]{Assembly instructions for getting the cycle counter value of a given hardware.}
     \label{tab:approach:asm_instrs_timing}
 \end{table}
-See \Cref{tab:approach:asm_instrs_timing} for the assembly instructions per hardware.
+See \Cref{tab:approach:asm_instrs_timing} for the assembly instructions per hardware and \Cref{fig:approach:bb-executable} for an example.
 
 Depending on the hardware and the \ac{os}, access to these instructions or registers might not be permitted.
 For the AArch64 architecture and a Linux \ac{os}, we had to implement and load a kernel module that granted access to this register.
  
-
 \subsection{Execution Unit}
-% \todo{Provide runtime example data}
 \label{sec:approach:exec_unit}
-For the learning process, we have to execute the differently scheduled basic blocks many times.
+Due to many iterations in the learning processes, we have to execute the differently scheduled basic blocks many times.
 If we executed the whole benchmark that contains the basic block of interest, it would be time-intensive, and many lines of code were executed that we are not interested in.
 This forces us to extract the basic block from the benchmark and execute it in isolation.
 Here, we discuss the advantages and disadvantages of the two possible approaches.
@@ -793,16 +761,15 @@ In order to get statistically relevant runtimes, we have to measure them multipl
 The alternative to executing the whole benchmark is to extract the scheduled basic block from the benchmark and execute it in isolation.
 By using this approach, we reduce the execution time to a minimum and do not execute code we are not interested in.
 Consequently, we can execute the benchmark many times and get statistically reliable runtime measurements.
-The disadvantage is that we have to slightly modify the basic block or the program will crash.
+The disadvantage is that we have to slightly modify the basic block or the execution crashes.
 
 \subsection{Basic Block Isolation}
 \label{sec:approach:bbisolation}
 As discussed in \Cref{sec:approach:exec_unit}, we are forced to execute basic blocks isolated from the benchmark.
-To make a basic block executable, we isolate it and insert it as inline assembly into our minimal C++ framework.
+To make a basic block executable, we isolate it, normalize it, and insert it as inline assembly into our minimal C++ framework.
 
 \subsubsection{Basic Block Extraction}
-% \todo{include numbers on speedup vs. benchmarking full function}
-First, we compile the benchmark and schedule the basic block with our modified compilation process (see \Cref{sec:approach:build_process}) into assembly files.
+First, we compile the benchmark and schedule the basic block with our modified compilation process (see \Cref{sec:approach:divided-build}) into assembly files.
 Next, we extract the basic block instructions from the assembly file.
 Then, we modify the basic block instructions to prevent execution and compilation errors, and as the last step, we inject it into our C++ framework.
 We describe the modifications in the next paragraphs.
@@ -883,7 +850,7 @@ mov	x23, x24
 \subsubsection{Isolated Basic Block Execution}
 \label{sec:approach:isol_bb_exec}
 To execute the extracted basic block, we have to surround it with some other code to generate a valid C/C++ program.
-For this, we have written a small benchmarking framework.
+For this, we implement a small benchmarking framework.
 \Cref{fig:approach:bb-executable} shows an example of the basic block from \Cref{fig:approach:bb-cleaning} integrated into this framework.
 We also add the \ac{cpu} timer calls and mark the used registers as clobbered.
 % This framework is compiled together with the given basic block in the inline assembly format.
@@ -925,7 +892,7 @@ public:
     }
 };        
     \end{lstlisting}
-    \caption[Assembly Basic Block Integration into Execution Framework]{AArch64 Assembly Basic Block Integration into Execution Framework:
+    \caption[Assembly Basic Block Integration Into Execution Framework]{AArch64 Assembly Basic Block Integration into Execution Framework:
     This example shows the basic block from \Cref{fig:approach:bb-cleaning} how it is integrated into the C++ framework.
     The compiler replaces the placeholder \lstinline|\%2| with a pointer to the array \lstinline|a| (line 8).
     We also list the used registers, so the compiler knows that their values have changed (line 28).
@@ -941,7 +908,7 @@ This happens when the cycle counter overflows.
 \subsection{Computing Rewards From Runtimes}
 Even though we do the warmup rounds, we still get few data points that are clearly outliers and should not be included in our experiments.
 We sort the 1,000 runtime measurements and strip the top and bottom 50 measurements.
-Spot checks have shown that we remove all the outliers in almost all the experiments.
+Spot checks have shown that we remove all the outliers in all the checked experiments.
 \begin{table}
     \centering
     \begin{tabular}{@{}rr@{}}
@@ -978,7 +945,7 @@ Spot checks have shown that we remove all the outliers in almost all the experim
         694 & 1 \\
         \bottomrule
     \end{tabular}
-    \caption[Example runtime measurement distribution]{Example runtime measurement distribution for three different schedules. (Benchmark: almabench, Function: anpm, Basic Block: entry)}
+    \caption[Example Runtime Measurement Distribution]{Example runtime measurement distribution for three different schedules.\\(Benchmark: almabench, Function: anpm, Basic Block: entry)}
     \label{tab:approach:example_runtimes}
 \end{table}
 See \Cref{tab:approach:example_runtimes} for an example with three different schedules for the same experiment.
@@ -989,7 +956,3 @@ To have a metric $m$ that we can compare with all other basic blocks in the data
     m=\frac{r_b}{r_e}
     \label{eqn:approach:mcts-score}
 \end{equation}
-
-% \section{Application of the Learned Model}
-% \label{sec:approach:ml-scheduler}
-% \todo{Write about how we run the learned models and how we make measurements}
