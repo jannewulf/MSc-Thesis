@@ -1,0 +1,37 @@
+{
+    "latex-workshop.latex.recipe.default": "Custom",
+    "latex-workshop.latex.outDir": "build",
+    "latex-workshop.latex.tools": [
+        {
+            "name": "lualatexmk",
+            "command": "latexmk",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-lualatex",
+                "-outdir=%OUTDIR%",
+                "%DOC%"
+            ],
+            "env": {}
+        },
+        {
+            "name": "sort_acronyms",
+            "command": "tools/sort_acronyms.py",
+            "args": [
+                "acronyms.tex",
+                "acronyms.tex"
+            ],
+            "env": {}
+        }
+    ],
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "Custom",
+            "tools": [
+                "sort_acronyms",
+                "lualatexmk"
+            ]
+        }
+    ]
+}
