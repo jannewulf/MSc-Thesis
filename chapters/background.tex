@@ -274,14 +274,14 @@ The theoretically best case is that all the stages are busy in every cycle and a
 This is not always possible, as we can see in the example \Cref{tbl:bg:scalar-pipeline}.
 We cannot start instruction $i_4$ (\iloccmdinl{mult}{\ilocreg{1},~\ilocreg{1}}{\ilocreg{1}}) in the fourth \ac{cpu} cycle, because we have a dependency on the result of instruction $i_1$ (\iloccmdinl{load}{\ilocreg{arp},~@a}{\ilocreg{1}}).
 In the fifth cycle, the result of instruction $i_1$ was written back and we can start instruction $i_4$.
-Various reasons of hazards exist that cause these stalls in the pipeline.
+There are various reasons of hazards that cause these stalls in the pipeline.
 \begin{itemize}
     \item Resource Hazards:
         When the \ac{cpu} needs to access a resource, which is already being accessed and thus blocked, the access cannot happen and has to wait.
         This could, for example, happen with registers that have only one connection to read their content.
         Redundancy of hardware units can solve or mitigate this problem.
     \item Data Hazards:
-        Three types of different data hazards exist when two instructions attempt to access the same register:
+        There are three types of different data hazards when two instructions attempt to access the same register:
         \begin{itemize}
             \item Read after write (RAW): A instruction has to wait until a previous instruction has produced the result that the latter has to read.
             \item Write after read (WAR): A instruction has to wait until a previous instruction has read a register, that the latter has to overwrite.
@@ -307,7 +307,7 @@ Note that now, instructions 1 and 2 are scheduled in the same \ac{cpu} cycle.
 If we had simulated a three-way superscalar pipeline, we could have started instructions 1-3 in the first cycle.
 However, with 20 cycles we still have a runtime improvement of one cycle compared to the scalar pipeline.
 
-Various ways exist to implement superscalar pipelines.
+There are various ways to implement superscalar pipelines.
 The three most typical implementations are:
 \begin{itemize}
     \item In-Order (static): 
@@ -552,7 +552,7 @@ Therefore, the problem is not only NP-complete, but also has to be solved with u
 
 % How
 Like the transformations in the optimizer stage, the instruction scheduling is typically done on a basic block level.
-However, there exists research on extending the scope of instruction scheduling (see \Cref{sec:rw:instruction-scheduling}).
+However, there is research on extending the scope of instruction scheduling (see \Cref{sec:rw:instruction-scheduling}).
 
 Compilers typically use the list scheduling approach to find an approximately optimal solution.
 List scheduling is more of a framework than a specific algorithm.
@@ -612,7 +612,7 @@ The described method is a top-down approach, but it is equally solvable in a bot
 
 \subsubsection{Register Allocation}
 In the previous instruction scheduling phase, the compiler works with an infinite amount of virtual registers.
-The processors have a defined set of different classes of registers, \eg different registers often exist for integer and floating-point numbers.
+The processors have a defined set of different classes of registers, \eg there are often different registers for integer and floating-point numbers.
 In this phase, the compiler's goal is to map $n$ virtual registers to $m$ hardware registers, where $m$ is a lot smaller than $n$.
 
 Registers are the fastest memory type in computers to access data.
@@ -689,7 +689,7 @@ LLVM comes with functionality to plot their internal \acp{dag}.
 
 The arrows represent the dependencies between instructions.
 They point from a given instruction to one of its dependency instructions.
-Three different types of edges exist that represent different types of dependencies:
+There are three different types of edges that represent different types of dependencies:
 \begin{itemize}
     \item Black: Represents a data flow dependency. That means that an instruction consumes the result of the previous instruction.
     \item Dashed Blue: This edge ensures that two unrelated instructions in terms of data flow remain scheduled in the correct order.

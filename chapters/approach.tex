@@ -590,7 +590,7 @@ We focus on optimizing the instruction scheduling for short runtimes.
 To generate data for our MCTS approach, we need a mapping from instruction schedules to runtimes.
 
 The most reliable approach is to measure the runtime while executing the code.
-However, research on approaches that rely on analytical models exists, see \Cref{sec:rw:other:runtime} %~\cite{llvm:mca, mendis2019ithemal, taha2003instruction, laukemann2018automated}.
+However, there is research on approaches that rely on analytical models, see \Cref{sec:rw:other:runtime} %~\cite{llvm:mca, mendis2019ithemal, taha2003instruction, laukemann2018automated}.
 We choose the classical approach of runtime measurements since we have access to the hardware, and the resulting data will be more accurate.
 Therefore, we compile the code with varying instruction schedules and execute it to measure its runtime.
 We discuss various aspects of this in the remainder of this section.
@@ -660,7 +660,7 @@ Thus, as this is a feasible solution for our experiments, we have chosen to meas
 \subsection{Runtime Measurement Methods}
 \label{sec:approach:datageneration:runtime_methods}
 % \todo{Could add little experiment where we compare hardware timers vs OS access}
-Various possibilities to observe execution times exist in systems that we use for our research.
+There are various possibilities to observe execution times in systems that we use for our research.
 These can typically be classified into the categories of profiling, \ac{os} utilities, or hardware utilities.
 We discuss these three in more detail.
 
