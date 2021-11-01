@@ -230,7 +230,7 @@ We choose the shortest measured runtime per benchmark run to ensure that we use 
 To check that the runtime measurements are reproducible, we run each generated instruction schedule two times.
 
 % evaluate
-To carry out this experiment, we choose a processor with the architecture AArch64 and the \aurora{}.
+To carry out this experiment, we choose a processor with the architecture AArch64 and the \auroralong{}.
 The choice is explained in \Cref{sec:eval:hw}.
 \Cref{fig:eval:rndm:aarch64} shows a representative selection of experimental results for the AArch64 processor.
 \begin{figure}
@@ -316,7 +316,7 @@ This means that there is potential for improvements.
         \includegraphics[width=\textwidth]{img/random-scheduling-experiment-aurora-collected/uuencode-crop.pdf}
     \end{subfigure}
 
-    \caption[Random Scheduling Experiment on \aurora{}]{Random Scheduling Experiment on \aurora{}:
+    \caption[Random Scheduling Experiment on \auroralong{}]{Random Scheduling Experiment on \auroralong{}:
     The bars show the runtime of a function with a random instruction schedule.
     The two runs of the instruction schedule are grouped together.
     The distance measure represents the longest execution time relative to the shortest execution time.
@@ -442,7 +442,7 @@ The \ac{mcts} learning process is separated into four phases:
 \begin{enumerate}
     \item Generate schedule: \\
     Apply the exploration or exploitation selection phase and generate a new schedule based on the previous experience.
-    This results in most situations in a partial instruction schedule because the \ac{mcts} tree usually not grows until it knows all states.
+    This results in the most situations in a partial instruction schedule because the \ac{mcts} tree usually not grows until it knows all states.
     The partial instruction schedules are completed by using random scheduling decisions. 
     \item Compile the generated schedule: \\
     The generated schedule is transformed into a C++ file with a function that contains the inline assembly of the scheduled basic block.
@@ -728,7 +728,7 @@ We do some error checking after the execution has stopped (see \Cref{sec:approac
         \toprule
         Hardware & Assembly instruction \\
         \midrule
-        \aurora{} & \lstinline|smir %s60, %usrcc| \\
+        \auroralong{} & \lstinline|smir %s60, %usrcc| \\
         AArch64 & \lstinline|mrs x0, PMCCNTR_EL0| \\
         ARM32 & \lstinline|mrc p15m, 0, r0, c15, c12, 1| \\
         x86 & \lstinline|rdtsc| \\

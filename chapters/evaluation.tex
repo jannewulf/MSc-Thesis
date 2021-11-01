@@ -26,7 +26,7 @@ With these aspects in mind, we select:
     \item \textbf{AArch64 (Arm Cortex-A53):} This processor is an edge \ac{cpu} and implements an in-order superscalar pipeline based on the AArch64 architecture.
     An edge device that uses it is the Raspberry Pi 3 Model B.
     We use this device for our experiments with Ubuntu 20.04.
-    \item \textbf{\aurora{}:} This processor is interesting because it, contrarily, implements an out-of-order superscalar pipeline. 
+    \item \textbf{\auroralong{}:} This processor is interesting because it, contrarily, implements an out-of-order superscalar pipeline. 
     Additionally, it is a vector processing accelerator card installed via a PCI-Express connection and thus a different type of processor.
 \end{itemize}
 
@@ -38,7 +38,7 @@ With these aspects in mind, we select:
         \toprule
         & \multicolumn{2}{c}{Processor} \\
         \cmidrule{2-3}
-        MCTS Performance & AArch64 & \aurora{} \\
+        MCTS Performance & AArch64 & \auroralong{} \\
         \midrule
         \tblsection{Absolute} && \\
         \tblitem{Better than baseline}    & 54.79\% (7759) & 31.73\% (1349) \\
@@ -161,7 +161,7 @@ These experiments aim to see if we can generate well-performing instruction sche
         \toprule
         & \multicolumn{2}{c}{Processor}\\
         \cmidrule{2-3}
-        Supervised Model & AArch64 & \aurora{} \\
+        Supervised Model & AArch64 & \auroralong{} \\
         \midrule
         Nearest Neighbor & \textbf{1.38\%} & -3.03\% \\
         \tblsection{Support Vector Regression} && \\
@@ -271,7 +271,7 @@ Here, the neural network approach with both, the balancing and clustering activa
     \begin{subfigure}{\textwidth}
         \centering
         \includegraphics[width=0.75\textwidth]{img/nearest-neighbor/aurora_nn_scatter_no_outliers.pdf}
-        \caption{\aurora{}}
+        \caption{\auroralong{}}
         \label{fig:eval:nn-hist:aurora}
     \end{subfigure}
     \caption{Influence of the Applied History Length on Nearest Neighbor Speedup}

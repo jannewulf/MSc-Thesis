@@ -14,7 +14,7 @@ A large part of that pipeline is concerned with automatically standardizing basi
 Lastly, we collect a dataset of basic blocks extracted from the [LLVM Test Suite](https://llvm.org/docs/TestSuiteGuide.html).
 
 Our experiments aim to compare the effectiveness of our approach on different processors.
-We use an in-order AArch64 CPU (ARM Cortex-A53) and the NEC SX-Aurora TSUBASA-VE, an out-of-order vector accelerator.
+We use an in-order AArch64 CPU (ARM Cortex-A53) and the NEC SX-Aurora TSUBASA, an out-of-order vector accelerator.
 To summarize, we search for well-performing instruction schedules on a set of micro-benchmarks.
 In an effort to reduce inference times, we train different supervised learning models with the results of the search approach.
 We generate instruction schedules for the basic blocks in our test dataset, which, on average, perform 8.35% (in-order) and 0.30% (out-of-order) better than the LLVM compiler framework.
@@ -35,7 +35,7 @@ Ein großer Teil dieser Arbeitsschritte befasst sich mit der automatischen Verei
 Zusätzlich erstellen wir einen Datensatz an Basic Blocks aus der [LLVM Test Suite](https://llvm.org/docs/TestSuiteGuide.html).
 
 Das Ziel unserer Experimente ist es die Wirksamkeit unserer Methoden auf verschiedenen Prozessoren zu untersuchen.
-Dafür, benutzen wir einen in-order AArch64 Prozessor (ARM Cortex-A53) und die out-of-order Beschleunigerkarte NEC SX-Aurora TSUBASA-VE.
+Dafür, benutzen wir einen in-order AArch64 Prozessor (ARM Cortex-A53) und die out-of-order Beschleunigerkarte NEC SX-Aurora TSUBASA.
 Wir suchen für die Basic Blocks in unserem Datensatz Instruction Schedules, die zu einer kürzeren Laufzeit führen.
 Um die langen Laufzeiten des Suchansatzes zu umgehen trainieren wir mit dessen Ergebnissen mehrere Supervised Learning Modelle.
 Für die Basic Blocks in unserem Testdatensatz generieren wir so Instruction Schedules die, im Vergleich zu jenen des LLVM Compiler Frameworks, durschnittlich zu einer um 8.35% (in-order) bzw. 0.30% (out-of-order) kürzeren Laufzeit führen.
