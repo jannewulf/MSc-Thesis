@@ -16,7 +16,7 @@ Secondly, we limit the hardware selection to processors that implement superscal
 There are additional essential aspects regarding the hardware.
 The most interesting one is if the processor implements an in-order superscalar pipeline or an out-of-order one.
 While the former comes with no restrictions for our experiments, the latter can reschedule instructions during execution.
-Followingly, it is interesting to see how the out-of-order model influences the performance of our approach.
+Consequently, it is interesting to see how the out-of-order model influences the performance of our approach.
 
 Additionally, to show the versatility of our approach, it is interesting to choose different types of processors.
 For example, there are classical \acp{cpu}, Edge \acp{cpu}, and accelerator cards (\eg Graphical Processing Units (GPU), Vector Processing Units (VPU), and Intelligence Processing Units (IPU)).
@@ -26,7 +26,7 @@ With these aspects in mind, we select:
     \item \textbf{AArch64 (Arm Cortex-A53):} This processor is an edge \ac{cpu} and implements an in-order superscalar pipeline based on the AArch64 architecture.
     An edge device that uses it is the Raspberry Pi 3 Model B.
     We use this device for our experiments with Ubuntu 20.04.
-    \item \textbf{\auroralong{}:} This processor is interesting because it, contrarily, implements an out-of-order superscalar pipeline. 
+    \item \textbf{\auroralong{}:} This processor is interesting because it implements an out-of-order superscalar pipeline. 
     Additionally, it is a vector processing accelerator card installed via a PCI-Express connection and thus a different type of processor.
 \end{itemize}
 
@@ -49,14 +49,14 @@ With these aspects in mind, we select:
         \bottomrule
     \end{tabular}
     \caption[Results of the \ac{mcts} Approach]{Results of the \ac{mcts} approach. The \ac{mcts} approach was very successful on the AArch64 processor. We found better instruction schedules for more than the half of the basic blocks.
-    On the \aurora{}, we are on par with the baseline for half of the basic blocks and fou nd better instruction schedules for a third of the basic blocks.}
+    On the \aurora{}, we are on par with the baseline for half of the basic blocks and found better instruction schedules for a third of the basic blocks.}
     \label{tbl:eval:mcts}
 \end{table}
 % Goal of the experiment
 We pursue two goals with this experiment:
-One is to search instruction schedules that perform better than our baseline, for which we choose the LLVM default instruction scheduler.
+One is to search for instruction schedules that perform better than our baseline, for which we choose the LLVM default instruction scheduler.
 The second goal is to build a dataset that we can use for our supervised learning approaches.
-As a side-effect, we will generate an upper limit for the supervised models' performance.
+We also generate an upper limit for the supervised models' performance, because we use the \ac{mcts} results as their basis and they cannot exceed that performance.
 
 % What do we do in this experiment
 For each basic block under consideration, we first measure the runtime of the basic block compiled with the baseline instruction scheduler.
@@ -68,17 +68,20 @@ Thereby, we generate many instruction schedules per basic block, each evaluated 
 % Baseline
 
 % How many (and which) BBs do we use
-To have many instruction schedules available for our supervised learning methods, we select 20,032 basic blocks from the LLVM Test Suite.
+To have enough instruction schedules available for our supervised learning methods, we select 20,032 basic blocks from the LLVM Test Suite.
 We generate one \ac{mcts} model for each basic block.
 For this experiment, we have selected the longest basic blocks in the dataset.
 The number of executions is not relevant in this experiment because we isolate the basic block and measure their specific runtime on the target hardware.
-A high number of instructions in the basic blocks help to avoid trivial scheduling situations.
+A high number of instructions in the basic blocks helps to avoid trivial scheduling situations.
 
 % Number of steps to outroll the MCTS tree
-This experiment is time-consuming because of the many basic blocks and the expensive compilation and runtime measurements.
-After 200 iterations, we have seen that we get a speedup for many basic blocks.
+This experiment is time-consuming because of the sheer number of basic blocks and the expensive compilation and runtime measurements.
+After 200 iterations, we have seen that we achieve a speedup for many basic blocks.
 Therefore, we run the \ac{mcts} model for each basic block for 200 iterations.
-The experiment execution took five weeks for the AArch64 processor, and three weeks for the \aurora{}.
+The experiment took five weeks to execute for the AArch64 processor, with two Raspberry Pi 3B executing one process per \ac{cpu} core, \ie four parallel processes each.
+An external machine compiled the benchmarks with an AMD EPYC 7702P 64-Core processor and 128 processes in parallel.
+The same experiment took three weeks on two \aurora{} cards with a single process each.
+The compilation was done by an Intel Xeon Gold 6126 with 24 processes in parallel.
 
 % Exploration vs Exploitation balance weight
 % WE DID NOT DESCRIBE THE FORMULAR NOWHERE
@@ -93,7 +96,7 @@ We cache the assemblies also because the format of the LLVM back-end still conta
 
 % Performance: Summary of the excel tables
 For the AArch64 we were able to run this experiment on 14,217 basic blocks.
-Due to some errors, we measured an unrealistic speedup for some basic blocks.
+Due to various errors, we measured an unrealistic speedup for some basic blocks.
 Thus, we mark all speedup factors greater than two as outliers.
 That leaves us with 14,162 valid instruction schedules for the AArch64 processor.
 \Cref{tbl:eval:mcts} summarizes the results and shows that we find better-performing instruction schedules for 54.79\% of these basic blocks.
@@ -116,7 +119,7 @@ That means, the \aurora{} might reschedule the instruction in hardware when it d
 Thus, it does not depend on good instruction schedules as the AArch64 processor.
 
 We showed with this experiment that we can find better instruction schedules for both our selected processors.
-However, our search for instruction schedules was more successful for the AArch64 processor, as does no rescheduling in hardware.
+However, our search for instruction schedules was more successful for the AArch64 processor, as it does no further rescheduling in hardware.
 
 \section{Supervised Schedule Generation}
 \label{sec:eval:supervised}
@@ -151,7 +154,7 @@ We split this dataset into a training set with 85\% randomly selected data point
     \label{fig:eval:datasets}
 \end{figure}
 
-These experiments aim to see if we can generate well-performing instruction schedules without auto-tuning methods, like the \ac{mcts} approach.
+These experiments aim to see if we can generate well-performing instruction schedules without search methods, like the \ac{mcts} approach.
 
 \subsection{Nearest Neighbor Model}
 \label{sec:eval:neighbor}
@@ -189,7 +192,7 @@ Then, we integrate this model into the LLVM compiler framework, and we use it to
 
 The instruction schedules that we compiled with the nearest-neighbor model for the AArch64 processor performed better than the baseline instruction scheduler from LLVM.
 The measured runtimes for the basic block are 1.38\% shorter.
-In fact, this is the only experiment where we exceeded the baseline performance with an inference approach.
+In fact, this is the only experiment where an inference approach exceeds the baseline performance.
 However, the measured runtimes on the \aurora{} processor are 3.03\% longer than the basic blocks compiled with the baseline instruction scheduler (see \Cref{tbl:eval:supervised-perf}).
 
 \subsection{Parametric Machine Learning Models}
@@ -218,8 +221,11 @@ This results in a dataset with a distribution closer to an equal distribution th
 \begin{figure}
     \centering
     \includegraphics[width=0.75\textwidth]{img/balanced-supervised-dataset-rpi.pdf}
-    \caption[Balancing for the AArch64 Dataset]{Balancing for the AArch64 dataset. 
-    We duplicate samples with a reward further away from the distribution mean, and delete some samples that are close to the mean.}
+    \caption[Balancing for the AArch64 Dataset]{Balancing for the AArch64 dataset: 
+    We duplicate samples with a reward further away from the distribution mean, and delete some samples that are close to the mean.
+    To not skew the dataset too much, we limit the number of deleted or duplicated samples per bin.
+    Therefore, we do not get an exact equal distribution, but still have more samples around the mean and fewer samples far away from the mean.
+    }
     \label{fig:eval:balanced-dataset}
 \end{figure}
 \Cref{fig:eval:balanced-dataset} illustrates the effect on the distribution of the AArch64-dataset.
@@ -280,7 +286,7 @@ Here, the neural network approach with both, the balancing and clustering activa
 In order to understand the results of the nearest neighbor approach, we want to investigate the influence of the history length on the performance.
 We define the history length as the number of previously scheduled instructions, included when searching for relevant scheduling situations.
 We choose the maximum history length for our nearest neighbor model to be five instructions.
-When searching for relevant scheduling situations, we might ignore some history instructions to find more relevant situations.
+When searching for relevant scheduling situations, we might ignore the oldest history instructions to find more relevant situations.
 Therefore, we speak of an applied history length and take the average of the applied history lengths of all scheduling decisions in a basic block.
 We refer to \Cref{sec:app:nearest-neighbor} for a detailed explanation.
 
@@ -319,7 +325,7 @@ The \ac{mcts} approach works well for searching well-performing instruction sche
 However, the approaches that depend on the results of the \ac{mcts} did not reach comparable performances.
 One reason for that might be the unknown latter part of the instruction schedules generated by \ac{mcts}.
 
-As a reminder (see \Cref{sec:bg:mcts} for details): The \ac{mcts} approach starts with selecting instructions that already exist in its tree.
+As a reminder (see \Cref{sec:bg:mcts} for details): The \ac{mcts} approach starts with selecting instructions that already are in its tree.
 Once the algorithm reaches a leaf in a tree path, it selects random child nodes, \ie random candidate instructions.
 Every node, \ie partial instruction schedule, has an assigned reward.
 However, this reward depends not only on the partial instruction schedule already present in the tree but also on the following randomly selected instructions.
