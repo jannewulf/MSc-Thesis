@@ -93,11 +93,11 @@ These stages are:
         In this stage, the \ac{cpu} loads the instruction from memory, where the whole program is saved. 
     \item Decode:
         The operands of the instructions are determined.
-        The actual memory address will be computed if there are memory addresses with offsets.
+        Further, the \ac{cpu} computes actual memory addresses from base addresses and offsets.
     \item Execution:
         Here, the instruction is executed with the given operands on the respective processing unit.
     \item Writeback:
-        The computed result will be written back to the specified register during this stage.
+        This phase writes back the computed result to the specified register.
 \end{enumerate}
 
 The \ac{cpu} executes one instruction at a time in this classical execution scheme.
@@ -290,7 +290,7 @@ Various reasons of hazards exist that cause these stalls in the pipeline.
         These hazards are typically solved by sorting the instructions or waiting and introducing \ac{nop} instructions into the pipeline when it is unavoidable.
     \item Control Hazards:
         It is not always obvious which instruction should be executed next due to if/else constructs or loops.
-        Usually, the \ac{cpu} will execute one branch speculatively and abort the instructions if it is the wrong branch.
+        Usually, the \ac{cpu} executes one branch speculatively and abort the instructions if it is the wrong branch.
         This problem is typically approached by branch prediction mechanisms that can be implemented in the compiler and on the hardware.
 \end{itemize}
 
@@ -317,7 +317,7 @@ The three most typical implementations are:
         Dynamic superscalar CPUs can see the following $n$ instructions and reschedule them to achieve higher parallelism.
         This means that the compiler does not fully control the executed instruction schedule, which is essential for our work.
     \item Very Long Instruction Word: 
-        The compiler can define which instructions the CPU will execute simultaneously for this type of superscalar pipeline.
+        The compiler can define which instructions the CPU should execute simultaneously for this type of superscalar pipeline.
         This assignment works by wrapping multiple short instructions into a single long instruction, thus the name.
         These long instructions must be defined in the instruction set.
 \end{itemize}
@@ -488,7 +488,7 @@ The scanner translates a character stream into a token stream.
 The parser then takes these tokens and is checked against the grammar defined by the source language.
 Even with a syntactically correct program, there can still be errors in the code, \eg assignments of incompatible types.
 These are checked during the context-sensitive analysis phase.
-Eventually, the source code is translated into an \ac{ir} which will be used as input to the optimizer and the back-end.
+Eventually, the source code is translated into an \ac{ir} which is then used as input to the optimizer and the back-end.
 
 The \ac{ir} is compiler-dependent and typically defined as an \ac{ssa} form.
 A \ac{ssa} language, is a language in which each variable is assigned exactly once.
@@ -513,7 +513,7 @@ They range from relatively simple optimizations, like replacing constant variabl
 \subsection{Back-end}
 \label{sec:bg:compilers:backend}
 The overall goal of the compiler's back-end is to transform the \ac{ir} to code for the target hardware.
-Further, it also decides where the processor stores variables (registers only or memory) and, thus, how they will be accessed.
+Further, it also decides where the processor stores variables (registers only or memory).
 In the subsequent paragraphs, we explain the necessary steps in more detail.
 
 \subsubsection{Instruction Selection}
@@ -536,7 +536,7 @@ Here we explain how instruction scheduling typically works.
 
 % Why important - but rewrite this probably
 As stated in \Cref{sec:bg:cpu-schedule}, different types of \ac{cpu} pipelines are influenced by the instruction schedule.
-When we look at the superscalar pipelines (see \Cref{sec:bg:superscalar-cpu}), the out-of-order pipeline will benefit the least from better instruction schedules because it can reschedule the instructions themselves.
+When we look at the superscalar pipelines (see \Cref{sec:bg:superscalar-cpu}), the out-of-order pipeline would benefit the least from better instruction schedules because it can reschedule the instructions themselves.
 The other two superscalar pipelines benefit more from better instruction schedules because they might stall completely until a hazard is cleared.
 However, all pipelined execution models might benefit from better instruction schedules.
 
@@ -545,7 +545,7 @@ Instruction scheduling is a challenging problem.
 One reason for that is that it is NP-complete to find an optimal schedule~\cite{hennessy1983postpass}.
 It is necessary to work with heuristics and generate approximations to optimal schedules.
 Additionally, processors get more and more optimized in special cases.
-That makes them faster, but it also becomes harder to predict what they will do in a given situation, \ie to predict how long it will take to execute a given instruction.
+That makes them faster, but it also becomes harder to predict what they would do in a given situation, \ie to predict how long it would take to execute a given instruction.
 Optimizations that have an influence on this are hardware branch prediction, pipeline forwarding, hardware interlocks, or early exits.
 This are only a few examples.
 Therefore, the problem is not only NP-complete, but also has to be solved with unreliable data.
@@ -712,7 +712,7 @@ There are three possible values for the output type:
 
 Even though the instruction selection has already finished, there can still be LLVM pseudo instructions, which are resolved in later stages.
 The LLVM \ac{dag} always contains an \lstinline|EntryToken| pseudo instruction which gets always scheduled first.
-Additionally, there is the \lstinline|GraphRoot| node at the bottom, which does not represent any instruction and will not get scheduled.
+Additionally, there is the \lstinline|GraphRoot| node at the bottom, which does not represent any instruction and does not get scheduled.
 The \lstinline|BasicBlock| pseudo instructions represent the \lstinline|EntryToken| of another basic block.
 
 \subsection{Instruction Scheduling}
@@ -777,11 +777,11 @@ Another problem might be that the simulation itself is costly.
 This process is too slow for the number of possible instruction schedules that exist for a typical basic block.
 
 \ac{mcts} works by exploring one level of decisions  and finishing the path with random decisions.
-When all decisions in a level were seen at least once, the algorithm will balance exploitation and exploration, which means it chooses the best possible decision most of the time.
-However, sometimes it will choose another decision to learn more in an undiscovered part of the decision tree.
+When all decisions in a level were seen at least once, the algorithm balances exploitation and exploration, which means it chooses the best possible decision most of the time.
+However, sometimes it chooses another decision to learn more in an undiscovered part of the decision tree.
 This balancing causes \ac{mcts} to learn how to extend the paths with better decisions.
 
-We will explain the algorithm in more detail here.
+We explain the algorithm in more detail here.
 The \ac{mcts} algorithm consists of four steps.
 These are:
 \begin{enumerate}
@@ -793,9 +793,9 @@ These are:
         The \ac{mcts} tree gets expanded by adding the available children to the selected node from the previous step.
         The new children are created with a view count of zero.
     \item Simulation Phase:
-        From the selected node, the path through the \ac{mcts} tree will be filled with randomly chosen nodes until a terminal state is reached.
-        In this phase, no nodes will be added to the tree.
-        They will just be used to fill the path.
+        From the selected node, the algorithm fills the path through the \ac{mcts} tree with randomly chosen nodes until a terminal state is reached.
+        In this phase, no nodes are added to the tree.
+        The randomly selected nodes are only used to fill the path.
         This path through the \ac{mcts} tree gets evaluated, \eg by playing the board game with the decisions or in our case by checking the runtime of the instruction schedule.
     \item Backpropagation Phase:
         The evaluation of that path gets applied to the statistics of all the path's nodes.
@@ -820,7 +820,7 @@ The standard policy for balancing are Upper Confidence Bounds for Trees (UCT)~\c
 \label{sec:bg:svm}
 \ac{svm}~\cite{cortes1995support} is a robust classification algorithm.
 There is also an extension for regression problems, which is called \ac{svr}~\cite{drucker1997support}.
-We use the \ac{svr} model, but we will first briefly explain the classification model, as the regression model is based on this.
+We use the \ac{svr} model, but we first briefly explain the classification model, as the regression model is based on this.
 
 Originally, \ac{svm} is a model that gets trained to separate data points into two classes.
 This model is then able to transfer what it has learned to new, unseen data points.

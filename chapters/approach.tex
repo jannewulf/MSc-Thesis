@@ -98,7 +98,7 @@ At the end of the main function, the pass adds a format string and injects a cal
 
 We include the optimizer pass into our build process (see \Cref{sec:approach:build_process}).
 To actually get the execution counts, we build a program with this optimizer pass and execute it.
-The benchmark will then print the counter values.
+The benchmark then prints the counter values.
 
 \subsubsection{Basic Block Instruction Count Pass}
 \label{sec:approach:instr-count}
@@ -143,7 +143,7 @@ Not all basic blocks provide an equal value to our experiments.
 It also consumes too much time to work on all the basic blocks within the scope of this thesis (\eg compilation time, execution time, machine learning training time).
 Therefore, we sort our basic blocks by heuristics. 
 From this list, we select as many as we need and can handle in our experiments.
-We design three heuristics which we will explain in the following paragraphs.
+We design three heuristics which we explain in the following paragraphs.
 See \Cref{tab:approach:bb_heuristics} for an example basic block with these heuristics.
 
 \begin{table}
@@ -377,7 +377,7 @@ But we can now simply run the model for all the available instructions and selec
 
 We need lots of data samples to utilize data-driven, or machine learning approaches.
 One way would be to generate valid random schedules.
-The downside of this approach is that we will generate many bad schedules because the better ones are rare.
+The downside of this approach is that we generate many bad schedules because the better ones are rare.
 A better way is to use \ac{mcts} to iteratively find better schedules (see \Cref{subsec:approach:ml:mcts}).
 The \ac{mcts} approach searches for good schedules locally, \ie for a single basic block.
 So, the search is not generalized for other basic blocks.
@@ -591,7 +591,7 @@ To generate data for our MCTS approach, we need a mapping from instruction sched
 
 The most reliable approach is to measure the runtime while executing the code.
 However, research on approaches that rely on analytical models exists, see \Cref{sec:rw:other:runtime} %~\cite{llvm:mca, mendis2019ithemal, taha2003instruction, laukemann2018automated}.
-We will choose the classical approach of runtime measurements since we have access to the hardware, and the resulting data will be more accurate.
+We choose the classical approach of runtime measurements since we have access to the hardware, and the resulting data will be more accurate.
 Therefore, we compile the code with varying instruction schedules and execute it to measure its runtime.
 We discuss various aspects of this in the remainder of this section.
 
@@ -700,16 +700,16 @@ The most precise timers are usually good for measuring intervals in the microsec
 See \Cref{tab:approach:timing_functions} for selected \acp{os}.
 The C++ function \lstinline|std::high_resolution_clock()| from the standard library falls back to one of these \ac{os} functions.
 
-Some \acp{os} not only provide timing methods, but also allow to manage how a process will be executed.
+Some \acp{os} not only provide timing methods, but also allow to manage how a process executes.
 Linux provides different methods to avoid or reduce the probability of \ac{os} interrupts during the execution of a process.
 \begin{itemize}
     \item Isolating \ac{cpu} cores: 
     The Linux kernel command line option \mbox{\iloc{isolcpus=\emph{<cpu-number>}}} in the boot loader instructs Linux to not schedule tasks to the given \ac{cpu} cores automatically.
     \item Pinning a process to a \ac{cpu} core: 
-    The Linux program \lstinline|taskset| can specify on which \ac{cpu} core a process will be scheduled.
+    The Linux program \lstinline|taskset| configures the \ac{os} to schedule processes to specific \ac{cpu} cores.
     This can also be used to schedule processes on isolated \ac{cpu} cores.
 \end{itemize}
-When we pin a process to an isolated \ac{cpu} core, this task will not be interrupted by the \ac{os}.
+If we pin a process to an isolated \ac{cpu} core, this task will not be interrupted by the \ac{os}.
 This makes the measuring of runtimes more reliable.
 
 \subsubsection{Hardware Performance Counters}
@@ -842,7 +842,7 @@ mov	x23, x24
     \caption[Assembly Basic Block Manipulation]{AArch64 Assembly Basic Block Manipulation:
     We remove the first line because it is a label.
     We remove the comments in the lines two to 6.
-    Then, we replace the memory accesses with the placeholder \lstinline|\%2|, which will be replaced by the compiler later (see \Cref{fig:approach:bb-executable}).
+    Then, we replace the memory accesses with the placeholder \lstinline|\%2|, which the compiler replaces later (see \Cref{fig:approach:bb-executable}).
     Lastly, we remove the jump instruction in line 17.}
     \label{fig:approach:bb-cleaning}
 \end{figure}
