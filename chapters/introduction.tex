@@ -21,7 +21,6 @@ Experts in the field perform this time-consuming and expensive task manually.
 We focus our work on one specific part of the hardware-dependent compiler phase: the instruction scheduling.
 Once the compiler has translated the source code into atomic instructions that the processor understands, the instruction scheduler can schedule these instructions in different orders without changing the outcome of the translated program.
 For example, if we want to compute $a+b+c$, it does not matter if we first compute $a+b$ and then add $c$ or if we start with $b+c$ and then add $a$.
-% \todo{Example ok? That reordering would not change anything probably, but I wanted a simple to understand example here.}
 However, one schedule might execute faster than the other because of the implementation details of the processor microarchitecture.
 
 The instruction scheduling is usually not performed on the whole program at once.

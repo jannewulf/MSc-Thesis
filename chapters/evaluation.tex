@@ -216,7 +216,6 @@ However, this can be problematic because the model might only learn to predict t
 Therefore, we duplicate samples whose target value is further away from the mean and delete samples whose target value is very close to the mean.
 % We sort the dataset into 40 histogram bins.
 % In order to not distort the dataset too much, we delete at most 50\% of the samples in a histogram bin and do not increase the number of occurances of a sample to more than 30 times.
-% \todo{How exactly}
 This results in a dataset with a distribution closer to an equal distribution than to a normal distribution.
 \begin{figure}
     \centering
